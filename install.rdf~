@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<RDF:RDF xmlns:em="http://www.mozilla.org/2004/em-rdf#"
+         xmlns:NC="http://home.netscape.com/NC-rdf#"
+         xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <RDF:Description RDF:about="urn:mozilla:install-manifest"
+                   em:id="{3AC28DC2-F1AD-4E67-8496-09DF2C38C08B}"
+                   em:name="Roster Processor"
+                   em:version="0.1.19"
+                   em:creator="Jon Lidgard"
+                   em:description="Convert BA flight crew rosters into ical (.ics) files"
+                   em:homepageURL="http://www.aircrewrosters.com"
+                   em:updateURL="http://www.aircrewrosters.com/update.rdf"
+                   em:iconURL="chrome://rosterprocessor/content/images/logo.png"
+                   em:optionsURL="chrome://rosterprocessor/content/options/options.xul"
+                   em:aboutURL="chrome://rosterprocessor/content/about/about.xul"
+                   em:updateKey="MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC4NUsMSejizfq6AEHDMPPJydQiKkzANizPGka4FRQW6Q9hsuCjexfeI0oOW0JOeV90eugtHhDiR3sWqAnZioEbnE5M2E0EQRihtkatfEe081QW6RO4GMsL0TZV/SJJuRmaOfYg+cVZAxxrR0Hwc0cNzbnqpEPfbvcJw+uJdsUHAwIDAQAB">
+    <em:targetApplication RDF:resource="rdf:#$0DbjD1"/>
+  </RDF:Description>
+  <RDF:Description RDF:about="rdf:#$0DbjD1"
+                   em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+                   em:minVersion="0.8"
+                   em:maxVersion="3.0.*" />
+</RDF:RDF>

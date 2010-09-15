@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<RDF:RDF xmlns:em="http://www.mozilla.org/2004/em-rdf#"
+         xmlns:NC="http://home.netscape.com/NC-rdf#"
+         xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+  <RDF:Description RDF:about="rdf:#$5C65E3"
+                   em:version="0.2.0">
+    <em:targetApplication RDF:resource="rdf:#$8C65E3"/>
+  </RDF:Description>
+  <RDF:Description RDF:about="rdf:#$8C65E3"
+                   em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
+                   em:minVersion="2.0"
+                   em:maxVersion="3.6.*"
+                   em:updateInfoURL="http://www.aircrewrosters.com/updateinfo.xml"
+                   em:updateLink="http://www.aircrewrosters.com/secured/rosterprocessor.xpi"
+                   em:updateHash="sha1:25b91cc0ddaf2cd0b3c8a3b4c26965e9766ca36d" />
+  <RDF:Seq RDF:about="rdf:#$4C65E3">
+    <RDF:li RDF:resource="rdf:#$5C65E3"/>
+  </RDF:Seq>
+  <RDF:Description RDF:about="urn:mozilla:extension:{3AC28DC2-F1AD-4E67-8496-09DF2C38C08B}"
+                   em:signature="MIGTMA0GCSqGSIb3DQEBDQUAA4GBABbQL3CEDWk1H7+ldG13vjIFRL0V4QEhcThMdwLdGzc85CTXbkuhWo2piz+HWv/AlV+16+zfpaF9loeO2ZTMZDRCA1frx1QmAT2DtOetoxyvelHUmLr2R0qBsbKz4ZakEoTpEyIPisiARi4a+g7PKkeo7cQnIKisTRp7eb8IvmIV">
+    <em:updates RDF:resource="rdf:#$4C65E3"/>
+  </RDF:Description>
+</RDF:RDF>

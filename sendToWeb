@@ -1,0 +1,23 @@
+#!/bin/sh
+cd ~/workspace/rosterprocessor
+HOST='www.aircrewrosters.com'
+USER='hgfvbjuh'
+PASSWD='liddj818995'
+
+ftp -n -v $HOST << EOT
+ascii
+user $USER $PASSWD
+epsv4
+cd public_html
+put updateinfo.xml
+put update.rdf
+cd secured
+binary
+put rosterprocessor.xpi
+cd /files
+put rosterprocessor.xpi
+rename rosterprocessor.xpi rosterprocessor_0.xpi
+bye
+bye
+EOT
+

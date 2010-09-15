@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--**************************************************************
+This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
+Please do not copy, modify, or distribute without prior consent.
+
+Version 0.1.20, April 20th, 2008.
+***************************************************************-->
+
+
+<?xml-stylesheet href="chrome://rosterprocessor/content/bugreport/bugform.css" type="text/css"?>
+
+<!DOCTYPE dialog SYSTEM "chrome://rosterprocessor/locale/logbook.dtd">
+
+<dialog buttons="accept, extra1, extra2" buttonlabelaccept="Done" buttonlabelextra1="Save" buttonlabelextra2="Copy"
+        id="rosterprocessor-logbook-dialog"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+        title="&rosterprocessor.logbook.title;"
+        persist="screenX screenY width height"
+        ondialogaccept="rosterprocessor_onDoneClick();"
+        ondialogextra1="rosterprocessor_onSaveLogbookClick()"
+        ondialogextra2="rosterprocessor_onCopyLogbookClick()"
+	onload="rosterprocessor_onInitLogbook()">
+    <script type="application/x-javascript" src="chrome://rosterprocessor/content/common/helpers.js"/>
+    <script type="application/x-javascript" src="chrome://rosterprocessor/content/logbook.js"/>     
+    <script type="application/x-javascript" src="chrome://rosterprocessor/content/roster.js"/>
+    <stringbundleset id="stringbundleset">
+        <stringbundle id="rosterprocessor-string-bundle" src="chrome://rosterprocessor/locale/rosterprocessor.properties"/>
+    </stringbundleset>
+
+    <hbox flex="1">
+	<grid class="logbook" flex="1">
+        <columns>
+            <column>
+                <label value="Date"/>
+                </column>
+            <column>
+                <label value="Reg"/>
+                </column>
+            <column>
+                <label value="Type"/>
+                </column>
+            <column>
+                <label value="Pilot"/>
+                </column>
+        </columns>
+        </grid>
+        </hbox>
+</dialog>

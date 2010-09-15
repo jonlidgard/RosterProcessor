@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--**************************************************************
+This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
+Please do not copy, modify, or distribute without prior consent.
+
+Version 0.1.20, April 20th, 2008.
+***************************************************************-->
+
+
+<?xml-stylesheet href="chrome://rosterprocessor/content/bugreport/bugform.css" type="text/css"?>
+
+<!DOCTYPE dialog SYSTEM "chrome://rosterprocessor/locale/bugform.dtd">
+
+<dialog buttons="accept, cancel, extra1" buttonlabelaccept="Send" buttonlabelextra1="clear"
+        id="rosterprocessor-bugform-dialog"
+        ondialogaccept="rosterprocessor_onSendBugReportClick()"
+        ondialogextra1="rosterprocessor_onClearBugFormClick()"
+	onload="rosterprocessor_onInitBugForm()"
+        title="&rosterprocessor.bugform.title;"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script type="application/x-javascript" src="chrome://rosterprocessor/content/common/helpers.js"/>
+    <script type="application/x-javascript" src="chrome://rosterprocessor/content/bugreport/bugform.js"/>
+ 
+    <stringbundleset id="stringbundleset">
+        <stringbundle id="rosterprocessor-string-bundle" src="chrome://rosterprocessor/locale/rosterprocessor.properties"/>
+    </stringbundleset>
+
+    <vbox flex="1">
+	<textbox id="rosterprocessor-bugform-roster" flex="3"  multiline="true" wrap="off" readonly="true"/>
+	<splitter resizebefore="closest" resizeafter="closest" state="open" collapse="before" />
+        <spacer/>
+        <textbox id="rosterprocessor-bugform-editor" flex="4" class="typingArea" multiline="true" wrap="on"/>
+    </vbox>
+</dialog>

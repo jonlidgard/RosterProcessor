@@ -1,0 +1,5 @@
+content rosterprocessor jar:chrome/rosterprocessor.jar!/content/
+locale rosterprocessor en-US jar:chrome/rosterprocessor.jar!/locale/en-US/
+skin rosterprocessor classic/1.0 jar:chrome/rosterprocessor.jar!/skin/
+overlay	chrome://browser/content/browser.xul	chrome://rosterprocessor/content/firefoxOverlay.xul
+style	chrome://global/content/customizeToolbar.xul	chrome://rosterprocessor/skin/overlay.css

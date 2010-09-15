@@ -1,0 +1,29 @@
+<!ENTITY rosterprocessor.options.title "Roster Processor Options">
+<!ENTITY rosterprocessor.options.general.caption "General">
+<!ENTITY rosterprocessor.options.general.label "General">
+<!ENTITY rosterprocessor.options.general.useUTC "Export ical dates with timezone id">
+<!ENTITY rosterprocessor.options.general.helpOpenTab "Open Help page in a new tab">
+<!ENTITY rosterprocessor.options.reset "Reset Options...">
+
+<!ENTITY rosterprocessor.options.bafc.caption "Flight Crew">
+<!ENTITY rosterprocessor.options.bafc.label "Flight Crew">
+<!ENTITY rosterprocessor.options.bafc.useReportTime "Use trip report time">
+<!ENTITY rosterprocessor.options.bafc.useUTC "Export ical dates with timezone id">
+<!ENTITY rosterprocessor.options.bafc.splitTrip "Split trip into sectors">
+<!ENTITY rosterprocessor.options.bafc.showOffDays "Show 'OFF' days">
+<!ENTITY rosterprocessor.options.bafc.showWrapDays "Show 'WR' days">
+<!ENTITY rosterprocessor.options.bafc.showLeaveDays "Show leave days">
+<!ENTITY rosterprocessor.options.bafc.showFltNo "Show 1st sector flight no' on summary line">
+<!ENTITY rosterprocessor.options.bafc.crewOnSummary "Show crew names on summary line">
+<!ENTITY rosterprocessor.options.bafc.showAbbrevNames "Abbreviate crew names on summary line">
+<!ENTITY rosterprocessor.options.bafc.noSummary "Don't summarize descriptions">
+<!ENTITY rosterprocessor.options.reset "Reset Options...">
+
+<!ENTITY rosterprocessor.options.bacc.caption "Cabin Crew">
+<!ENTITY rosterprocessor.options.bacc.label "Cabin Crew">
+<!ENTITY rosterprocessor.options.bacc.splitTrip "Split trip into sectors">
+<!ENTITY rosterprocessor.options.bacc.useReportTime "Use trip report time">
+<!ENTITY rosterprocessor.options.bacc.showFltNo "Show 1st sector flight no' on summary line">
+<!ENTITY rosterprocessor.options.bacc.showOffDays "Show 'OFF' days">
+<!ENTITY rosterprocessor.options.bacc.showLeaveDays "Show leave days">
+<!ENTITY rosterprocessor.options.bacc.noSummary "Don't summarize descriptions">

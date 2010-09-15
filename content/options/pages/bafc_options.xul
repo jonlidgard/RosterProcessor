@@ -1,0 +1,41 @@
+<?xml version="1.0"?>
+<!--**************************************************************
+This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
+Please do not copy, modify, or distribute without prior consent.
+
+Version 0.1.20, April 20th, 2008.
+***************************************************************-->
+
+<?xml-stylesheet href="chrome://rosterprocessor/content/options/options.css" type="text/css"?>
+
+<!DOCTYPE page SYSTEM "chrome://rosterprocessor/locale/options.dtd">
+
+<page onload="parent.rosterprocessor_initializeOptions()"
+      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <groupbox>
+        <caption label="&rosterprocessor.options.bafc.caption;"/>
+        <checkbox id="rosterprocessor.fcSplitTrip" label="&rosterprocessor.options.bafc.splitTrip;"/>
+        <checkbox id="rosterprocessor.fcShowFltNo" label="&rosterprocessor.options.bafc.showFltNo;"/>
+        <checkbox id="rosterprocessor.fcShowOffDays" label="&rosterprocessor.options.bafc.showOffDays;"/>
+        <checkbox id="rosterprocessor.fcShowWrapDays" label="&rosterprocessor.options.bafc.showWrapDays;"/>
+        <checkbox id="rosterprocessor.fcShowLeaveDays" label="&rosterprocessor.options.bafc.showLeaveDays;"/>
+        <checkbox id="rosterprocessor.fcCrewOnSummary" label="&rosterprocessor.options.bafc.crewOnSummary;"/>
+        <checkbox id="rosterprocessor.fcShowAbbrevNames" label="&rosterprocessor.options.bafc.showAbbrevNames;"/>
+        <checkbox id="rosterprocessor.fcNoSummary" label="&rosterprocessor.options.bafc.noSummary;"/>
+<!--
+	<textbox id="rosterprocessor.fcdefaultFolder" width="350" style="background-color:#FF0000;" />
+	<button id="rosterprocessor.fcSelectFolderButton" label="&rosterprocessor.options.bafc.defaultFolder;" oncommand="browsedir()"/>
+
+	<textbox id="rosterprocessor.fcdefaultFolder" width="350" style="background-color:#FF0000;" preference="asf_defaultfolder"/>
+    <preference id="asf_defaultfolder" name="extensions.asf.defaultfolder" type="string"/>
+-->
+
+    </groupbox>
+    <separator/>
+    <hbox>
+        <button label="&rosterprocessor.options.reset;" oncommand="parent.rosterprocessor_resetOptions()"/>
+        <spacer flex="1"/>
+    </hbox>
+    
+</page>

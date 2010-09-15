@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+<!--**************************************************************
+This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
+Please do not copy, modify, or distribute without prior consent.
+
+Version 0.1.20, April 20th, 2008.
+***************************************************************-->
+
+<?xml-stylesheet href="chrome://rosterprocessor/content/options/options.css" type="text/css"?>
+
+<!DOCTYPE page SYSTEM "chrome://rosterprocessor/locale/options.dtd">
+
+<page onload="parent.rosterprocessor_initializeOptions()"
+      xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <groupbox>
+        <caption label="&rosterprocessor.options.bacc.caption;"/>
+        <checkbox id="rosterprocessor.ccSplitTrip" label="&rosterprocessor.options.bacc.splitTrip;" disabled="true" />
+        <checkbox id="rosterprocessor.ccShowFltNo" label="&rosterprocessor.options.bacc.showFltNo;"/>
+        <checkbox id="rosterprocessor.ccShowOffDays" label="&rosterprocessor.options.bacc.showOffDays;"/>
+        <checkbox id="rosterprocessor.ccShowLeaveDays" label="&rosterprocessor.options.bacc.showLeaveDays;"/>
+        <checkbox id="rosterprocessor.ccNoSummary" label="&rosterprocessor.options.bacc.noSummary;"/>
+
+    </groupbox>
+    <separator/>
+    <hbox>
+        <button label="&rosterprocessor.options.reset;" oncommand="parent.rosterprocessor_resetOptions()"/>
+        <spacer flex="1"/>
+    </hbox>
+</page>

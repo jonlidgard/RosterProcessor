@@ -1,0 +1,50 @@
+<?xml version="1.0"?>
+
+<!--**************************************************************
+This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
+Please do not copy, modify, or distribute without prior consent.
+
+Version 0.2.0, April 20th, 2008.
+***************************************************************-->
+
+<?xml-stylesheet href="chrome://rosterprocessor/content/about/about.css" type="text/css"?>
+
+<!DOCTYPE dialog SYSTEM "chrome://rosterprocessor/locale/about.dtd">
+<!--
+<!DOCTYPE dialog [
+    <!ENTITY % dialogsDTD SYSTEM "chrome://rosterprocessor/locale/rosterprocessor.dtd">
+    <!ENTITY % menuDTD SYSTEM "chrome://rosterprocessor/locale/menu.dtd"> 
+    %dialogsDTD;
+    %menuDTD;
+]>
+-->
+
+<dialog buttons="accept"
+        id="rosterprocessor-about-dialog"
+        title="&rosterprocessor.about.title;"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+    <script type="application/x-javascript" src="chrome://rosterprocessor/content/common/preferences.js"/>
+    <script type="application/x-javascript" src="chrome://rosterprocessor/content/about/about.js"/>
+
+    <vbox id="rosterprocessor-about-details">
+        <hbox>
+            <vbox>
+                <hbox>
+                    <description class="name">Roster Processor</description>
+                    <description class="name">0.2.0</description>
+                </hbox>
+                <description value="&rosterprocessor.about.author;" class="title"/>
+                <description>Jon Lidgard</description>
+            </vbox>
+            <spacer flex="1"/>
+            <vbox>
+                <image src="chrome://rosterprocessor/content/images/logo.png" width="32" height="32"/>
+                <spacer flex="1"/>
+            </vbox>
+        </hbox>
+        <description value="&rosterprocessor.about.homepage;" class="title"/>
+        <description onclick="rosterprocessor_visitHomePage()" class="url">http://www.aircrewrosters.com/</description>
+    </vbox>
+    <separator class="groove" id="rosterprocessor-about-separator"/>
+</dialog>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--**************************************************************
+This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
+Please do not copy, modify, or distribute without prior consent.
+
+Version 0.1.20, April 20th, 2008.
+***************************************************************-->
+
+
+<?xml-stylesheet href="chrome://rosterprocessor/content/options/options.css" type="text/css"?>
+
+<!DOCTYPE dialog SYSTEM "chrome://rosterprocessor/locale/options.dtd">
+
+<dialog buttons="accept, cancel"
+        id="rosterprocessor-options-dialog"
+        ondialogaccept="rosterprocessor_saveOptions()"
+        title="&rosterprocessor.options.title;"
+        xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<!--
+    <script type="application/x-javascript" src="chrome://rosterprocessor/content/common/dom.js"/>
+    <script type="application/x-javascript" src="chrome://rosterprocessor/content/common/prompt.js"/>
+    <script type="application/x-javascript" src="chrome://rosterprocessor/content/common/string.js"/>
+    <script type="application/x-javascript" src="chrome://rosterprocessor/content/upgrade.js"/>
+    <script type="application/x-javascript" src="chrome://rosterprocessor/content/rosterProcessor.js"/> 
+-->
+    <script type="application/x-javascript" src="chrome://rosterprocessor/content/common/preferences.js"/>
+    <script type="application/x-javascript" src="chrome://rosterprocessor/content/options/options.js"/>
+ 
+    <stringbundleset id="stringbundleset">
+        <stringbundle id="rosterprocessor-string-bundle" src="chrome://rosterprocessor/locale/rosterprocessor.properties"/>
+    </stringbundleset>
+
+    <hbox flex="1">
+        <listbox id="rosterprocessor-page-list" onselect="rosterprocessor_changePage(this)">
+            <listitem label="&rosterprocessor.options.general.label;" selected="true" value="chrome://rosterprocessor/content/options/pages/general.xul"/>
+            <listitem label="&rosterprocessor.options.bafc.label;" selected="false" value="chrome://rosterprocessor/content/options/pages/bafc_options.xul"/>
+            <listitem label="&rosterprocessor.options.bacc.label;" selected="false" value="chrome://rosterprocessor/content/options/pages/bacc_options.xul"/>
+        </listbox>
+        <vbox flex="1">
+            <iframe flex="1" id="rosterprocessor-options-iframe" src="chrome://rosterprocessor/content/options/pages/general.xul"/>
+        </vbox>
+    </hbox>
+</dialog>

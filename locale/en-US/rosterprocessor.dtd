@@ -1,0 +1,34 @@
+<!ENTITY rosterprocessor.label "RosterProcessor">
+<!ENTITY rosterprocessor.key "R">
+<!ENTITY rosterprocessorContext.label "Roster Processor">
+<!ENTITY rosterprocessorContext.accesskey "o">
+
+<!ENTITY rosterprocessor.Sync.label "Update Sync server">
+<!ENTITY rosterprocessor.Sync.accesskey "U">
+<!ENTITY rosterprocessor.SaveAsText.label "Save as text">
+<!ENTITY rosterprocessor.SaveAsText.accesskey "t">
+<!ENTITY rosterprocessor.SaveAsCal.label "Export as ical">
+<!ENTITY rosterprocessor.SaveAsLog.label "Export as Logbook csv">
+<!ENTITY rosterprocessor.Export.label "Export Roster">
+<!ENTITY rosterprocessor.SaveAsCal.accesskey "x">
+<!ENTITY rosterprocessor.SaveAsLog.accesskey "l">
+<!ENTITY rosterprocessor.AutoSave.label "Auto save">
+<!ENTITY rosterprocessor.AutoSave.accesskey "A">
+<!ENTITY rosterprocessor.MailTo.label "Mail to:">
+<!ENTITY rosterprocessor.MailTo.accesskey "M">
+<!ENTITY rosterprocessor.BugReport.label "Report bug">
+<!ENTITY rosterprocessor.BugReport.accesskey "B">
+
+<!ENTITY rosterprocessorToolbar.label "Crewlink Rosters">
+<!ENTITY rosterprocessorToolbar.tooltip "Visit the crewlink roster page">
+
+<!ENTITY rosterprocessor.other.label "Other">
+<!ENTITY rosterprocessor.other.key "t">
+<!ENTITY rosterprocessor.options.menu.label "Options...">
+<!ENTITY rosterprocessor.options.menu.key "O">
+<!ENTITY rosterprocessor.update.label "Check for updates">
+<!ENTITY rosterprocessor.update.key "U">
+<!ENTITY rosterprocessor.help.label "Help...">
+<!ENTITY rosterprocessor.help.key "H">
+<!ENTITY rosterprocessor.about.label "About...">
+<!ENTITY rosterprocessor.about.key "A">

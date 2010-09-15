@@ -1,0 +1,148 @@
+Septempber 07 Roster
+
+
+Check options are being read correctly
+check local time works - with full days
+Make daysInMonth work with .baseDate instead of .month & .year
+
+Implement 'is member of' func in flightSector.loggable func.
+Implement 'is OFF day' func
+
+Correct Summary & description text
+
+test 'Update function'
+test loading xul / javascript from website
+
+option for summary to cover entire trip length - not just each day.
+info dialog on roster conversion before save dialog
+
+Testing
+=======
+
+1/ Save as Text
+
+Is the correct default directory displayed for each o.s.
+Is the directory saved on file save
+Can a file be overwritten
+
+2/ Save as iCal
+
+Is the correct default directory displayed for each o.s.
+Is the directory saved on file save
+Can a file be overwritten
+Is the correct file extension (.ics / .cal) used
+
+bugrep
+ticket      timestamp   userid  report  roster  status  priority
+int auto
+
+
+
+users
+id  crewcode    username firstname lastname password email account_status ident
+
+
+
+
+
+
+BA AUTO LOGIN INFO
+
+password_username
+password_password
+onsubmit = formSubmit(this) in login.js
+action="https://tempauth.baplc.com/securid-cgi/securid.pl"
+
+<SCRIPT src="login.js" language="JavaScript" type="text/javascript"></SCRIPT>
+<FORM AUTOCOMPLETE="off" method="post" onsubmit="return formSubmit(this)" action="https://tempauth.baplc.com/securid-cgi/securid.pl" target="" name="login_form">
+<INPUT value="" name="username" type="hidden"><INPUT value="" name="tokenuser" type="hidden"><INPUT value="" name="login" type="hidden"><INPUT value="" name="login_name" type="hidden"><INPUT value="" name="login_pw" type="hidden"><INPUT value="" name="formid" type="hidden"><INPUT value="" name="password" type="hidden"><INPUT value="" name="choice" type="hidden"><INPUT value="" name="program" type="hidden"><INPUT value="" name="newpin" type="hidden"><INPUT value="" name="newpin2" type="hidden"><INPUT value="" name="x-forwarded-for" type="hidden">
+<td class="login_method">
+<div id="option_password">
+<table class="login_option">
+<td class="login_text"><label class="login_method" for="button_password"><input onclick="updateFields()" value="password" id="button_password" name="loginType" type="radio">BSAFE</label></td>
+<td class="login_fields">
+<div style="display:none" id="method_password">
+<TABLE class="login_fields">
+<TD class="method_field_title">User ID</TD><TD class="method_field"><INPUT name="password_username" id="password_username" size="15" type="text"></TD><TD class="method_field_title">BSAFE Password</TD><TD class="method_field"><INPUT name="password_password" id="password_password" size="15" type="password"></TD>
+<TD colspan="2"></TD><TD class="method_field_info" colspan="2"><A href="http://my.baplc.com/passwords.do" class="method_field_info2">Don't know your password?</A></TD>
+<td class="login_method">
+<div id="option_securid">
+<table class="login_option">
+<td class="login_text"><label class="login_method" for="button_securid"><input onclick="updateFields()" value="securid" id="button_securid" name="loginType" type="radio">SecurID</label></td>
+<div style="display:none" id="method_securid">
+<TABLE class="login_fields">
+<TD class="method_field_title">User ID</TD><TD class="method_field"><INPUT name="securid_username" id="securid_username" size="15" type="text"></TD><TD class="method_field_title">PIN+SecurID</TD><TD class="method_field"><INPUT onBlur="validate_securid(this)" name="securid_password" id="securid_password" size="15" type="password"></TD>
+<td class="login_button"><span class="button primary"><INPUT value="Log in" class="plain" name="login_button" id="login_button" type="submit"></span></td>
+</FORM>
+<FORM method="post" action="/securid-cgi/securid.pl" name="NONE">
+<INPUT value="" name="login" type="hidden"><INPUT value="" name="login_name" type="hidden"><INPUT value="NONE" name="formid" type="hidden"><INPUT value="" name="password" type="hidden"><INPUT value="" name="choice" type="hidden"><INPUT value="" name="program" type="hidden"><INPUT value="" name="newpin" type="hidden"><INPUT value="" name="newpin2" type="hidden"><INPUT value="" name="x-forwarded-for" type="hidden">
+
+</FORM>
+
+https://tempauth.baplc.com/securid-cgi/securid.pl
+username "" hidden
+tokenuser "" hidden
+login "" hidden
+login_name "" hidden
+login_pw "" hidden
+form_id "" hidden
+password "" hidden
+
+
+
+
+Cabin Crew
+==========
+generate summary & duty line
+decode STL / BA flight no correctly
+DONE - error check by adding up duty hours & comparing to roster
+showEvent code - set duty code
+crew names - what to do with?
+DONE - How is positioning flight shown?
+CC Options page
+format descriptions line correctly
+
+
+
+24/04/08
+1.13 Release ToDo
+================
+Upload update.rdf
+Work out how to detect a night duty that lands back on day 1 & therefore shouldn't have it's duty counted
+Also a night duty which leaves on the last day of the month & returning on the 1st of next month should have next months duty counted.
+Chop all text after NO REMARKS.
+Add Roster for line to cabin crew rosters.
+
+15/07/08
+1.14 Release ToDo
+==================
+DONE: Add rosterprocessor footer
+DONE: update to aircrewrosters.com
+DONE: test against liddj0508.txt
+DONE: add option of crew name to summary line
+DONE: check against report times
+DONE: add crew names to description when split sectors is true
+
+26/08/08
+1.15 Release ToDo
+==================
+
+TEST: Test Split Sectors functionality for flight crew (should always split for Sim details) & cabin crew.
+DONE: Remove Sync option from menu for now.
+DONE: Get the FDO check in decodeDuties working again
+DONE: Fix abbrevName function in helper.hs & crew name output in outputICAL.js
+TEST: Check rollover Mod against known rosters.
+TEST: outputIcal - fix kludge that generates a RPT time for start of duty.
+DONE: Bug wont allow Tools menu to be shown in some websites (www.which.co.uk) bug in getRosterInfo ?
+DONE: Maybe disable the cabin crew split sectors till the ical kludge is fixed.
+
+tba?
+0.2 Release ToDo
+==================
+TODO: Re-instate Sync option in menu.
+TODO: Create a JSON representation of roster object without any functions.
+TODO: Add registration fields to general options tab
+TODO: Add code for saving to a preset directory ( see other addon's code for howto )
+TODO: Put duties array inside a trip array
+
+

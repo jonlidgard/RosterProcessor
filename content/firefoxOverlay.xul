@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--**************************************************************
+This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
+Please do not copy, modify, or distribute without prior consent.
+
+Version 0.1.20, April 20th, 2008.
+***************************************************************-->
+
+
+
+<?xml-stylesheet href="chrome://rosterprocessor/skin/overlay.css" type="text/css"?>
+<!DOCTYPE overlay SYSTEM "chrome://rosterprocessor/locale/rosterprocessor.dtd">
+<overlay id="rosterprocessor-overlay"
+         xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+  <script type="application/x-javascript" src="chrome://rosterprocessor/content/sqlite.js"/>  
+  <script type="application/x-javascript" src="chrome://rosterprocessor/content/common/helpers.js"/>
+  <script type="application/x-javascript" src="chrome://rosterprocessor/content/convert.js"/>
+  <script type="application/x-javascript" src="chrome://rosterprocessor/content/parsers/BAFlightCrewParser.js"/> 
+  <script type="application/x-javascript" src="chrome://rosterprocessor/content/parsers/BACabinCrewParser.js"/>
+  <script type="application/x-javascript" src="chrome://rosterprocessor/content/outputICAL.js"/>
+  <script type="application/x-javascript" src="chrome://rosterprocessor/content/outputLogbook.js"/>
+  <script type="application/x-javascript" src="chrome://rosterprocessor/content/logbook.js"/>
+  <script type="application/x-javascript" src="chrome://rosterprocessor/content/common/preferences.js"/>
+  <script type="application/x-javascript" src="chrome://rosterprocessor/content/options/options.js"/>
+  <script type="application/x-javascript" src="chrome://rosterprocessor/content/bugreport/bugform.js"/>
+  <script type="application/x-javascript" src="chrome://rosterprocessor/content/roster.js"/>
+
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="rosterprocessor-strings" src="chrome://rosterprocessor/locale/rosterprocessor.properties"/>
+  </stringbundleset>
+
+  <menupopup id="menu_FilePopup" >
+      <menuitem id="rosterprocessor-File-Sync" label="&rosterprocessor.Sync.label;" accesskey="&rosterprocessor.Sync.accesskey;" oncommand="rosterprocessor.onSync()" insertbefore="goOfflineMenuitem" hidden="true"/>
+      <menuitem id="rosterprocessor-File-SaveAsCal" label="&rosterprocessor.Export.label;" accesskey="&rosterprocessor.SaveAsCal.accesskey;" oncommand="rosterprocessor.onSaveAsCal()" insertbefore="goOfflineMenuitem"/>
+      <menuseparator insertbefore="goOfflineMenuitem"/>
+  </menupopup>
+  <menupopup id="menu_ToolsPopup">
+    <menu label="&rosterprocessor.label;" accesskey="&rosterprocessor.key;" id="rosterprocessor-menu" insertafter="devToolsSeparator">
+      <menupopup>
+	<menuitem id="rosterprocessor-Tools-Sync" label="&rosterprocessor.Sync.label;" accesskey="&rosterprocessor.Sync.accesskey;" oncommand="rosterprocessor.onSync()" hidden="true"/>
+	<menuitem id="rosterprocessor-Tools-SaveAsText" label="&rosterprocessor.SaveAsText.label;" accesskey="&rosterprocessor.SaveAsText.accesskey;" oncommand="rosterprocessor.onSaveAsText()"/>
+	<menuitem id="rosterprocessor-Tools-SaveAsCal" label="&rosterprocessor.SaveAsCal.label;" accesskey="&rosterprocessor.SaveAsCal.accesskey;" oncommand="rosterprocessor.onSaveAsCal()"/>
+	<menuitem id="rosterprocessor-Tools-SaveAsLog" label="&rosterprocessor.SaveAsLog.label;" accesskey="&rosterprocessor.SaveAsLog.accesskey;" oncommand="rosterprocessor.onSaveAsLog()"/>
+	<menuitem id="rosterprocessor-Tools-AutoSave" label="&rosterprocessor.AutoSave.label;" accesskey="&rosterprocessor.AutoSave.accesskey;" oncommand="rosterprocessor.onAutoSave()" hidden="true"/>
+	<menuitem id="rosterprocessor-Tools-MailTo" label="&rosterprocessor.MailTo.label;" accesskey="&rosterprocessor.MailTo.accesskey;" oncommand="rosterprocessor.onMailTo()" disabled=""/>
+        <menuseparator/>
+        <menuitem id="rosterprocessor-Tools-BugReport" label="&rosterprocessor.BugReport.label;" accesskey="&rosterprocessor.BugReport.accesskey;" oncommand="rosterprocessor.onBugReport()" disabled=""/>
+        <menuitem label="&rosterprocessor.options.menu.label;" accesskey="&rosterprocessor.options.menu.key;" oncommand="rosterprocessor.options()"/>
+        <menuseparator/>
+ <!--       <menuitem id="HiddenUpdate" label="&rosterprocessor.update.label;" accesskey="&rosterprocessor.update.key;" oncommand="rosterprocessor.onCheckForUpdates()"/> -->
+        <menuitem label="&rosterprocessor.help.label;" accesskey="&rosterprocessor.help.key;" oncommand="rosterprocessor.help()"/>
+        <menuitem label="&rosterprocessor.about.label;" accesskey="&rosterprocessor.about.key;" oncommand="rosterprocessor.about()"/>
+      </menupopup>
+    </menu>
+  </menupopup>
+
+  <popup id="contentAreaContextMenu">
+    <menuseparator id="rosterprocessor-ContextSeparator"/>
+    <menu id="context-rosterprocessor" label="&rosterprocessorContext.label;" accesskey="&rosterprocessorContext.accesskey;">
+      <menupopup>
+	<menuitem id="rosterprocessor-Sync" label="&rosterprocessor.Sync.label;" accesskey="&rosterprocessor.Sync.accesskey;" oncommand="rosterprocessor.onSync()" hidden="true"/>
+	<menuitem id="rosterprocessor-SaveAsText" label="&rosterprocessor.SaveAsText.label;" accesskey="&rosterprocessor.SaveAsText.accesskey;" oncommand="rosterprocessor.onSaveAsText()"/>
+	<menuitem id="rosterprocessor-SaveAsCal" label="&rosterprocessor.SaveAsCal.label;" accesskey="&rosterprocessor.SaveAsCal.accesskey;" oncommand="rosterprocessor.onSaveAsCal()"/>
+	<menuitem id="rosterprocessor-SaveAsLog" label="&rosterprocessor.SaveAsLog.label;" accesskey="&rosterprocessor.SaveAsLog.accesskey;" oncommand="rosterprocessor.onSaveAsLog()"/>
+	<menuitem id="rosterprocessor-AutoSave" label="&rosterprocessor.AutoSave.label;" accesskey="&rosterprocessor.AutoSave.accesskey;" oncommand="rosterprocessor.onAutoSave()" hidden="true"/>
+	<menuitem id="rosterprocessor-MailTo" label="&rosterprocessor.MailTo.label;" accesskey="&rosterprocessor.MailTo.accesskey;" oncommand="rosterprocessor.onMailTo()" disabled=""/>
+        <menuseparator/>
+        <menu label="&rosterprocessor.other.label;" accesskey="&rosterprocessor.other.key;">
+          <menupopup> <!-- onpopupshowing="rosterprocessor_updateOptionsMenu('menu')"> -->
+            <menuitem id="rosterprocessor-BugReport" label="&rosterprocessor.BugReport.label;" accesskey="&rosterprocessor.BugReport.accesskey;" oncommand="rosterprocessor.onBugReport()" disabled=""/>
+            <menuitem label="&rosterprocessor.options.menu.label;" accesskey="&rosterprocessor.options.menu.key;" oncommand="rosterprocessor.options()"/>
+            <menuseparator/>
+            <menuitem label="&rosterprocessor.help.label;" accesskey="&rosterprocessor.help.key;" oncommand="rosterprocessor.help()"/>
+            <menuitem label="&rosterprocessor.about.label;" accesskey="&rosterprocessor.about.key;" oncommand="rosterprocessor.about()"/>
+          </menupopup>
+        </menu>
+      </menupopup>
+      </menu>
+  </popup>
+
+  <toolbarpalette id="BrowserToolbarPalette">
+  <toolbarbutton id="rosterprocessor-toolbar-button"
+    label="&rosterprocessorToolbar.label;"
+    tooltiptext="&rosterprocessorToolbar.tooltip;"
+    oncommand="rosterprocessor.onToolbarButtonCommand()"
+    class="toolbarbutton-1 chromeclass-toolbar-additional"/>
+  </toolbarpalette>
+</overlay>
+<!--    oncommand="rosterprocessor.onToolbarButtonCommand()" -->

@@ -1,0 +1,28 @@
+@import url("chrome://global/skin/");
+@namespace url("http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul");
+
+hbox > label
+{
+    margin-left: 0 !important;
+}
+
+#rosterprocessor-bugform-dialog
+{
+    height: 40em !important;
+    width: 55em !important;
+}
+
+splitter
+{
+    background-color:#c0c0c0;
+}
+
+.typingArea
+{
+}
+
+.buttonArea
+{
+    border-style:groove;
+    border-color:gray;
+}
