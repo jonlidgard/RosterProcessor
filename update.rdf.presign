@@ -5,11 +5,11 @@
   <RDF:Description RDF:about="rdf:#$nj7qV"
                    NS1:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
                    NS1:minVersion="0.20"
-                   NS1:maxVersion="3.6.*"
+                   NS1:maxVersion="4.0.*"
                    NS1:updateLink="http://www.aircrewrosters.com/secured/rosterprocessor.xpi"
                    NS1:updateHash="sha1:e4b0ac6fa3ea46227ea84545b8385151fa1f4c7c" />
   <RDF:Description RDF:about="urn:mozilla:extension:{3AC28DC2-F1AD-4E67-8496-09DF2C38C08B}"
-                   NS1:version="0.2.0"
+                   NS1:version="0.1.23"
                    NS1:signature="MIGTMA0GCSqGSIb3DQEBDQUAA4GBAH8yjSZm8SSmqsAJixjgxEoOyojZhTyoEEhmt1qyaYUYSmcY1i2k1FWBisfxF+H61dSVLPJ6uhl3ePkXDJ5SkUf41Y+BlY0iNIrfX5n3yLmEhpIqZ+ITrXx/2HhwIbTGAbBM95J9/cnDZV/WXnT0fyAwpHjDtR0LhgB6RB+anGkb">
     <NS1:targetApplication RDF:resource="rdf:#$nj7qV"/>
   </RDF:Description>

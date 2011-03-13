@@ -14,6 +14,8 @@ content/images/logo.png
 content/images/oldlogo.png
 content/images/roster16.png
 content/images/roster24.png
+content/logbook.js
+content/logbook.xul
 content/options/options.css
 content/options/options.js
 content/options/options.xul
@@ -21,12 +23,14 @@ content/options/pages/bacc_options.xul
 content/options/pages/bafc_options.xul
 content/options/pages/general.xul
 content/outputICAL.js
+content/outputLogbook.js
 content/parsers/BACabinCrewParser.js
 content/parsers/BAFlightCrewParser.js
 content/roster.js
 content/sqlite.js
 locale/en-US/about.dtd
 locale/en-US/bugform.dtd
+locale/en-US/logbook.dtd
 locale/en-US/options.dtd
 locale/en-US/rosterprocessor.dtd
 locale/en-US/rosterprocessor.properties

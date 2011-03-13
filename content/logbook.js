@@ -41,7 +41,7 @@ function rosterprocessor_onInitLogbook()
       alert("Error decoding roster: " + err.errorText );
         var stream = encodeURI("&rostype="+rt+"&fname="+myRoster.firstName+"&lname="+myRoster.lastName+"&ccode="+myRoster.getFileName()+"&roster="+myRoster.getRawRosterText()+"&ver="+PROGRAM_VERSION);
         var url="http://www.aircrewrosters.com/collate.php";
-        sendToWeb(url,stream,this.processCollate,"");
+        //sendToWeb(url,stream,this.processCollate,"");
    }
 }
 

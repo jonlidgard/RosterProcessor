@@ -2,15 +2,15 @@
 This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
 Please do not copy, modify, or distribute without prior consent.
 
-Version 0.2.0, April 20th, 2008.
+Version 0.1.23, April 20th, 2008.
 ***************************************************************/
 
 
 
 debugger;
 
-const ICAL =   {V1_HEADER:'BEGIN:VCALENDAR\nVERSION:1.0\nPRODID:-//www.aircrewrosters.com/NONSGML Roster Calendar V0.2.0//EN\n',
-                V2_HEADER:'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//www.aircrewrosters.com/NONSGML Roster Calendar V0.2.0//EN\n',
+const ICAL =   {V1_HEADER:'BEGIN:VCALENDAR\nVERSION:1.0\nPRODID:-//www.aircrewrosters.com/NONSGML Roster Calendar V0.1.23//EN\n',
+                V2_HEADER:'BEGIN:VCALENDAR\nVERSION:2.0\nPRODID:-//www.aircrewrosters.com/NONSGML Roster Calendar V0.1.23//EN\n',
                 TIMEZONE_INFO:'BEGIN:VTIMEZONE\nTZID:/aircrewrosters.com/20070129_1/Europe/London\nX-LIC-LOCATION:Europe/London\nBEGIN:DAYLIGHT\nTZOFFSETFROM:+0000\nTZOFFSETTO:+0100\nTZNAME:BST\nDTSTART:19700329T010000\nRRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=3\nEND:DAYLIGHT\nBEGIN:STANDARD\nTZOFFSETFROM:+0100\nTZOFFSETTO:+0000\nTZNAME:GMT\nDTSTART:19701025T020000\nRRULE:FREQ=YEARLY;INTERVAL=1;BYDAY=-1SU;BYMONTH=10\nEND:STANDARD\nEND:VTIMEZONE\n',
                 CAL_FOOTER:'END:VCALENDAR\n',
                 EVENT_HEADER:'BEGIN:VEVENT\n',
@@ -68,7 +68,7 @@ function outputICAL(theRoster)
                     if ( firstSector )
                     {
                         crewLine = " " + abbrevName(crewList);
-// Mod 0.2.0 - need to switch between L & Z for cc or fc rosters
+// Mod 0.1.23 - need to switch between L & Z for cc or fc rosters
 //                        rptText = "RPT" + theEvent.startTime.toISO8601String(7,false) + "Z ";
                         rptText = '';
                         this.outputText = this.outputText.concat('DTSTART' + TZID + theEvent.getStartTime() + "\n");

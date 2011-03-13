@@ -3,13 +3,13 @@
          xmlns:NC="http://home.netscape.com/NC-rdf#"
          xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <RDF:Description RDF:about="rdf:#$HcgKu1"
-                   em:version="0.2.0">
+                   em:version="0.1.23">
     <em:targetApplication RDF:resource="rdf:#$KcgKu1"/>
   </RDF:Description>
   <RDF:Description RDF:about="rdf:#$KcgKu1"
                    em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
                    em:minVersion="2.0"
-                   em:maxVersion="3.6.*"
+                   em:maxVersion="4.0.*"
                    em:updateLink="http://www.aircrewrosters.com/secured/rosterprocessor.xpi"
                    em:updateInfoURL="http://www.aircrewrosters.com/updateInfo.xml"
                    em:updateHash="sha1:1cf2cad55f6cd6f1f735ce79061ece63822eb1a2" />

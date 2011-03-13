@@ -30,5 +30,9 @@ Version 0.1.20, April 20th, 2008.
 	<splitter resizebefore="closest" resizeafter="closest" state="open" collapse="before" />
         <spacer/>
         <textbox id="rosterprocessor-bugform-editor" flex="4" class="typingArea" multiline="true" wrap="on"/>
+  		<hbox>
+  			<label value="Your email address:" />
+  			 <textbox id="rosterprocessor-bugform-email" flex="1" />
+  		</hbox>
     </vbox>
 </dialog>

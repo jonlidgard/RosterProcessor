@@ -7,8 +7,10 @@
 <body>
 <h1>RosterProcessor - What's New</h1>
 <p>&nbsp;</p>
-<h2>What's New - 0.2.0</h2>
+<h2>What's New - 0.1.23</h2>
 <ul>
+<li>Updated for Firefox 4</li>
+<li>Internal rework to make it easier to maintain</li>
 <li>Fixed some decoding issues</li>
 </ul>
 </body>

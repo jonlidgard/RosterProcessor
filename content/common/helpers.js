@@ -333,7 +333,7 @@ result = result + '-';
 i = Math.floor(Math.random()*16).toString(16).toUpperCase();
 result = result + i;
 }
-return result
+return result;
 }
 
 function rosterprocessor_loadURL(url)
@@ -500,7 +500,7 @@ function sendToWeb(url,request,callback,errorMsg)
 
 // Validate email address
 function checkEmail(str){
-    var filter=/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i
+    var filter=/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/i;
     return (filter.test(str));
 }
 

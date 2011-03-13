@@ -14,7 +14,7 @@ install.rdf
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="{3AC28DC2-F1AD-4E67-8496-09DF2C38C08B}"
                    em:name="Roster Processor"
-                   em:version="0.2.0"
+                   em:version="0.1.23"
                    em:creator="Jon Lidgard"
                    em:description="Convert BA flight crew rosters into ical (.ics) files"
                    em:homepageURL="http://www.aircrewrosters.com"
@@ -35,7 +35,7 @@ update.rdf
          xmlns:NC="http://home.netscape.com/NC-rdf#"
          xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <RDF:Description RDF:about="rdf:#$5C65E3"
-                   em:version="0.2.0">
+                   em:version="0.1.23">
     <em:targetApplication RDF:resource="rdf:#$8C65E3"/>
   </RDF:Description>
   <RDF:Description RDF:about="urn:mozilla:extension:{3AC28DC2-F1AD-4E67-8496-09DF2C38C08B}"

@@ -17,6 +17,7 @@ document.getElementById("rosterprocessor-bugform-editor").clickSelectsAll = firs
 //document.getElementById("rosterprocessor-bugform-ticketNo").setAttribute("value","Ticket No:#00001");
 document.getElementById("rosterprocessor-bugform-roster").setAttribute("value",params.in.roster.text.all);
 document.getElementById("rosterprocessor-bugform-editor").setAttribute("value",params.in.desc);
+document.getElementById("rosterprocessor-bugform-email").setAttribute("value",params.in.email);
 document.getElementById("rosterprocessor-bugform-editor").focus();
 /*
 var iframe = document.getElementById("rosterprocessor-bugform-iframe");
@@ -34,7 +35,9 @@ iframe.appendChild(newNode);
 // Send
 function rosterprocessor_onSendBugReportClick()
 {
-    window.arguments[0].out = {desc:document.getElementById("rosterprocessor-bugform-editor").value};
+    window.arguments[0].out = {desc:document.getElementById("rosterprocessor-bugform-editor").value,
+    						email:document.getElementById("rosterprocessor-bugform-email").value};
+ 
     return true;
 }
 

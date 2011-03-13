@@ -3,7 +3,7 @@
          xmlns:NC="http://home.netscape.com/NC-rdf#"
          xmlns:RDF="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
   <RDF:Description RDF:about="rdf:#$5C65E3"
-                   em:version="0.2.0">
+                   em:version="0.1.23">
     <em:targetApplication RDF:resource="rdf:#$8C65E3"/>
   </RDF:Description>
   <RDF:Description RDF:about="urn:mozilla:extension:{3AC28DC2-F1AD-4E67-8496-09DF2C38C08B}"
@@ -16,7 +16,7 @@
   <RDF:Description RDF:about="rdf:#$8C65E3"
                    em:id="{ec8030f7-c20a-464f-9b0e-13a3a9e97384}"
                    em:minVersion="2.0"
-                   em:maxVersion="3.6.*"
+                   em:maxVersion="4.0.*"
                    em:updateLink="http://www.aircrewrosters.com/secured/rosterprocessor.xpi"
                    em:updateHash="sha1:59107625b36084b0c43f1e82138cf3d5f0075b28" />
 </RDF:RDF>

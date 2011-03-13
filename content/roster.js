@@ -2,7 +2,7 @@
 This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
 Please do not copy, modify, or distribute without prior consent.
 
-Version 0.2.0, April 20th, 2008.
+Version 0.1.23, April 20th, 2008.
 ***************************************************************/
 
 
@@ -16,8 +16,8 @@ const THROW_EXCEPTION_ERROR_LEVEL = 0x100; // DO NOT VARY THIS.
 const LOG_LEVEL = 10; // SET logging level here
 const icalExt = '.ics';
 
-const PROGRAM_VERSION = '0.2.0';
-
+const PROGRAM_VERSION = '0.1.23';
+const RP_EMAIL = 'rosterprocessor@gmail.com';
 // Globals
 var myRoster = null;
 var firstShow = true;
@@ -292,7 +292,7 @@ var rosterprocessor = {
     },
     sendRoster: function(recipient,subjString,bodyString)
     {
-        try
+    	try
         {
             var rDoc = rp_getContentDocument();
             var tB = rDoc.getElementById("rosterprocessor-sendLink");
@@ -341,8 +341,9 @@ var rosterprocessor = {
         subjString + "\n\n" + myRoster.text.body + "\n------------------------------------------\n" +
         myRoster.text.footer;
     var theDesc = this.strings.getString("rosterprocessor_bugFormEdit");
+    var userEmail = "";
     var chopPattern = /^Please enter your bug reports, suggestions, etc here:/;
-    var params = { in:{desc:theDesc, id:818995, roster:myRoster}, out: null }; 
+    var params = { in:{desc:theDesc, id:818995, roster:myRoster, email:userEmail }, out: null }; 
     var url="http://www.aircrewrosters.com/bugreport.php";
     //var url="http://localhost/aircrewrosters/bugtest2.php"; //?&desc=test";
 //    dump("Bug params in:"+params.in.email+"\nBug params out:"+params.out+"\n");
@@ -355,17 +356,29 @@ do
         if ( params.out ) // Send pressed
         {
             theDesc = params.out.desc;
+            userEmail = params.out.email;
             theDesc = theDesc.replace(this.strings.getString("rosterprocessor_bugFormEdit"),"");
             if ( theDesc == "" )
             { // empty report description
                 alert("Please enter some descriptive text of the problem!");
                 validDesc = false; // frig to get it to loop
             }
-            else // Everything OK so send to the web database
+            else
             {
-                stream = encodeURI("&id="+params.out.id+"&desc="+theDesc+"&roster="+myRoster.getRosterText()+"&ver="+PROGRAM_VERSION);
-                sendToWeb(url,stream,this.processBugFormResponse,"There was a problem sending the report!");
-                validDesc = true; // drop out the loop
+                if ( userEmail == "" )
+                { // invalid email address
+                    alert("Please enter a valid email address.");
+                    validDesc = false; // frig to get it to loop
+                }
+                else // Everything OK so send to the web database
+                {
+                	//stream = encodeURI("&id="+params.out.id+"&desc="+theDesc+"&roster="+myRoster.getRosterText()+"&email="+userEmail+"&ver="+PROGRAM_VERSION);
+                    //stream = "Extension Version:"+PROGRAM_VERSION + "\nReply Email:" + userEmail + "\n\nReport:\n" + theDesc + "\n\nRoster:\n"+myRoster.getRosterText();
+                    stream = "Extension Version:"+PROGRAM_VERSION + "\n\nReport:\n" + theDesc + "\n\nRoster:\n"+myRoster.getRosterText();
+                	this.sendRoster(RP_EMAIL,"Bug Report",stream);
+                	//sendToWeb(url,stream,this.processBugFormResponse,"There was a problem sending the report!");
+                	validDesc = true; // drop out the loop
+                }
             }
         }
     }while( params.out && !validDesc );
@@ -438,16 +451,14 @@ do
         	outFileStream.write(icalText, icalText.toString().length);
             outFileStream.close();
         }
-        var stream = encodeURI("&rostype="+rt+"&fname="+myRoster.firstName+"&lname="+myRoster.lastName+"&ccode="+myRoster.getFileName()+"&roster="+myRoster.getRosterText()+"&ics="+icalText+"&ver="+PROGRAM_VERSION);
-        var url="http://www.aircrewrosters.com/updaterosters.php";
-        sendToWeb(url,stream,this.processCollate,"");
+        var stream = "Extension Version:"+PROGRAM_VERSION + "\nRosterType:"+rt+"\nFirstName:"+myRoster.firstName+"\nLastName:"+myRoster.lastName+"\nCrewCode:"+myRoster.getFileName()+"\nRoster:\n"+myRoster.getRosterText()+"\n\niCal:\n"+icalText;
+        //this.sendRoster(RP_EMAIL,"Decode Error for "+myRoster.getFileName(),stream);
        }
    }
    catch(err) {
-      alert("Error decoding roster: " + err.errorText );
-        var stream = encodeURI("&rostype="+rt+"&fname="+myRoster.firstName+"&lname="+myRoster.lastName+"&ccode="+myRoster.getFileName()+"&roster="+myRoster.getRawRosterText()+"&ver="+PROGRAM_VERSION);
-        var url="http://www.aircrewrosters.com/collate.php";
-        sendToWeb(url,stream,this.processCollate,"");
+      alert("Error decoding roster: " + err.errorText + "\n\nPlease email me the following bug report.");
+      var stream = "Extension Version:"+PROGRAM_VERSION + "\nRosterType:"+rt+"\nFirstName:"+myRoster.firstName+"\nLastName:"+myRoster.lastName+"\nCrewCode:"+myRoster.getFileName()+"\nRoster:\n"+myRoster.getRosterText()+"\n\niCal:\n"+icalText;
+      this.sendRoster(RP_EMAIL,"Decode Error",stream);
    }
 },
 
@@ -483,7 +494,7 @@ do
 
 //        var stream = encodeURI("&rostype="+rt+"&fname="+myRoster.firstName+"&lname="+myRoster.lastName+"&ccode="+myRoster.getFileName()+"&roster="+myRoster.getRosterText()+"&ics="+icalText+"&ver="+PROGRAM_VERSION);
         var url="http://127.0.0.1/mfcr/updatexml.php";
-        sendToWeb(url,domTree,this.processCollate,"");
+        //sendToWeb(url,domTree,this.processCollate,"");
        }
    }
    catch(err) {
@@ -550,7 +561,6 @@ do
 
 
 window.addEventListener("load", function(e) { rosterprocessor.onLoad(e); }, false);
-//gBrowser.addEventListener("load", function(e) { rosterprocessor.onLoad(e); }, false);
 
 // hide the update button
 function updateNotAvailable()
