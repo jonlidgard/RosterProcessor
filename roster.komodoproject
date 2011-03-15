@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Komodo Project File - DO NOT EDIT -->
+<project id="e695bd2a-2d89-4f53-aae6-227341709849" kpf_version="5" name="roster.komodoproject">
+<file id="2341b6dc-58c4-4dcb-bf8d-2c6a99e4dcf5" idref="4a7e9b36-6adf-457d-8f82-1f59726ecc66" name="bugreport.php" url="file:///var/www/myflightcrewroster/public_html/bugreport.php">
+</file>
+<file id="52abfd76-88c7-4a3a-a722-bde5bcf10401" idref="4a7e9b36-6adf-457d-8f82-1f59726ecc66" name="index.php" url="file:///var/www/myflightcrewroster/public_html/index.php">
+</file>
+<file id="0d5c842b-5f77-4830-8cea-0f24bd7ac9ed" idref="7caf3852-e8e5-4f93-8f44-91fb18250b6a" name="OUTPUT.CPP" url="file:///home/jon/Projects/RosterV50/OUTPUT.CPP">
+</file>
+<file id="386df550-36da-4bbf-87b0-036abd81f1f7" idref="7caf3852-e8e5-4f93-8f44-91fb18250b6a" name="CONVERT.h" url="file:///home/jon/Projects/RosterV50/CONVERT.h">
+</file>
+<file id="44a8a800-d50b-4e60-bc84-a7ba38328e7a" idref="7caf3852-e8e5-4f93-8f44-91fb18250b6a" name="CONVERT.CPP" url="file:///home/jon/Projects/RosterV50/CONVERT.CPP">
+</file>
+<file id="b4847ffe-c3dc-4aa0-8df8-1062c542ca72" idref="7caf3852-e8e5-4f93-8f44-91fb18250b6a" name="SECTOR.CPP" url="file:///home/jon/Projects/RosterV50/SECTOR.CPP">
+</file>
+<file id="c4091cb0-4ec2-4626-9a50-27d6bcd3b0ec" idref="7caf3852-e8e5-4f93-8f44-91fb18250b6a" name="SECTOR.h" url="file:///home/jon/Projects/RosterV50/SECTOR.h">
+</file>
+<file id="e879cde1-25fe-40fa-9d11-6606d20e4ab7" idref="7caf3852-e8e5-4f93-8f44-91fb18250b6a" name="OUTPUT.h" url="file:///home/jon/Projects/RosterV50/OUTPUT.h">
+</file>
+<folder id="4a7e9b36-6adf-457d-8f82-1f59726ecc66" idref="e695bd2a-2d89-4f53-aae6-227341709849" name="php">
+</folder>
+<folder id="7caf3852-e8e5-4f93-8f44-91fb18250b6a" idref="e695bd2a-2d89-4f53-aae6-227341709849" name="CBuilder Files">
+</folder>
+<livefolder id="e695bd2a-2d89-4f53-aae6-227341709849/skin/modern" idref="e695bd2a-2d89-4f53-aae6-227341709849/skin" name="modern" url="file:///Users/jonlidgard/Library/Application Support/Firefox/Profiles/6yyhdc3j.default/extensions/foxmarks@kei.com/chrome/skin/modern">
+</livefolder>
+<preference-set idref="e695bd2a-2d89-4f53-aae6-227341709849">
+  <boolean id="import_live">1</boolean>
+</preference-set>
+</project>
