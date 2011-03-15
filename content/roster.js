@@ -1,14 +1,15 @@
-/**************************************************************
-This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
-Please do not copy, modify, or distribute without prior consent.
-
-Version 0.1.23, April 20th, 2008.
-***************************************************************/
+/*******************************************************************************
+ * This code is copyright of Jon Lidgard (jonlidgard@gmail.com). Please do not
+ * copy, modify, or distribute without prior consent.
+ * 
+ * Version 0.1.24, April 20th, 2008.
+ ******************************************************************************/
 
 
 /*
- NOTE: When updating version number: Update in install.rdf, update.rdf, about.xul
-*/
+ * NOTE: When updating version number: Update in install.rdf, update.rdf,
+ * about.xul
+ */
 
 debugger;
 const DEBUG = true;
@@ -16,15 +17,15 @@ const THROW_EXCEPTION_ERROR_LEVEL = 0x100; // DO NOT VARY THIS.
 const LOG_LEVEL = 10; // SET logging level here
 const icalExt = '.ics';
 
-const PROGRAM_VERSION = '0.1.23';
+const PROGRAM_VERSION = '0.1.24';
 const RP_EMAIL = 'rosterprocessor@gmail.com';
+const RP_STATEMENTS_URL = 'https://crewlink.baplc.com/crewlink/portal.jsp';
+const RP_HELP_URL = 'http://www.aircrewrosters.com/help.html';
+
+
 // Globals
 var myRoster = null;
 var firstShow = true;
-
-var availableUpdate;
-var gExtensionManager = Components.classes['@mozilla.org/extensions/manager;1'].getService(Components.interfaces.nsIExtensionManager);
-
 
 var promptService = Components.classes["@mozilla.org/embedcomp/prompt-service;1"]
                                   .getService(Components.interfaces.nsIPromptService);
@@ -35,17 +36,6 @@ const nsIFilePicker = Components.interfaces.nsIFilePicker;
 var rosterTypes = new Array();
     rosterTypes[0] = BaFcRoster;
     rosterTypes[1] = BaCcRoster;
-
-/*
-var defaultDir = Components.classes["@mozilla.org/file/directory_service;1"]
-                .getService(Components.interfaces.nsIProperties)
-                .get("ProfD", Components.interfaces.nsILocalFile);
-
-var sqliteFile = Components.classes["@mozilla.org/file/local;1"].createInstance();
-if (sqliteFile instanceof Components.interfaces.nsILocalFile){
-  sqlite.initWithPath("rosterbase.sqlite");
-}
-*/
 
 
 // Create an object type UserException
@@ -94,40 +84,6 @@ function createValidDestination(path) {
 		} catch(e) {return false;}
 	return directory;
 }
-/*
-function browsedir() {
-	var current_folder_input = document.getElementById("asf-default-folder").value;
-
-	const nsIFilePicker = Components.interfaces.nsIFilePicker;
-	var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
-
-	fp.init(window, "", nsIFilePicker.modeGetFolder);
-	//fp.appendFilters(nsIFilePicker.filterAll | nsIFilePicker.filterText);
-
-	// locate current directory
-	current_folder_input = createValidDestination(current_folder_input);	
-	if (current_folder_input != false) fp.displayDirectory = current_folder_input;
-
-	var rv = fp.show();
-	if (rv == nsIFilePicker.returnOK)
-	{
-		var asf_url = fp.file.path;
-
-		// Set the data into the input box
-		document.getElementById("asf-default-folder").value = asf_url;
-
-	}
-
-//needed for linux and Mac: autosaved when changing folder
-	if (navigator.appVersion.indexOf("Win")!=-1) { } // = Windows
-	else
-	{
-	//save the default folder
-	var default_folder = document.getElementById("asf-default-folder").value;
-	prefManager.setCharPref("extensions.asf.defaultfolder", default_folder);
-	}
-}
-*/
 
 
 var rosterprocessor = {
@@ -158,7 +114,7 @@ var rosterprocessor = {
 // Opens the help
     help: function()
     {
-        rosterprocessor_loadURL("http://www.aircrewrosters.com/help.php");
+        rosterprocessor_loadURL(RP_HELP_URL);
     },
 
 // Displays the about dialog
@@ -172,13 +128,13 @@ var rosterprocessor = {
     {
     window.openDialog("chrome://rosterprocessor/content/options/options.xul", "rosterprocessor-options-dialog", "centerscreen,chrome,modal,resizable");
 
-    //rosterprocessor_changeOptions();
+    // rosterprocessor_changeOptions();
     },
 
     
     onSaveAsText: function()
     {
-//         firstShow = true;
+// firstShow = true;
 
 
         // Set to the os home directory
@@ -197,20 +153,6 @@ var rosterprocessor = {
          }
          LOG(10,"Current Folder: " + current_folder_input + "\n");
          
-/*        defaultDir.initWithPath( prefs.getCharPref("txtDefaultDir") );
-
-
-/*    var prefs = Components.classes["@mozilla.org/preferences-service;1"]
-                      .getService(Components.interfaces.nsIPrefService)
-                      .getBranch("extensions.rosterprocessor.");
-    if (prefs.prefHasUserValue("txtDefaultDir"))
-    {
-        defaultDir.initWithPath( prefs.getCharPref("txtDefaultDir") );
-        dump("Saved path = " + defaultDir.path + "\n");
-    }
-
-    dump("DefaultDir:" + defaultDir.path + "\n");
-*/
       if (myRoster == null) {
          myRoster = isValidRoster(myRoster);
       }
@@ -225,72 +167,28 @@ var rosterprocessor = {
                 firstShow = false;
             }
             fp.init(window, this.strings.getString("saveDialogTitle"), nsIFilePicker.modeSave);
-//            fp.init(window, "", nsIFilePicker.modeGetFolder);
             fp.appendFilters(nsIFilePicker.filterAll | nsIFilePicker.filterText);
             fp.filterIndex = 0;
 
-/*            current_folder_input = createValidDestination(current_folder_input);	
-            if (current_folder_input != false)  {
-               fp.displayDirectory = current_folder_input;
-               LOG(10,"CREATED DIRECTORY OBJECT");
-            }
-            else LOG(10,"COULDN'T CREATE DIRECTORY OBJECT");
-*/
             var showResult = fp.show();
             var rosterText = new String(myRoster.getRosterText());
             if (showResult == nsIFilePicker.returnOK || showResult == nsIFilePicker.returnReplace)
             {
-		var file = fp.file;
-		var path = fp.file.path;
+            	var file = fp.file;
+            	var path = fp.file.path;
                 var outFileStream = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
-		outFileStream.init(file, 0x02 | 0x08 | 0x20, 0660, 0);
-		outFileStream.write(rosterText, rosterText.length);
-		outFileStream.close();
-
-/*         	if (navigator.appVersion.indexOf("Win")!=-1) { } // = Windows
-         	else
-         	{
-                  //save the default folder
-                  prefs.setCharPref("defaultfolder", path);
-         	}
-*/
+                outFileStream.init(file, 0x02 | 0x08 | 0x20, 0660, 0);
+                outFileStream.write(rosterText, rosterText.length);
+                outFileStream.close();
             }
         }
-/*//-----------------        
-        	fp.init(window, "", nsIFilePicker.modeGetFolder);
-	//fp.appendFilters(nsIFilePicker.filterAll | nsIFilePicker.filterText);
-
-	// locate current directory
-	current_folder_input = createValidDestination(current_folder_input);	
-	if (current_folder_input != false) fp.displayDirectory = current_folder_input;
-
-	var rv = fp.show();
-	if (rv == nsIFilePicker.returnOK)
-	{
-		var asf_url = fp.file.path;
-
-		// Set the data into the input box
-		document.getElementById("asf-default-folder").value = asf_url;
-
-	}
-
-//needed for linux and Mac: autosaved when changing folder
-	if (navigator.appVersion.indexOf("Win")!=-1) { } // = Windows
-	else
-	{
-	//save the default folder
-	var default_folder = document.getElementById("asf-default-folder").value;
-	prefManager.setCharPref("extensions.asf.defaultfolder", default_folder);
-	}
-//------------------------
-*/        
     },
     
     onAutoSave: function()
     {
         
     },
-    sendRoster: function(recipient,subjString,bodyString)
+    launchEmail: function(recipient,subjString,bodyString,attachmentPath) // email function
     {
     	try
         {
@@ -305,30 +203,78 @@ var rosterprocessor = {
                 rDoc.body.appendChild(x);
                 tB = rDoc.getElementById("rosterprocessor-sendLink");
             }
-            var hrefString = "mailto:" + recipient + "?&subject=" + subjString + "&body=" + bodyString;
-//            dump("---------\n" + hrefString );
-            tB.setAttribute("href",encodeURI(hrefString));
+//            var hrefString = "mailto:" + recipient + "?attachment=" + attachmentPath + "&subject=" + subjString + "&body=" + bodyString;
+            var hrefString = "mailto:" + encodeURI(recipient) + 
+//            	"?attachment=" + encodeURI(attachmentPath) +
+            	"?subject=" + encodeURI(subjString) +
+            	"&body=" + encodeURI(bodyString);
+            tB.setAttribute("href",hrefString);
+//            tB.setAttribute("href",encodeURI(hrefString));
+//            if( attachmentPath != '') {
+//            	hrefString = hrefString + "&attachment=" + attachmentPath;
+//            }
+            dump("\nhref:=" + hrefString +"\n\n");
             var mEvent = document.createEvent("MouseEvents");
             mEvent.initEvent("click","true","true");
             tB.dispatchEvent(mEvent);
         }
         catch(e)
         {
-            alert("Error trying to email roster! ( " + e + " )");
+            alert("Error trying to launch email! ( " + e + " )");
         }
     },
     onMailTo: function()
     {
-    var subjString = myRoster.getTitleString();
-    var bodyString = subjString + 
-        "\n\n" + myRoster.text.body + "\n-----------------------\n" + myRoster.text.footer +
-        "\n\n" + this.strings.getString("mailFooter");
-    this.sendRoster('',subjString,myRoster.getRosterString());
+        // Grab a copy of the roster
+        var validRoster = isValidRoster(myRoster);
+        if ( !validRoster )
+        {
+            myRoster = new roster();
+            myRoster.text.all = rp_getContentDocument().body.textContent;
+            if (!isvalidRoster(myRoster) ) {
+              alert("Unrecognised roster");
+              return;
+            }
+        }
+       
+       try {
+            var rt = (myRoster instanceof BaFcRoster) ? 1 : 0;
+            rt = (myRoster instanceof BaCcRoster) ? 2 : rt;
+            
+
+           if (myRoster.parsePage(myRoster)) {
+            var icalText = outputICAL(myRoster);
+/*
+            var file = Components.classes["@mozilla.org/file/directory_service;1"].
+    		getService(Components.interfaces.nsIProperties).
+    		get("TmpD", Components.interfaces.nsIFile);
+
+            file.append("roster.ics");
+            file.createUnique(Components.interfaces.nsIFile.NORMAL_FILE_TYPE, 0666); //adds text to make filename unique if already exists
+          
+            var outFileStream = Components.classes["@mozilla.org/network/file-output-stream;1"].createInstance(Components.interfaces.nsIFileOutputStream);
+            outFileStream.init(file, 0x02 | 0x08 | 0x20, 0660, 0);
+            outFileStream.write(icalText, icalText.toString().length);
+            outFileStream.close();
+ */           
+              var subjString = myRoster.getTitleString();
+              var bodyString = subjString + 
+              "\n\n" + myRoster.text.body + "\n-----------------------\n" + myRoster.text.footer;
+             // "\n\n" + this.strings.getString("mailFooter");
+
+             // this.launchEmail('',subjString,bodyString,file.path);
+              this.launchEmail('',subjString,bodyString,'');
+              }
+       }
+       catch(err) {
+          alert("Error decoding roster: " + err.errorText + "\n\nPlease email me the following bug report.");
+          var stream = "Extension Version:"+PROGRAM_VERSION + "\nRosterType:"+rt+"\nFirstName:"+myRoster.firstName+"\nLastName:"+myRoster.lastName+"\nCrewCode:"+myRoster.getFileName()+"\nRoster:\n"+myRoster.getRosterText()+"\n\niCal:\n"+icalText;
+          this.launchEmail(RP_EMAIL,"Decode Error",stream,'');
+       }    	dump("\nonMailTo:\n");
     },
     
     onBugReport: function()
     {
-//    dump("On Bug Report\n");
     var validRoster = isValidRoster(myRoster);
     if ( !validRoster )
     {
@@ -345,14 +291,11 @@ var rosterprocessor = {
     var chopPattern = /^Please enter your bug reports, suggestions, etc here:/;
     var params = { in:{desc:theDesc, id:818995, roster:myRoster, email:userEmail }, out: null }; 
     var url="http://www.aircrewrosters.com/bugreport.php";
-    //var url="http://localhost/aircrewrosters/bugtest2.php"; //?&desc=test";
-//    dump("Bug params in:"+params.in.email+"\nBug params out:"+params.out+"\n");
-do
+    do
     {
         validDesc = false;
         params.out = null;
         window.openDialog("chrome://rosterprocessor/content/bugreport/bugform.xul", "rosterprocessor-bugform-dialog", "centerscreen,chrome,modal,resizable", params);
-//        dump("Bug params in:"+params.in.email+"\nBug params out:"+params.out+"\n");
         if ( params.out ) // Send pressed
         {
             theDesc = params.out.desc;
@@ -365,20 +308,11 @@ do
             }
             else
             {
-                if ( userEmail == "" )
-                { // invalid email address
-                    alert("Please enter a valid email address.");
-                    validDesc = false; // frig to get it to loop
-                }
-                else // Everything OK so send to the web database
-                {
-                	//stream = encodeURI("&id="+params.out.id+"&desc="+theDesc+"&roster="+myRoster.getRosterText()+"&email="+userEmail+"&ver="+PROGRAM_VERSION);
-                    //stream = "Extension Version:"+PROGRAM_VERSION + "\nReply Email:" + userEmail + "\n\nReport:\n" + theDesc + "\n\nRoster:\n"+myRoster.getRosterText();
-                    stream = "Extension Version:"+PROGRAM_VERSION + "\n\nReport:\n" + theDesc + "\n\nRoster:\n"+myRoster.getRosterText();
-                	this.sendRoster(RP_EMAIL,"Bug Report",stream);
-                	//sendToWeb(url,stream,this.processBugFormResponse,"There was a problem sending the report!");
-                	validDesc = true; // drop out the loop
-                }
+            	stream = "Extension Version:"+PROGRAM_VERSION + "\n\nReport:\n" + theDesc + "\n\nRoster:\n"+myRoster.getRosterText();
+                this.launchEmail(RP_EMAIL,"Bug Report",stream,'');
+                // sendToWeb(url,stream,this.processBugFormResponse,"There
+				// was a problem sending the report!");
+                validDesc = true; // drop out the loop
             }
         }
     }while( params.out && !validDesc );
@@ -388,7 +322,8 @@ do
     {
         var theResults = response.split(",");
         var rCode = (theResults[0].substring((theResults[0].indexOf("=")+1),theResults[0].length)).toLowerCase();
-//        dump("\n-------------\nResults[0]="+theResults[0] + "\nrCode=" + rCode + "\n----------\n");
+// dump("\n-------------\nResults[0]="+theResults[0] + "\nrCode=" + rCode +
+// "\n----------\n");
         if( rCode == "true" )
         {
             alert("Thankyou, your report has been registered!");
@@ -396,7 +331,7 @@ do
         else
         {
             alert("Sorry an error occurred processing your report!");
-//            dump("Response is " + response + "\n");
+// dump("Response is " + response + "\n");
         }
     },
 
@@ -413,7 +348,6 @@ do
                 .getService(Components.interfaces.nsIProperties)
                 .get("Home", Components.interfaces.nsILocalFile);
 
-//    dump(icalExt + "\n");
     // Grab a copy of the roster
     var validRoster = isValidRoster(myRoster);
     if ( !validRoster )
@@ -437,7 +371,7 @@ do
         var fp = Components.classes["@mozilla.org/filepicker;1"]
 	           .createInstance(nsIFilePicker);
         fp.defaultString = myRoster.getFileName() + icalExt;
-//        fp.displayDirectory = defaultDir;
+// fp.displayDirectory = defaultDir;
         fp.init(window, this.strings.getString("saveDialogTitle"), nsIFilePicker.modeSave);
         fp.appendFilter("Calendar files","*" + icalExt);
         fp.appendFilters(nsIFilePicker.filterAll);
@@ -451,14 +385,12 @@ do
         	outFileStream.write(icalText, icalText.toString().length);
             outFileStream.close();
         }
-        var stream = "Extension Version:"+PROGRAM_VERSION + "\nRosterType:"+rt+"\nFirstName:"+myRoster.firstName+"\nLastName:"+myRoster.lastName+"\nCrewCode:"+myRoster.getFileName()+"\nRoster:\n"+myRoster.getRosterText()+"\n\niCal:\n"+icalText;
-        //this.sendRoster(RP_EMAIL,"Decode Error for "+myRoster.getFileName(),stream);
        }
    }
    catch(err) {
       alert("Error decoding roster: " + err.errorText + "\n\nPlease email me the following bug report.");
       var stream = "Extension Version:"+PROGRAM_VERSION + "\nRosterType:"+rt+"\nFirstName:"+myRoster.firstName+"\nLastName:"+myRoster.lastName+"\nCrewCode:"+myRoster.getFileName()+"\nRoster:\n"+myRoster.getRosterText()+"\n\niCal:\n"+icalText;
-      this.sendRoster(RP_EMAIL,"Decode Error",stream);
+      this.launchEmail(RP_EMAIL,"Decode Error",stream,'');
    }
 },
 
@@ -467,70 +399,13 @@ do
     window.openDialog("chrome://rosterprocessor/content/logbook.xul", "rosterprocessor-logbook-dialog", "centerscreen,chrome,modal,resizable");
 },
 
-
-  onSync: function() {
-
-    var validRoster = isValidRoster(myRoster);
-    if ( !validRoster )
-    {
-        myRoster = new roster();
-        myRoster.text.all = rp_getContentDocument().body.textContent;
-        if (!isvalidRoster(myRoster) ) {
-          alert("Unrecognised roster");
-          return;
-        }
-    }
-   
-   try {
-        var rt = (myRoster instanceof BaFcRoster) ? 1 : 0;
-        rt = (myRoster instanceof BaCcRoster) ? 2 : rt;
-        
-
-       if (myRoster.parsePage(myRoster)) {
-        var icalText = outputICAL(myRoster);
-        var domTree = outputXML(myRoster);
-        var serializer = new XMLSerializer();
-        dump("\n" + serializer.serializeToString(domTree) + "\n");
-
-//        var stream = encodeURI("&rostype="+rt+"&fname="+myRoster.firstName+"&lname="+myRoster.lastName+"&ccode="+myRoster.getFileName()+"&roster="+myRoster.getRosterText()+"&ics="+icalText+"&ver="+PROGRAM_VERSION);
-        var url="http://127.0.0.1/mfcr/updatexml.php";
-        //sendToWeb(url,domTree,this.processCollate,"");
-       }
-   }
-   catch(err) {
-      alert("Error decoding roster: " + err.errorText );
-        var stream = encodeURI("&rostype="+rt+"&fname="+myRoster.firstName+"&lname="+myRoster.lastName+"&ccode="+myRoster.getFileName()+"&roster="+myRoster.getRosterText()+"&ver="+PROGRAM_VERSION);
-        var url="http://www.aircrewrosters.com/collate.php";
-//        sendToWeb(url,stream,this.processCollate,"");
-   }
-  },
-
-  serializeXML: function(filePath,domTree) {
-   try   {
-      var serializer = new XMLSerializer();
-      var foStream = Components.classes["@mozilla.org/network/file-output-stream;1"]
-         .createInstance(Components.interfaces.nsIFileOutputStream);
-         foStream.init(filePath, 0x02 | 0x08 | 0x20, 0664, 0);   // write, create, truncate
-         serializer.serializeToStream(domTree, foStream, "");   // rememeber, doc is the DOM tree
-         }
-   finally {
-      foStream.close();
-   }
-  },
-
   onMenuItemCommand: function(e) {
    
-//      promptService.alert(window, this.strings.getString("helloMessageTitle"),
-//                                this.strings.getString("helloMessage"));
-    gBrowser.addTab("https://fgprd-web.baplc.com/statements/currentmenu.do");
-
-  // Get the path as string. Note that you usually won't 
-  // need to work with the string paths.
-  // work with returned nsILocalFile...
+    gBrowser.addTab(RP_STATEMENTS_URL);
   },
 
   onToolbarButtonCommand: function(e) {
-    // just reuse the function above.  you can change this, obviously!
+    // just reuse the function above. you can change this, obviously!
     rosterprocessor.onMenuItemCommand(e);
   },
 
@@ -546,9 +421,8 @@ do
     this.initialized = true;
     rosterprocessor_setupDefaultOptions();
     this.strings = document.getElementById("rosterprocessor-strings");
-//     document.getElementById("context-rosterprocessor").hidden = false;
+// document.getElementById("context-rosterprocessor").hidden = false;
 
-   IPSO_CheckUpdate(); // check for update
     document.getElementById("contentAreaContextMenu")
             .addEventListener("popupshowing", this.showContextMenu, false);
     document.getElementById("menu_ToolsPopup")
@@ -559,87 +433,4 @@ do
 
 };
 
-
 window.addEventListener("load", function(e) { rosterprocessor.onLoad(e); }, false);
-
-// hide the update button
-function updateNotAvailable()
-{
-//   document.getElementById('HiddenUpdate').hidden = true;
-return;
-}
-
-function UpdateCheckListener() {
-
-}
-
-UpdateCheckListener.prototype = {
-
-// show the update button
-onUpdateStarted: function() {
-
-//   document.getElementById('HiddenUpdate').hidden = false;
-   return;
-},
-
-// show the update button
-onUpdateEnded: function() {
-
-//   document.getElementById('HiddenUpdate').hidden = false;
-
-   return;
-},
-
-onAddonUpdateStarted: function(addon) {
-   
-   return;
-},
-
-  onUpdateStarted: function() {
-
-  },
- 
-  onUpdateEnded: function() {
-
-  },
-
-// if there is update, present the user with a button on the toolbar to let him know about the update
-onAddonUpdateEnded: function(addon, status)
-{
-
-// nsIExtensionManager.idl
-const nsIAUCL = Components.interfaces.nsIAddonUpdateCheckListener;
-
-switch (status) {
-   case nsIAUCL.STATUS_UPDATE:
-      availableUpdate = addon;
-//      document.getElementById('HiddenUpdate').hidden = false;
-      var win = window.openDialog("chrome://mozapps/content/extensions/extensions.xul", "", "chrome,menubar,extra-chrome,toolbar,dialog=no,resizable", "updates-only");
-    return;
-   }
-updateNotAvailable();
-},
-
-
-// See nsISupports.idl
-QueryInterface: function(iid) {
-
-if (!iid.equals(Components.interfaces.nsIAddonUpdateCheckListener) && !iid.equals(Components.interfaces.nsISupports))
-   throw Components.results.NS_ERROR_NO_INTERFACE;
-return this;
-}
-
-};
-
-
-
-// called on startup to check for update
-function IPSO_CheckUpdate()
-{
-var nsIUpdateItem = gExtensionManager.getItemForID("{3AC28DC2-F1AD-4E67-8496-09DF2C38C08B}");
-var nsIUpdateItems = new Array(nsIUpdateItem);
-var nsIUpdateCheckListener = new UpdateCheckListener();
-
-gExtensionManager.update(nsIUpdateItems, nsIUpdateItems.length, false, nsIUpdateCheckListener);
-
-} 

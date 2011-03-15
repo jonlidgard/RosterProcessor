@@ -2,7 +2,7 @@
 This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
 Please do not copy, modify, or distribute without prior consent.
 
-Version 0.1.20, April 20th, 2008.
+Version 0.1.24, April 20th, 2008.
 ***************************************************************/
 
 
@@ -231,7 +231,7 @@ LIDDJ          818995       CA-  LGW  SEN. = 1468  737                          
  CONTROL:   .00   PAYABLE:   .00  NCP(BID):   .00  NCP(EXT):   .00 NCP(YTD):   .00
 
 
-OLD FUNCTION CODE - MODDED IN 0.1.20
+OLD FUNCTION CODE - MODDED IN 0.1.24
         var matchDatesLine = /^\s\(01\)\s02\s\s03/;
         var matchBlkLine = /BLK\.\s*\d{0,2}.\d\d/;
         var matchTripLine = /\d{4}/;

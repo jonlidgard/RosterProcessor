@@ -2,7 +2,7 @@
 This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
 Please do not copy, modify, or distribute without prior consent.
 
-Version 0.1.20, April 20th, 2008.
+Version 0.1.24, April 20th, 2008.
 ***************************************************************/
 
 
@@ -170,7 +170,7 @@ function flyingDuty(summary, description, creationDate)
        this.straddleFlag = false; // Set if duty straddles a month boundary
        this.showSectors = function()
        {
-       //Function added in 0.1.20
+       //Function added in 0.1.24
        // Need to Test
               var tmpSector;
               var result = rosterprocessor_getBooleanPreference("rosterprocessor.fcSplitTrip", true);

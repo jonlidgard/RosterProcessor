@@ -3,7 +3,7 @@
 This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
 Please do not copy, modify, or distribute without prior consent.
 
-Version 0.1.20, April 20th, 2008.
+Version 0.1.24, April 20th, 2008.
 ***************************************************************-->
 
 
@@ -26,13 +26,9 @@ Version 0.1.20, April 20th, 2008.
     </stringbundleset>
 
     <vbox flex="1">
-	<textbox id="rosterprocessor-bugform-roster" flex="3"  multiline="true" wrap="off" readonly="true"/>
-	<splitter resizebefore="closest" resizeafter="closest" state="open" collapse="before" />
-        <spacer/>
-        <textbox id="rosterprocessor-bugform-editor" flex="4" class="typingArea" multiline="true" wrap="on"/>
-  		<hbox>
-  			<label value="Your email address:" />
-  			 <textbox id="rosterprocessor-bugform-email" flex="1" />
-  		</hbox>
+		<textbox id="rosterprocessor-bugform-roster" flex="3"  multiline="true" wrap="off" readonly="true"/>
+		<splitter resizebefore="closest" resizeafter="closest" state="open" collapse="before" />
+		<spacer/>
+    	<textbox id="rosterprocessor-bugform-editor" flex="4" class="typingArea" multiline="true" wrap="on"/>
     </vbox>
 </dialog>

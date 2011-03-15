@@ -3,7 +3,7 @@
 This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
 Please do not copy, modify, or distribute without prior consent.
 
-Version 0.1.20, April 20th, 2008.
+Version 0.1.24, April 20th, 2008.
 ***************************************************************-->
 
 
@@ -64,7 +64,7 @@ Version 0.1.20, April 20th, 2008.
 	<menuitem id="rosterprocessor-SaveAsCal" label="&rosterprocessor.SaveAsCal.label;" accesskey="&rosterprocessor.SaveAsCal.accesskey;" oncommand="rosterprocessor.onSaveAsCal()"/>
 	<menuitem id="rosterprocessor-SaveAsLog" label="&rosterprocessor.SaveAsLog.label;" accesskey="&rosterprocessor.SaveAsLog.accesskey;" oncommand="rosterprocessor.onSaveAsLog()" hidden="true"/>
 	<menuitem id="rosterprocessor-AutoSave" label="&rosterprocessor.AutoSave.label;" accesskey="&rosterprocessor.AutoSave.accesskey;" oncommand="rosterprocessor.onAutoSave()" hidden="true"/>
-	<menuitem id="rosterprocessor-MailTo" label="&rosterprocessor.MailTo.label;" accesskey="&rosterprocessor.MailTo.accesskey;" oncommand="rosterprocessor.onMailTo()" disabled=""/>
+	<menuitem id="rosterprocessor-Tools-MailTo" label="&rosterprocessor.MailTo.label;" accesskey="&rosterprocessor.MailTo.accesskey;" oncommand="rosterprocessor.onMailTo()" disabled=""/>
         <menuseparator/>
         <menu label="&rosterprocessor.other.label;" accesskey="&rosterprocessor.other.key;">
           <menupopup> <!-- onpopupshowing="rosterprocessor_updateOptionsMenu('menu')"> -->

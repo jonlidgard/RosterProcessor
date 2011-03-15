@@ -2,7 +2,7 @@
 This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
 Please do not copy, modify, or distribute without prior consent.
 
-Version 0.1.20, April 20th, 2008.
+Version 0.1.24, April 20th, 2008.
 ***************************************************************/
 
 
@@ -63,7 +63,7 @@ function BaCcFlyingDuty(summary, description, creationDate)
 //              summaryLine = "R" + this.startTime.toISO8601String(7,true) + "L ";
               summaryLine = this.summary + ' ';
 //               abbrevBase(tmpSector.origin.IATA);
-// Mod Ver 0.1.20 07/09/08 - Removes BA_ from flight no on summary line
+// Mod Ver 0.1.24 07/09/08 - Removes BA_ from flight no on summary line
               if ( rosterprocessor_getBooleanPreference("rosterprocessor.ccShowFltNo", true))
               {
                      var fn = trimString(tmpSector.flightNo.replace(/BA/,""));
@@ -88,7 +88,7 @@ function BaCcFlyingDuty(summary, description, creationDate)
        }
        this.showSectors = function()
        {
-       // Function added in 0.1.20 - NEED TO TEST
+       // Function added in 0.1.24 - NEED TO TEST
               return ( rosterprocessor_getBooleanPreference("rosterprocessor.ccSplitTrip", true) );
        }
 };

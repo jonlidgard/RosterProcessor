@@ -2,7 +2,7 @@
 This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
 Please do not copy, modify, or distribute without prior consent.
 
-Version 0.1.20, April 20th, 2008.
+Version 0.1.24, April 20th, 2008.
 ***************************************************************/
 
 
@@ -78,7 +78,7 @@ function trimString(str)
     {
         str = "" + str; // force to a string;
 //        return str.replace(/^\s+|\s+$/g,"");
-//  Modified 0.1.20 after seeing savefolder extension code's trimString example
+//  Modified 0.1.24 after seeing savefolder extension code's trimString example
     return str.replace(/(^\s*)|(\s*$)/g,"");
     }
     else

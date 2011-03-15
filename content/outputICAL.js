@@ -2,7 +2,7 @@
 This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
 Please do not copy, modify, or distribute without prior consent.
 
-Version 0.1.23, April 20th, 2008.
+Version 0.1.24, April 20th, 2008.
 ***************************************************************/
 
 
@@ -68,7 +68,7 @@ function outputICAL(theRoster)
                     if ( firstSector )
                     {
                         crewLine = " " + abbrevName(crewList);
-// Mod 0.1.23 - need to switch between L & Z for cc or fc rosters
+// Mod 0.1.24 - need to switch between L & Z for cc or fc rosters
 //                        rptText = "RPT" + theEvent.startTime.toISO8601String(7,false) + "Z ";
                         rptText = '';
                         this.outputText = this.outputText.concat('DTSTART' + TZID + theEvent.getStartTime() + "\n");

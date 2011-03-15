@@ -5,13 +5,12 @@
 <title>RosterProcessor - What's New</title>
 </head>
 <body>
-<h1>RosterProcessor - What's New</h1>
-<p>&nbsp;</p>
-<h2>What's New - 0.1.23</h2>
+<h2>What's New - 0.1.24</h2>
 <ul>
-<li>Updated for Firefox 4</li>
-<li>Internal rework to make it easier to maintain</li>
-<li>Fixed some decoding issues</li>
+<li>Updated to work with Firefox 4.0</li>
+<li>MailTo feature now works again</li>
+<li>Decoding errors and Bug reports are now sent as email</li>
+<li>Started code tidy-up</li>
 </ul>
 </body>
 </html>
