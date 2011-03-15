@@ -1,0 +1,8 @@
+# Sign the update.rdf file, copy files to ~/Sites/AirCrewRosters/
+
+# echo "Signing the key, using spock & key file located in McCoy directory
+# spock -i urn:mozilla:extension:{3AC28DC2-F1AD-4E67-8496-09DF2C38C08B} -d /Users/jon/Library/Application\ Support/McCoy/Profiles/78nkq20j.default update.rdf
+
+echo "Firing up McCoy, Please sign update.rdf then run /usr/local/bin/xpi_upload to upload to local & remote servers"
+/Applications/Utilities/McCoy.app/Contents/MacOS/mccoy &
+

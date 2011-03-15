@@ -1,0 +1,10 @@
+# Just do a quick backup
+echo "Backing up important files:"
+echo "rosterprocessor.xpi -> rosterprocessor.xpi.old"
+echo "update.rdf -> update.rdf.old"
+echo "updateInfo.xml -> updateInfo.xml.old"
+
+cp rosterprocessor.xpi rosterprocessor.xpi.old
+cp update.rdf update.rdf.old
+cp updateInfo.xml updateInfo.xml.old
+

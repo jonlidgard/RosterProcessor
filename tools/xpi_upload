@@ -1,0 +1,44 @@
+#!/bin/sh
+
+
+PRESENT_DIR=`pwd`
+SITE_DIR=~/Sites/AircrewRosters/htdocs
+
+# Backup local server files
+
+cd "$SITE_DIR"
+echo "Copying ""$SITE_DIR"" files to ../previous ...."
+cp index.html rosterprocessor.xpi updateInfo.xml update.rdf help.html previous/
+
+# Copy across files to local server from build dir (present working directory)
+
+cd "$PRESENT_DIR"
+echo "Copying across files from ""$PRESENT_DIR"" to ""$SITE_DIR"""
+cp rosterprocessor.xpi updateInfo.xml update.rdf ~/Sites/AircrewRosters/htdocs/
+cp rosterprocessor.xpi ~/Sites/AircrewRosters/htdocs/secured
+
+echo "Remember to update index.html, updateInfo.xml, & help.html"
+
+cd "$SITE_DIR"
+
+HOST='ftp.webspace.virginmedia.com'
+USER='aircrewrosters'
+PASSWD='liddj81899'
+
+ftp -n -v $HOST << EOT
+ascii
+user $USER $PASSWD
+epsv4
+cd htdocs
+put index.html
+put help.html
+put updateInfo.xml
+put update.rdf
+binary
+put rosterprocessor.xpi
+cd secured
+put rosterprocessor.xpi
+bye
+bye
+EOT
+

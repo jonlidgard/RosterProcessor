@@ -1,0 +1,5 @@
+
+/usr/local/bin/xpi_pre_build
+/usr/local/bin/xpibuild
+/usr/local/bin/xpi_post_build
+#/usr/local/bin/xpi_upload
