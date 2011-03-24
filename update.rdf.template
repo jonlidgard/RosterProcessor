@@ -13,7 +13,7 @@
         <!-- Each li is a different version of the same add-on -->
         <RDF:li>
           <RDF:Description>
-            <em:version>0.1.24</em:version> <!-- This is the version number of the add-on -->
+            <em:version>0.1.25</em:version> <!-- This is the version number of the add-on -->
 
             <!-- One targetApplication for each application the add-on is compatible with -->
             <!-- Firefox --> 

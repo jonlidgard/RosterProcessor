@@ -9,24 +9,94 @@ Version 0.1.25, April 20th, 2008.
 
 debugger;
 
-const WHOLEDAY=86400000;
-const ONEMINUTE=60000;
-const POSTFLIGHTDUTYTIME = 1800000; // 1/2 hour
-const PREFLIGHTDUTYTIME = 3600000; // 1 hour
-const LHRCCPREFLIGHTDUTYTIME = 4800000; // 01:20
-const MINREST = 39600000; // 11 hours
 
 //---------------------------- ROSTER OBJECTS -------------------------------                                          
 
-function roster()
-{
+var rosterObjects = {
+    WHOLEDAY : 86400000,
+    ONEMINUTE : 60000,
+    POSTFLIGHTDUTYTIME : 1800000, // 1/2 hour
+    PREFLIGHTDUTYTIME : 3600000, // 1 hour
+    LHRCCPREFLIGHTDUTYTIME : 4800000, // 01:20
+    MINREST : 39600000, // 11 hours
+    
+    roster : function () {
+       this.parsePage = undefined;
+       this.getFileName = undefined;
+    },
+
+    trip : function () {
+       this.tripNo = "0000";
+       this.duties = [];
+       this.crewList = [];
+    },
+
+    baseEvent : function () {
+       var dtStamp = new Date();
+       this.created = new Date(0);
+       this.lastModified = new Date(0);
+       this.startTime = new Date(0);
+       this.endTime = new Date(0);
+       this.categories = "";
+       this.summary = "";
+       this.description = "";
+       this.wholeDay = false;
+       this.showEvent = function() { return true; } ;
+       this.showSectors = function() { return false; } ;
+       var uuid = generateGUID();
+       this.getUUID = function () { return( uuid ); };
+       this.getCreated = function ()
+       {
+              return( this.created.toISO8601String(5));
+       }
+       this.getLastModified = function ()
+       {
+              return( this.lastModified.toISO8601String(5));
+       }
+       this.getDtStamp = function ()
+       {
+              return( dtStamp.toISO8601String(5));
+       }
+       this.getStartTime = function ()
+       {
+              if( this.wholeDay )
+              {
+                     return( this.startTime.toISO8601String(3, true));                     
+              }
+              else
+              {
+                     return( this.startTime.toISO8601String(5, rosterprocessor_getBooleanPreference("rosterprocessor.useUTC", true)));
+              }
+       }
+       this.getEndTime = function ()
+       {
+              if( this.wholeDay )
+              {
+                     return( this.endTime.toISO8601String(3, true));                     
+              }
+              else
+              {
+                     return( this.endTime.toISO8601String(5, rosterprocessor_getBooleanPreference("rosterprocessor.useUTC", true)));
+              }
+       }
+       this.getSummary = function ()
+       {
+              // remove multiple spaces       
+              return(this.summary.replace(/ +/," "));
+       }
+       this.getDescription = function ()
+       {
+              return(this.description.replace(/ +/," "));
+       }
+}
+
+
+
+
+    
        this.document = null; // rp_getContentDocument();
        this.text = {all:"",header:"",body:"",footer:""};
        this.staffNo = "";
-       this.nameCode = "";
-       this.crewStatus = "";
-       this.lastName = "";
-       this.firstName = "";
        this.month = "";
        this.year = "";
        this.created = new Date();
@@ -36,8 +106,6 @@ function roster()
        this.duties = [];
        this.crewList = [];
        this.homeBase = "";
-       this.parsePage = null;
-       this.getFileName = null;
        this.getTitleString = function() { return ""; };
        this.getRosterText = function() {
               return this.text.body == '' ? this.text.all :
@@ -57,15 +125,16 @@ function roster()
               }
        }
        this.getRosterInfo = null;
+        
+    }
 }
 
+       this.nameCode = "";
+       this.crewStatus = "";
+       this.lastName = "";
+       this.firstName = "";
+
 //---------------------DUTY OBJECTS ------------------------------------------------------
-function trip()
-{
-       this.tripNo = "0000";
-       this.duties = [];
-       this.crewList = [];
-}
 
 function baseEvent()
 {

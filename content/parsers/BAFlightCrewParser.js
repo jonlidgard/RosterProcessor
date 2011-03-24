@@ -2,7 +2,7 @@
 This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
 Please do not copy, modify, or distribute without prior consent.
 
-Version 0.1.24, April 20th, 2008.
+Version 0.1.25, April 20th, 2008.
 ***************************************************************/
 
 
@@ -193,70 +193,6 @@ function splitRoster(that)
 //  ------decodeDutyDates-------------------------------------------------
     function decodeDutyDates(that)
     {
-/*
- ------------------------------------------------------------------------------------------------------------------------------------
-LIDDJ          818995       CA-  LGW  SEN. = 1500  737                                                    DUTY DAYS: CR.     .00
-                                                                                                                     BLK.  91.35
-         FDO FDO              IN
-3329            33813397        33633363        344134313261        3411        33743262        33923389
- MAN LGW         LGW LGW         LGW LGW         LGW LGW AMS AMS LGW LGW         LGW BLQ GLA LGW LGW LGW
- (01) 02  03  04  05  06  07  08  09  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  01
-  SU  MO  TU  WE  TH  FR  SA  SU  MO  TU  WE  TH  FR  SA  SU  MO  TU  WE  TH  FR  SA  SU  MO  TU  WE  TH  FR  SA  SU  MO  TU  we
-------------------------------------------------------------------------------------------------------------------------------------
-
-------------------------------------------------------------------------------------------------------------------------------------
-LIDDJ          818995       CA-  LGW  SEN. = 1735  737                                                    DUTY DAYS: CR.     .00
-                                                                                                                     BLK.  17.55
-  GT  VC  VC  S3  S3  S4  VC  VC  VC  S5  S5  S5  S5  VC  S4  S4  VC  VC  S5  S5  S5  GD      VC  VC  VC  VC      VC  VC
-                                                                                    1200
-                                                                                    1600
-                                                                                        3601                3593        3625
-                                                                                         LGW                 LGW         LGW
-                                     T   T   T   T                       T   T   T         T                   T           T
- (01) 02  03  04  05  06  07  08  09  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  01
-  WE  TH  FR  SA  SU  MO  TU  WE  TH  FR  SA  SU  MO  TU  WE  TH  FR  SA  SU  MO  TU  WE  TH  FR  SA  SU  MO  TU  WE  TH  FR  sa
-------------------------------------------------------------------------------------------------------------------------------------
-
-
-LIDDJ818995FINAL ROSTERS 737 LGW JULY 2008                                                      01JUL-31JUL 2008         06/16/08  14:02
-------------------------------------------------------------------------------------------------------------------------------------
-LIDDJ          818995       CA-  LGW  SEN. = 1468  737                                                    DUTY DAYS: CR.     .00
-                                                                                                                     BLK.  96.10
-                             FDO FDO                                                                                  WR  WR
-    3298        32543252            3491351635113517        35113369        35213525        3278                3528
-     FCO BLQ LGW  -  LGW  - LGW      LGW LGW LGW LGW         LGW TLS WAW LGW LGW LGW         BLQ AMS LGW         LGW
- (01) 02  03  04  05  06  07  08  09  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  31  01
-  TU  WE  TH  FR  SA  SU  MO  TU  WE  TH  FR  SA  SU  MO  TU  WE  TH  FR  SA  SU  MO  TU  WE  TH  FR  SA  SU  MO  TU  WE  TH  fr
-------------------------------------------------------------------------------------------------------------------------------------
- CONTROL:   .00   PAYABLE:   .00  NCP(BID):   .00  NCP(EXT):   .00 NCP(YTD):   .00
-
-
-OLD FUNCTION CODE - MODDED IN 0.1.24
-        var matchDatesLine = /^\s\(01\)\s02\s\s03/;
-        var matchBlkLine = /BLK\.\s*\d{0,2}.\d\d/;
-        var matchTripLine = /\d{4}/;
-        var dutyLines = that.text.header.split('\n');
-        var lineNo = 0;
-        try
-        {
-            // The days off line is the one after the BLK. hh.mm line
-            while ( ++lineNo < dutyLines.length && !matchBlkLine.exec(dutyLines[lineNo]) );
-            var daysOffLine = dutyLines[lineNo+1];
-            lineNo = 0;
-            while ( ++lineNo < dutyLines.length && !matchDatesLine.exec(dutyLines[lineNo]) );
-            var dateLine = dutyLines[lineNo];
-            var daysLine = dutyLines[lineNo+1];
-            var tripLine = matchTripLine.exec(dutyLines[lineNo-2]) ? dutyLines[lineNo-2] : dutyLines[lineNo-3];
-                LOG(9,dateLine);
-                LOG(9,daysLine);
-                LOG(9,tripLine);
-                LOG(9,daysOffLine);
-
-            var myDuty,theDate,theDay,theDaysOff,theTrip,rolledOverFlag = false;
-            var lastDayOfMonth = daysInMonth2(that.baseDate);
-
-*/
-
 
         var matchDatesLine = /^\s*\(01\) 02  03/;
         var matchBlkLine = /BLK\.\s*\d{0,2}.\d\d/;

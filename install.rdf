@@ -9,7 +9,7 @@
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="{3AC28DC2-F1AD-4E67-8496-09DF2C38C08B}"
                    em:name="Roster Processor"
-                   em:version="0.1.24"
+                   em:version="0.1.25"
                    em:creator="Jon Lidgard"
                    em:description="Convert BA flight crew rosters into ical (.ics) files"
                    em:homepageURL="http://www.aircrewrosters.com"

@@ -1,3 +1,5 @@
+
+
 /**************************************************************
 This code is copyright of Jon Lidgard (jonlidgard@gmail.com).
 Please do not copy, modify, or distribute without prior consent.
@@ -138,65 +140,81 @@ function abbrevBase(base) // Abbreviated the home base to L or G
     return base;
 }
 
-Date.prototype.toHHMMString = function(separator,round)
-{
-        /* Returns a date as hh:mm, where hh shows total hours
-          e.g. 3 days would be returned as 72:00
-        */
-        if (!separator)
+
+
+
+(function(proto) {
+
+    function incUTCMonth () { this.setUTCMonth(this.getUTCMonth() + 1);}
+
+    function decUTCMonth () { this.setUTCMonth(this.getUTCMonth() - 1);}
+
+  function toISOString() {
+    return this.getUTCFullYear() + '-' +
+      (this.getUTCMonth() + 1).toPaddedString(2) + '-' +
+      this.getUTCDate().toPaddedString(2) + 'T' +
+      this.getUTCHours().toPaddedString(2) + ':' +
+      this.getUTCMinutes().toPaddedString(2) + ':' +
+      this.getUTCSeconds().toPaddedString(2) + 'Z';
+  }
+
+    function toISO8601String (format, useLocal) {
+    /* accepted values for the format [1-6]:
+     1 Year:
+       YYYY (eg 1997)
+     2 Year and month:
+       YYYY-MM (eg 1997-07)
+     3 Complete date:
+       YYYY-MM-DD (eg 1997-07-16)
+     4 Complete date plus hours and minutes:
+       YYYY-MM-DDThh:mmTZD (eg 1997-07-16T19:20+01:00)
+     5 Complete date plus hours, minutes and seconds:
+       YYYY-MM-DDThh:mm:ssTZD (eg 1997-07-16T19:20:30+01:00)
+     6 Complete date plus hours, minutes, seconds and a decimal
+       fraction of a second
+       YYYY-MM-DDThh:mm:ss.sTZD (eg 1997-07-16T19:20:30.45+01:00)
+     7 Time as HHMM
+    */
+    var offset = useLocal ? '' : 'Z';
+    var date = this;
+    if (!format) { var format = 6; }
+
+    var zeropad = function (num) { return ((num < 10) ? '0' : '') + num; }
+
+    var str = "";
+    str += date.getUTCFullYear();
+    if (format > 1) { str += zeropad(date.getUTCMonth() + 1); }
+    if (format > 2) { str += zeropad(date.getUTCDate()); }
+    if (format > 3) {
+        str += "T" + zeropad(date.getUTCHours()) +
+               zeropad(date.getUTCMinutes());
+    }
+    if (format > 5) {
+        var secs = Number(date.getUTCSeconds() + "." +
+                   ((date.getUTCMilliseconds() < 100) ? '0' : '') +
+                   zeropad(date.getUTCMilliseconds()));
+        str += ":" + zeropad(secs);
+    } else if (format > 4) { str += zeropad(date.getUTCSeconds()); }
+
+    if (format > 3) { str += offset; }
+    if (format == 7)
+    {
+        if ( useLocal)
         {
-            separator = ':';
+            str = zeropad(date.getHours()) +
+               zeropad(date.getMinutes());
         }
-        var dutyHrs,dutyMins;
-        
-        if (round) {
-            dutyHrs = this.getUTCHours();
-            dutyMins = this.getUTCMinutes();
+        else
+        {
+            str = zeropad(date.getUTCHours()) +
+               zeropad(date.getUTCMinutes());
         }
-        else {
-            dutyMins = Math.floor(this.getTime() / (60 * 1000));
-            dutyHrs = Math.floor(dutyMins / 60);
-            dutyMins = dutyMins - (dutyHrs * 60);
-        }
-
-        dutyHrs = (dutyHrs < 10) ? "0" + dutyHrs : dutyHrs;
-        dutyMins = (dutyMins < 10) ? "0" + dutyMins : dutyMins;
-        return( dutyHrs + separator + dutyMins);
+    }
+    return str;
 }
 
 
-Date.prototype.setHHMMTime = function(newTime, useLocal)
-{
-    newTime = newTime.replace(/^\s*(\d{1,4})\s*$/,"$1");
-    if (!/^\d{1,4}$/(newTime))
-    {
-        dump("Invalid time passed to setHHMMTime:" + newTime + "_\n");
-        throw("Invalid variable passed to setHHMMTime");
-    }
-    
-    while (newTime.length < 4) //zeropad out a time of 959 or less to 0959
-    {
-        newTime = "0" + newTime;
-    }
-    /* Update the time in HHMM format */
-    if ( useLocal )
-    {
-//    dump("Setting Local Time:" + newTime  + "\n");
-    this.setHours(newTime.slice(0,2));
-    this.setMinutes(newTime.slice(2,4));
-    }
-    else
-    {
-//    dump("Setting UTC Time:" + newTime  + "\n");
-    this.setUTCHours(newTime.slice(0,2));
-    this.setUTCMinutes(newTime.slice(2,4));
-    }
-}
-
-Date.prototype.incUTCMonth = function () { this.setUTCMonth(this.getUTCMonth() + 1);}
-Date.prototype.decUTCMonth = function () { this.setUTCMonth(this.getUTCMonth() - 1);}
-
-Date.prototype.setISO8601 = function (string) {
+    function setISO8601 (string) {
     var regexp = "([0-9]{4})(-([0-9]{2})(-([0-9]{2})" +
         "(T([0-9]{2}):([0-9]{2})(:([0-9]{2})(\.([0-9]+))?)?" +
         "(Z|(([-+])([0-9]{2}):([0-9]{2})))?)?)?)?";
@@ -221,7 +239,7 @@ Date.prototype.setISO8601 = function (string) {
     this.setTime(Number(time));
 }
 
-Date.prototype.timeDiff = function (d1, d2) {
+    function timeDiff (d1, d2) {
 
     d1 = d1.valueOf();
     d2 = d2.valueOf();
@@ -235,7 +253,7 @@ Date.prototype.timeDiff = function (d1, d2) {
     return new Date(d2 - d1);
 }
 
-Date.prototype.toShortDate = function () {
+    function toShortDate () {
  
     var zeropad = function (num) { return ((num < 10) ? '0' : '') + num; }
     var date = this;
@@ -252,74 +270,16 @@ Date.prototype.toShortDate = function () {
 }
 
 
+  function toJSON() {
+    return this.toISOString();
+  }
 
-Date.prototype.toISO8601String = function (format, useLocal) {
-    /* accepted values for the format [1-6]:
-     1 Year:
-       YYYY (eg 1997)
-     2 Year and month:
-       YYYY-MM (eg 1997-07)
-     3 Complete date:
-       YYYY-MM-DD (eg 1997-07-16)
-     4 Complete date plus hours and minutes:
-       YYYY-MM-DDThh:mmTZD (eg 1997-07-16T19:20+01:00)
-     5 Complete date plus hours, minutes and seconds:
-       YYYY-MM-DDThh:mm:ssTZD (eg 1997-07-16T19:20:30+01:00)
-     6 Complete date plus hours, minutes, seconds and a decimal
-       fraction of a second
-       YYYY-MM-DDThh:mm:ss.sTZD (eg 1997-07-16T19:20:30.45+01:00)
-     7 Time as HHMM
-    */
-    var offset = useLocal ? '' : 'Z';
-    var date = this;
-    if (!format) { var format = 6; }
-/*
-    if (!offset) {
-    } else {
-        var d = offset.match(/([-+])([0-9]{2}):([0-9]{2})/);
-        var offsetnum = (Number(d[2]) * 60) + Number(d[3]);
-        offsetnum *= ((d[1] == '-') ? -1 : 1);
-        var date = new Date(Number(Number(this) + (offsetnum * 60000)));
-    }
-*/
+  if (!proto.incUTCMonth) proto.incUTCMonth = incUTCMonth;
+  if (!proto.decUTCMonth) proto.decUTCMonth = decUTCMonth;
+  if (!proto.toISOString) proto.toISOString = toISOString;
+  if (!proto.toJSON) proto.toJSON = toJSON;
 
-    var zeropad = function (num) { return ((num < 10) ? '0' : '') + num; }
-
-    var str = "";
-    str += date.getUTCFullYear();
-//    if (format > 1) { str += "-" + zeropad(date.getUTCMonth() + 1); }
-//    if (format > 2) { str += "-" + zeropad(date.getUTCDate()); }
-    if (format > 1) { str += zeropad(date.getUTCMonth() + 1); }
-    if (format > 2) { str += zeropad(date.getUTCDate()); }
-    if (format > 3) {
-        str += "T" + zeropad(date.getUTCHours()) +
-//               ":" + zeropad(date.getUTCMinutes());
-               zeropad(date.getUTCMinutes());
-    }
-    if (format > 5) {
-        var secs = Number(date.getUTCSeconds() + "." +
-                   ((date.getUTCMilliseconds() < 100) ? '0' : '') +
-                   zeropad(date.getUTCMilliseconds()));
-        str += ":" + zeropad(secs);
-//    } else if (format > 4) { str += ":" + zeropad(date.getUTCSeconds()); }
-    } else if (format > 4) { str += zeropad(date.getUTCSeconds()); }
-
-    if (format > 3) { str += offset; }
-    if (format == 7)
-    {
-        if ( useLocal)
-        {
-            str = zeropad(date.getHours()) +
-               zeropad(date.getMinutes());
-        }
-        else
-        {
-            str = zeropad(date.getUTCHours()) +
-               zeropad(date.getUTCMinutes());
-        }
-    }
-    return str;
-}
+})(Date.prototype);
 
 // Return a pseudo GUID
 function generateGUID()
@@ -359,114 +319,6 @@ function rosterprocessor_loadURL(url)
 
     return generatedPage.content.document;
 }
-
-
-
-var BrowserDetect = {
-	init: function () {
-		this.browser = this.searchString(this.dataBrowser) || "An unknown browser";
-		this.version = this.searchVersion(navigator.userAgent)
-			|| this.searchVersion(navigator.appVersion)
-			|| "an unknown version";
-		this.OS = this.searchString(this.dataOS) || "an unknown OS";
-	},
-	searchString: function (data) {
-		for (var i=0;i<data.length;i++)	{
-			var dataString = data[i].string;
-			var dataProp = data[i].prop;
-			this.versionSearchString = data[i].versionSearch || data[i].identity;
-			if (dataString) {
-				if (dataString.indexOf(data[i].subString) != -1)
-					return data[i].identity;
-			}
-			else if (dataProp)
-				return data[i].identity;
-		}
-	},
-	searchVersion: function (dataString) {
-		var index = dataString.indexOf(this.versionSearchString);
-		if (index == -1) return;
-		return parseFloat(dataString.substring(index+this.versionSearchString.length+1));
-	},
-	dataBrowser: [
-		{ 	string: navigator.userAgent,
-			subString: "OmniWeb",
-			versionSearch: "OmniWeb/",
-			identity: "OmniWeb"
-		},
-		{
-			string: navigator.vendor,
-			subString: "Apple",
-			identity: "Safari"
-		},
-		{
-			prop: window.opera,
-			identity: "Opera"
-		},
-		{
-			string: navigator.vendor,
-			subString: "iCab",
-			identity: "iCab"
-		},
-		{
-			string: navigator.vendor,
-			subString: "KDE",
-			identity: "Konqueror"
-		},
-		{
-			string: navigator.userAgent,
-			subString: "Firefox",
-			identity: "Firefox"
-		},
-		{
-			string: navigator.vendor,
-			subString: "Camino",
-			identity: "Camino"
-		},
-		{		// for newer Netscapes (6+)
-			string: navigator.userAgent,
-			subString: "Netscape",
-			identity: "Netscape"
-		},
-		{
-			string: navigator.userAgent,
-			subString: "MSIE",
-			identity: "Explorer",
-			versionSearch: "MSIE"
-		},
-		{
-			string: navigator.userAgent,
-			subString: "Gecko",
-			identity: "Mozilla",
-			versionSearch: "rv"
-		},
-		{ 		// for older Netscapes (4-)
-			string: navigator.userAgent,
-			subString: "Mozilla",
-			identity: "Netscape",
-			versionSearch: "Mozilla"
-		}
-	],
-	dataOS : [
-		{
-			string: navigator.platform,
-			subString: "Win",
-			identity: "Windows"
-		},
-		{
-			string: navigator.platform,
-			subString: "Mac",
-			identity: "Mac"
-		},
-		{
-			string: navigator.platform,
-			subString: "Linux",
-			identity: "Linux"
-		}
-	]
-
-};
-BrowserDetect.init();
 
 function sendToWeb(url,request,callback,errorMsg)
 {

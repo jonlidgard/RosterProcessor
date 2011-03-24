@@ -1,0 +1,49 @@
+#!/bin/bash
+
+
+APP_NAME=          # short-name, jar and xpi files name. Must be lowercase with no spaces
+CHROME_PROVIDERS=  # which chrome providers we have (space-separated list)
+CLEAN_UP=          # delete the jar / "files" when done?       (1/0)
+ROOT_FILES=        # put these files in root of xpi (space separated list of leaf filenames)
+ROOT_DIRS=         # ...and these directories       (space separated list)
+RDF_TEMPLATE=
+RDF_PRESIGN=
+BEFORE_BUILD=/usr/local/bin/xpi_pre_build      # run this before building       (bash command)
+AFTER_BUILD=/usr/local/bin/xpi_post_build       # ...and this after the build    (bash command)
+
+
+if [ -z $1 ]; then
+  . ./config_build.sh
+else
+  . $1
+fi
+
+if [ -z $APP_NAME ]; then
+  echo "You need to create build config file first!"
+  echo "Read comments at the beginning of this script for more info."
+  exit;
+fi
+
+ROOT_DIR=`pwd`
+TMP_DIR=.build
+
+#uncomment to debug
+#set -x
+
+# remove any left-over files from previous build
+rm -f $APP_NAME.jar $APP_NAME.xpi files
+rm -rf $TMP_DIR
+
+# $BEFORE_BUILD
+
+mkdir -pv $TMP_DIR/chrome
+
+# generate the JAR file, excluding CVS, SVN, and temporary files
+JAR_FILE=$TMP_DIR/chrome/$APP_NAME.jar
+echo "Generating $JAR_FILE..."
+for CHROME_SUBDIR in $CHROME_PROVIDERS; do
+  find $CHROME_SUBDIR \( -path '*CVS*' -o -path '*.svn*' \) -prune -o -type f -print | grep -v \~ >> files
+done
+
+zip -0 -r -X $JAR_FILE -@ < files
+

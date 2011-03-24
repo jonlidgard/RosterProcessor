@@ -1,0 +1,59 @@
+
+
+Thoughts on re-writing rosterprocessor
+
+Use of javascript libraries such as 'Prototype' will help improbe OO coding.
+
+Can re-write parser as:
+
+1/ Javascript state machine
+    Advantages:  Completely self enclosed in extension.
+                Doesn't require a web server to be used.
+                Should be fairly future proof.
+                Could be used in a Safari extension
+                
+    Disadvantges:
+                Harder to write & debug -(Maybe develop an Xcode widgit for easier debugging?)
+                Not readily portable to other platforms (iphone, android).
+                Relies on update mechanism to introduce new versions
+                
+    To investigate:
+                Can javascript be called from iphone webkit ?                
+                javascript to iphone code conversion utilitly
+
+2/ XPCOM
+    Advantages:
+                Can be written in c & ported to iphone easily
+                Easier debugging - use xcode
+                
+    Disadvantges:
+                Have to build firefox
+                Rebuild & update for new firefox versions - heavy maintenance
+
+
+    To investigate: Ptyhon XPCOM
+            Have to build xpi's for each supported firefox version since pythonext is different for each
+                and for each platform.
+                Not yet available for FF4.
+                Future support unknown
+
+3/  Server based parsing
+
+    Advantages:
+            Easier to code
+            Could be called from all platforms
+            All users using latest code
+            Can use SMC state machine compiler
+                
+    Disadvantges:
+            Relies on keeping a web server up & running
+            Possible cost implication
+            Data will have to be encrypted or a SSL connection used.
+
+    To investigate:
+            Use of virgin webspace & php - traffic limit ?
+            Amazon - could use Java - code already partly written.
+
+Virgin - php 4.3 - not good version for OO design & limited libraries
+php is probably the most flexible in terms of free or cheap hosting. All hosting services provide it.
+php can be called from the command line & is easily integrated with a debugger (x-debug).
