@@ -9,7 +9,6 @@ Version 0.1.25, April 20th, 2008.
 
 
 
-debugger;
 const ICALNS = 'urn:ietf:params:xml:ns:xcal';
 const IROSTER = 'http://www.myflightcrewroster.com/xroster';
 const DAYSOFWEEK = ["SU","MO","TU","WE","TH","FR","SA"];

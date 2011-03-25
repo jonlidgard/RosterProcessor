@@ -1,7 +1,7 @@
 
 
 
-/*jslint white: false */
+/*jslint white: false, devel: true */
 
 "use strict";
 
@@ -89,6 +89,7 @@ function BaFcLookingForBLKLineState (parser) { // old - startState
     this.foundBLKLine = function () {
         this.parser.doBLKLineAction ();
         this.parser.state = this.parser.lookingForDayDutyFSLineState;
+        this.parser.ignoreUnrecognisedLines = true; // Ignore the cruft between BLK & DAY DUTY FS
     };
 }
 BaFcLookingForBLKLineState.prototype = new BaFcDefaultState();
@@ -99,6 +100,7 @@ function BaFcLookingForDayDutyFSLineState (parser) { // old - startState
     this.foundDayDutyFSLine = function () {
         this.parser.doDayDutyFSLineAction ();
         this.parser.state = this.parser.lookingForDutyLineState;
+        this.parser.ignoreUnrecognisedLines = false; // Don't ignore lines frome here-on.
     };
 }
 BaFcLookingForDayDutyFSLineState.prototype = new BaFcDefaultState();
@@ -190,24 +192,59 @@ function Parser (theRoster) {
     this.lineNo = 0;
     this.state = undefined;
     this.ignoreUnrecognisedLines = false;
+    this.matchedFields = undefined;
 }
 
 Parser.prototype.doRosterDateLineAction = function () {
     console.log("Doing rosterDateLineAction");
+        // '01APR-30APR 2011 01/03/11 14:50
+        matchRosterDateLine = /^.*([0-3][0-9])([A-Z]{3})-([0-3][0-9])([A-Z]{3}) (\d{4})\s+([0-3][0-9])\/([0-9][0-9])\/([0-9][0-9])\s+([0-2][0-9]):([0-5][0-9])\s*$/, // TO-CHECK
+
+//            a = /[0-3][0-9]([A-Z]{3})-[0-3][0-9][A-Z]{3}\s+(20\d{2})/(this.text.header);
+            this.month = a[1];
+            this.year = a[2];
+            this.baseDate = new Date(a[1] + " 1, " + a[2] + " 00:00:00 UTC");
+            console.log("Roster baseDate: " + this.baseDate);
+            // Get the timestamp of when the roster was published by BA.
+            a = /([0-1][0-9])\/([0-9][0-9])\/([0-9][0-9])\s+([0-2][0-9]):([0-5][0-9])/(this.text.header);
+            this.created.setFullYear(2000+(a[3]-0),a[1],a[2]);
+            this.created.setHours(a[4],a[5],0,0);    
+*/
 };
 
 Parser.prototype.doCrewInfoLineAction = function () {
     console.log("Doing crewInfoLineAction");
 };
-
+//---------------
 Parser.prototype.doBLKLineAction = function () {
-    console.log("Doing BLKLineAction");
-    this.ignoreUnrecognisedLines = true; // Ignore the cruft between BLK & DAY DUTY FS
-};
 
+    this.publishedDutyHours = this.getBlkHrs(this.matchedFields);
+    console.log("dutyHours:" + this.publishedDutyHours);
+    this.duties = [];   
+
+};
+// Use a separate function to return the value so can be used more easily in unit testing
+Parser.prototype.getBlkHrs = function (match) {
+    var dutyHours =  Number("" + match ? match[1] : 0), // force a string conversion
+        hrs,mins,ms;
+
+    if (isNaN(dutyHours)) {
+        throw("Error, exiting: Could not find published duty hours!");
+    }
+    
+    // Now convert published duty hrs (BLK) to milliseconds to initialise a Date object.
+    // We multiply everything by 100 first to avoid javascript floating point maths errors
+    hrs = Math.floor(dutyHours) * 100;
+    mins = Math.round(100*dutyHours)-hrs;
+    ms = ((hrs * 36000) + mins*60000);
+        
+    console.log("Doing BLKLineAction: " + dutyHours, "ms: " + ms, "hrs: " + hrs, "mins: " + mins);
+    return ( new Date(ms) );
+
+};
+//--------------------
 Parser.prototype.doDayDutyFSLineAction = function () {
     console.log("Doing dayDutyFSLineAction");
-    this.ignoreUnrecognisedLines = false; // Don't ignore lines frome here-on.
 };
 
 Parser.prototype.doDutyLineAction = function () {
@@ -248,7 +285,9 @@ Parser.prototype.parse = function () {
         //  'LIDDJ818995 CA LGW sen 1308 737
         matchCrewInfoLine = /^\s*([A-Z]{5})\s*(\d{6})\s*(CA|FO).+(LGW|LHR).+(\d{4})\s+(\d{3}).*$/,
         // BLK. 79.45
-        matchBLKLine = /^.*BLK\.*\s+(\d{1,3})\.(\d{2}).*$/,
+//        matchBLKLine = /^.*BLK\.*\s+(\d{0,3})\.(\d{2}).*$/,
+        matchBLKLine = /BLK\.\s*(\d{0,3}.\d\d)\s*$/,
+
         // DAY DUTY F L I G H T  S E Q U E N C E
         matchDayDutyFSLine = /^\s*DAY\s+DUTY\s+F[LIGHTSEQUNC ]+$/,
         // Trip: Crew
@@ -278,61 +317,61 @@ Parser.prototype.parse = function () {
         
         if (this.state===this.lookingForDutyLineState) {
             // Trip Crew line - signifies end of duty lines & start of crew names list
-            if (matchTripCrewLine.exec(this.line)) {
+            if ((this.matchedFields = matchTripCrewLine.exec(this.line)) !== null) {
                 console.log("Found a Trip Crew line");
                 this.state.foundTripCrewLine();
                 continue;
             }
             // Multi Day
-            if (matchMultiDayLine.exec(this.line)) {
+            if ((this.matchedFields = matchMultiDayLine.exec(this.line)) !== null) {
                 console.log("Found a Multi Day line");
                 this.doMultiDayLineAction();
                 continue;
             }
             // Flying Duty
-            if (matchFlyingDutyLine.exec(this.line)) {
+            if ((this.matchedFields = matchFlyingDutyLine.exec(this.line)) !== null) {
                 console.log("Found a Flying Duty line");
                 this.doFlyingDutyLineAction();
                 continue;
             }
             // Ground Duty
-            if (matchGndDutyLine.exec(this.line)) {
+            if ((this.matchedFields = matchGndDutyLine.exec(this.line)) !== null) {
                 console.log("Found a Gnd Duty line");
                 this.doGndDutyLineAction();
                 continue;
             }
         }
         
-        if (matchRosterDateLine.exec(this.line)) {
+        if ((this.matchedFields = matchRosterDateLine.exec(this.line)) !== null) {
         console.log("Found a roster date line");
         this.state.foundRosterDateLine();
         continue;
         }
 
-        if (matchCrewInfoLine.exec(this.line)) {
+        if ((this.matchedFields = matchCrewInfoLine.exec(this.line)) !== null) {
         console.log("Found a crew info line");
         this.state.foundCrewInfoLine();
         continue;
         }
 
-        if (matchBLKLine.exec(this.line)) {
+        if ((this.matchedFields = matchBLKLine.exec(this.line)) !== null) {
         console.log("Found a BLK line");
         this.state.foundBLKLine();
         continue;
         }
 
-        if (matchDayDutyFSLine.exec(this.line)) {
+        if ((this.matchedFields = matchDayDutyFSLine.exec(this.line)) !== null) {
         console.log("Found a DayDutyFS line");
         this.state.foundDayDutyFSLine();
         continue;
         }
 
-        if (matchCrewNamesLine.exec(this.line)) {
+        if ((this.matchedFields = matchCrewNamesLine.exec(this.line)) !== null) {
         console.log("Found a CrewNames line");
         this.state.foundCrewLine();
         continue;
         }
 
-       // this.state.foundOtherLine();
+        this.state.foundOtherLine();
     }
 };
