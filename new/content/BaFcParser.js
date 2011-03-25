@@ -200,25 +200,71 @@ function Parser (theRoster) {
 
 Parser.prototype.doRosterDateLineAction = function () {
     console.log("Doing rosterDateLineAction");
-        // '01APR-30APR 2011 01/03/11 14:50
-        // matchRosterDateLine = /^.*([0-3][0-9])([A-Z]{3})-([0-3][0-9])([A-Z]{3}) (\d{4})\s+([0-3][0-9])\/([0-9][0-9])\/([0-9][0-9])\s+([0-2][0-9]):([0-5][0-9])\s*$/, // TO-CHECK
+        // 'BARYS119181FINAL ROSTERS 737 LGW APRIL 2010   01APR-30APR 2011 01/03/11 14:50
+		//	[1]	 [2]	[3]			 [4] [5] [6]   [7]	  [8&9][10&11][12] [13-15]  [16&17]
+        // matchRosterDateLine = /^\s*([A-Z]{5})\s*(\d{6})\s*(FINAL|ACHIEVED|ACHEIVED).*(\d{3})\s*([A-Z]{3})\s*([A-Z]{3,8})\s*(\d{4})\s+([0-3][0-9])([A-Z]{3})-([0-3][0-9])([A-Z]{3}) (\d{4})\s+([0-3][0-9])\/([0-9][0-9])\/([0-9][0-9])\s+([0-2][0-9]):([0-5][0-9])\s*$/, // TO-CHECK
+		// Get the date for the start of the duties.
 
-			// Get the date for the start of the duties.
-            this.startDay = a[1];
-			this.month = a[2];
-            this.year = a[5];
+            var f = this.matchedFields,
+			shortMonth = f[6], // need to short to 1st 3 chars
+			alertMsg = '';
+
+		    this.nameCode = f[1];
+		    this.staffNo = f[2];
+		    this.rosterType = f[3];
+		    this.homeBase = f[5];
+			this.startDay = f[8];
+			this.month = f[9];
+            this.year = f[12];
+
+			// Do some cross checking to make sure roster is valid
+		    if (this.year !== f[7]) {
+				alertMsg = "Roster year doesn't match.\n";
+			}
+		    if (this.month !== shortMonth) {
+				alertMsg += "Roster month doesn't match.\n";
+			}
+			if (alertMsg !=='') {
+				throw("Parsing error in line "  this.lineNo + " :" + alertMsg);
+			}
+
             this.baseDate = new Date(this.month + this.startDay + ", " + this.year + " 00:00:00 UTC");
             console.log("Roster baseDate: " + this.baseDate);
 
             // Get the timestamp of when the roster was created by BA.
-            this.createdDate.setFullYear(2000+(a[8]-0),a[6],a[7]);
-            this.createdDate.setHours(a[9],a[10],0,0);    
+            this.createdDate.setFullYear(2000+(f[15]-0),f[13],f[14]);
+            this.createdDate.setHours(f[16],f[17],0,0);    
             console.log("Roster created: " + this.createdDate);
-
+			console.log("Crewcode:" + this.nameCode);
 };
 
 Parser.prototype.doCrewInfoLineAction = function () {
+    //  'LIDDJ818995 CA LGW sen 1308 737
+    //	  [1]  [2]  [3] [4]     [5]  [6]
+	// matchCrewInfoLine = /^\s*([A-Z]{5})\s*(\d{6})\s*(CA|FO).+(LGW|LHR).+(\d{4})\s+(\d{3}).*$/,
+	
     console.log("Doing crewInfoLineAction");
+
+	var f = this.matchedFields,
+		alertMsg = '';
+
+    this.crewStatus = f[3];
+    this.seniority = f[5];
+
+	// Do some cross checking to make sure roster is valid
+    if (this.nameCode !== f[1]) {
+		alertMsg = "CrewCode doesn't match.\n";
+	}
+    if (this.staffNo !== f[2]) {
+		alertMsg += "Staff No' doesn't match.\n";
+	}   
+    if (this.homeBase !== f[4]) {
+		alertMsg += "Home base doesn't match.\n";
+	}
+	if (alertMsg !=='') {
+		alert("Parsing error in lines 1 & " + this.lineNo + " :" + alertMsg);
+	}
+
 };
 //---------------
 Parser.prototype.doBLKLineAction = function () {
@@ -286,9 +332,11 @@ Parser.prototype.doAnyOtherLineAction = function () {
 Parser.prototype.parse = function () {
     var matchDashedLine = /^-+$/,
         // '01APR-30APR 2011 01/03/11 14:50
-        matchRosterDateLine = /^.*([0-3][0-9])([A-Z]{3})-([0-3][0-9])([A-Z]{3}) (\d{4})\s+([0-3][0-9])\/([0-9][0-9])\/([0-9][0-9])\s+([0-2][0-9]):([0-5][0-9])\s*$/, // TO-CHECK
-        //  'LIDDJ818995 CA LGW sen 1308 737
-        matchCrewInfoLine = /^\s*([A-Z]{5})\s*(\d{6})\s*(CA|FO).+(LGW|LHR).+(\d{4})\s+(\d{3}).*$/,
+//        matchRosterDateLine = /^.*([0-3][0-9])([A-Z]{3})-([0-3][0-9])([A-Z]{3}) (\d{4})\s+([0-3][0-9])\/([0-9][0-9])\/([0-9][0-9])\s+([0-2][0-9]):([0-5][0-9])\s*$/, // TO-CHECK
+		// 'BARYS119181FINAL ROSTERS 737 LGW APRIL 2010   01APR-30APR 2011 01/03/11 14:50
+		//	[1]	 [2]	[3]			 [4] [5] [6]   [7]	  [8&9][10&11][12] [13-15]  [16&17]
+ 		matchRosterDateLine = /^\s*([A-Z]{5})\s*(\d{6})\s*(FINAL|ACHIEVED|ACHEIVED).*(\d{3})\s*([A-Z]{3})\s*([A-Z]{3,8})\s*(\d{4})\s+([0-3][0-9])([A-Z]{3})-([0-3][0-9])([A-Z]{3}) (\d{4})\s+([0-3][0-9])\/([0-9][0-9])\/([0-9][0-9])\s+([0-2][0-9]):([0-5][0-9])\s*$/, // TO-CHECK
+
         // BLK. 79.45
 //        matchBLKLine = /^.*BLK\.*\s+(\d{0,3})\.(\d{2}).*$/,
         matchBLKLine = /BLK\.\s*(\d{0,3}.\d\d)\s*$/,
