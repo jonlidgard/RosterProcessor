@@ -151,7 +151,7 @@ function Roster (rosterLines) {
                     if (!this.hasNext()) {
                         return null;
                     }
-                    element = lines[index]; // Need to check for trim - only in ECMA 5, else add function
+                    element = lines[index]; // Do not trim - whitespace is important to parser
                     index += 1;
                 
                     // skip blank lines
@@ -163,7 +163,10 @@ function Roster (rosterLines) {
             },
             getLineNo : function () {
                 return index;
-            }
+            },
+			reset: function () {
+				index = 0;
+			}
         };
     }());
 }
@@ -198,18 +201,20 @@ function Parser (theRoster) {
 Parser.prototype.doRosterDateLineAction = function () {
     console.log("Doing rosterDateLineAction");
         // '01APR-30APR 2011 01/03/11 14:50
-        matchRosterDateLine = /^.*([0-3][0-9])([A-Z]{3})-([0-3][0-9])([A-Z]{3}) (\d{4})\s+([0-3][0-9])\/([0-9][0-9])\/([0-9][0-9])\s+([0-2][0-9]):([0-5][0-9])\s*$/, // TO-CHECK
+        // matchRosterDateLine = /^.*([0-3][0-9])([A-Z]{3})-([0-3][0-9])([A-Z]{3}) (\d{4})\s+([0-3][0-9])\/([0-9][0-9])\/([0-9][0-9])\s+([0-2][0-9]):([0-5][0-9])\s*$/, // TO-CHECK
 
-//            a = /[0-3][0-9]([A-Z]{3})-[0-3][0-9][A-Z]{3}\s+(20\d{2})/(this.text.header);
-            this.month = a[1];
-            this.year = a[2];
-            this.baseDate = new Date(a[1] + " 1, " + a[2] + " 00:00:00 UTC");
+			// Get the date for the start of the duties.
+            this.startDay = a[1];
+			this.month = a[2];
+            this.year = a[5];
+            this.baseDate = new Date(this.month + this.startDay + ", " + this.year + " 00:00:00 UTC");
             console.log("Roster baseDate: " + this.baseDate);
-            // Get the timestamp of when the roster was published by BA.
-            a = /([0-1][0-9])\/([0-9][0-9])\/([0-9][0-9])\s+([0-2][0-9]):([0-5][0-9])/(this.text.header);
-            this.created.setFullYear(2000+(a[3]-0),a[1],a[2]);
-            this.created.setHours(a[4],a[5],0,0);    
-*/
+
+            // Get the timestamp of when the roster was created by BA.
+            this.createdDate.setFullYear(2000+(a[8]-0),a[6],a[7]);
+            this.createdDate.setHours(a[9],a[10],0,0);    
+            console.log("Roster created: " + this.createdDate);
+
 };
 
 Parser.prototype.doCrewInfoLineAction = function () {
