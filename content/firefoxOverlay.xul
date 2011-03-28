@@ -31,6 +31,26 @@ Version 0.1.25, April 20th, 2008.
     <stringbundle id="rosterprocessor-strings" src="chrome://rosterprocessor/locale/rosterprocessor.properties"/>
   </stringbundleset>
 
+<!-- Firefox 4  - Firefox button on Windows Vista / 7 -->
+ <menupopup id="appmenu-popup">
+    <menu label="&rosterprocessor.label;" accesskey="&rosterprocessor.key;" id="rosterprocessor-menu" insertafter="devToolsSeparator">
+      <menupopup>
+	<menuitem id="rosterprocessor-Tools-Sync" label="&rosterprocessor.Sync.label;" accesskey="&rosterprocessor.Sync.accesskey;" oncommand="rosterprocessor.onSync()" hidden="true"/>
+	<menuitem id="rosterprocessor-Tools-SaveAsText" label="&rosterprocessor.SaveAsText.label;" accesskey="&rosterprocessor.SaveAsText.accesskey;" oncommand="rosterprocessor.onSaveAsText()"/>
+	<menuitem id="rosterprocessor-Tools-SaveAsCal" label="&rosterprocessor.SaveAsCal.label;" accesskey="&rosterprocessor.SaveAsCal.accesskey;" oncommand="rosterprocessor.onSaveAsCal()"/>
+	<menuitem id="rosterprocessor-Tools-SaveAsLog" label="&rosterprocessor.SaveAsLog.label;" accesskey="&rosterprocessor.SaveAsLog.accesskey;" oncommand="rosterprocessor.onSaveAsLog()"/>
+	<menuitem id="rosterprocessor-Tools-MailTo" label="&rosterprocessor.MailTo.label;" accesskey="&rosterprocessor.MailTo.accesskey;" oncommand="rosterprocessor.onMailTo()" disabled=""/>
+        <menuseparator/>
+        <menuitem id="rosterprocessor-Tools-BugReport" label="&rosterprocessor.BugReport.label;" accesskey="&rosterprocessor.BugReport.accesskey;" oncommand="rosterprocessor.onBugReport()" disabled=""/>
+        <menuitem label="&rosterprocessor.options.menu.label;" accesskey="&rosterprocessor.options.menu.key;" oncommand="rosterprocessor.options()"/>
+        <menuseparator/>
+        <menuitem id="HiddenUpdate" label="&rosterprocessor.update.label;" accesskey="&rosterprocessor.update.key;" oncommand="rosterprocessor.onCheckForUpdates()"/>
+        <menuitem label="&rosterprocessor.help.label;" accesskey="&rosterprocessor.help.key;" oncommand="rosterprocessor.help()"/>
+        <menuitem label="&rosterprocessor.about.label;" accesskey="&rosterprocessor.about.key;" oncommand="rosterprocessor.about()"/>
+      </menupopup>
+    </menu>
+  </menupopup>
+
   <menupopup id="menu_FilePopup" >
       <menuitem id="rosterprocessor-File-Sync" label="&rosterprocessor.Sync.label;" accesskey="&rosterprocessor.Sync.accesskey;" oncommand="rosterprocessor.onSync()" insertbefore="goOfflineMenuitem" hidden="true"/>
       <menuitem id="rosterprocessor-File-SaveAsCal" label="&rosterprocessor.Export.label;" accesskey="&rosterprocessor.SaveAsCal.accesskey;" oncommand="rosterprocessor.onSaveAsCal()" insertbefore="goOfflineMenuitem"/>
