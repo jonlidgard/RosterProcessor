@@ -1,43 +1,52 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"></script>
-<title>RosterProcessor Test Page</title>
-<style type="text/css">
-body {
+	<meta http-equiv="Content-Type" content="text/html; charset=us-ascii"/>
+	<title>RosterProcessor Test Page</title>
+
+<!--	<link rel="stylesheet" type="text/css" href="yui 2/assets/yui.css" /> -->
+	<link rel="stylesheet" type="text/css" href="yui 2/assets/dpSyntaxHighlighter.css" />
+	<link rel="stylesheet" type="text/css" href="yui 2/build/logger/assets/skins/sam/logger.css" />
+	<link rel="stylesheet" type="text/css" href="yui 2/build/yuitest/assets/skins/sam/yuitest.css" />
+	<link rel="stylesheet" type="text/css" href="yui 2/build/button/assets/skins/sam/button.css" />
+
+	<style type="text/css">
+	body {
 	background-color: #CCF;
 	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
 	color: #000;
-}
-a:link {
+	}
+	a:link {
 	color: #F60;
 	text-decoration: none;
-}
-a:visited {
+	}
+	a:visited {
 	text-decoration: none;
 	color: #C00;
-}
-a:hover {
+	}
+	a:hover {
 	text-decoration: underline;
 	color: #000;
-}
-a:active {
+	}
+	a:active {
 	text-decoration: none;
 	color: #0C0;
-}
-h1 {
+	}
+	h1 {
 	font-size: 18px;
 	color: #F60;
-}
-h2 {
+	}
+	h2 {
 	font-size: 16px;
 	color: #000;
-}
-h3 {
+	}
+	h3 {
 	font-size: 14px;
 	color: #F60;
-}
-#title {
+	}
+	#title {
 	position:absolute;
 	left:29px;
 	top:10px;
@@ -57,8 +66,8 @@ h3 {
 	border-bottom-style: none;
 	border-left-style: none;
 	padding: 0px;
-}
-#roster {
+	}
+	#roster {
 	position:absolute;
 	left:30px;
 	top:50px;
@@ -69,61 +78,55 @@ h3 {
 	font-size: 10px;
 	color: #006;
 	background-color: #FFC;
-}
-#toolbar {
+	}
+	#toolbar {
 	position:absolute;
 	left: 700px;
 	top: 10px;
-}
-.outline {
-}
+	}
+	#testLogger {
+	position:absolute;
+	left: 10px;
+	top: 580px;
+	}
+	.outline {
+	}
 
-</style>
+	</style>
 
-<script type="text/javascript" src="new/content/Wrapper_Test.js"></script>
-<script type="text/javascript" src="new/content/Wrapper.js"></script>
-<script type="text/javascript" src="new/content/BaFcParser.js"></script>
-
-<script type="text/javascript">
- // Some examples of using FireUnit
-if ( typeof fireunit === "object" ) {
-
-    var myUtilityTests = new utilityTests();
- 	fireunit.compare( typeof myUtilityTests , "object" , "Tests object created");
+	<script type="text/javascript" src="yui 2/build/yuiloader/yuiloader-min.js"></script>
+	<script type="text/javascript" src="yui 2/build/event/event-min.js"></script>
+	<script type="text/javascript" src="yui 2/build/dom/dom-min.js"></script>
+	<script type="text/javascript" src="yui 2/build/yuiloader/yuiloader-dom-event.js"></script>
+	<script type="text/javascript" src="yui 2/build/logger/logger-min.js"></script>
+	<script type="text/javascript" src="yui 2/build/yuitest/yuitest-min.js"></script>
+	<script type="text/javascript" src="yui 2/build/element/element-min.js"></script>
+	<script type="text/javascript" src="yui 2/build/button/button-min.js"></script>
  
-        // Run all tests in MathUtilityTests
-    var method;
-    for (method in myUtilityTests) {
-            if (method.substring(0, 4) == 'test')
-                myUtilityTests[method]();
-        }
-
-	// Display the total results
-	fireunit.testDone();
-}
-    </script>
 </head>
 
 <body>
-<div id="title">RosterProcessor Test Page
-</div>
-<div>
-	<textarea name="rosterCode" id="roster" cols="45" rows="5">
-    BARYS119181FINAL ROSTERS 737 LGW APRIL 2010                                                     01APR-30APR 2010         03/17/10  14:50
+	<div id="title">
+		RosterProcessor Test Page
+	</div>
+
+	<div>
+		<textarea name="rosterCode" id="roster" cols="45" rows="5">
+BARYS119181FINAL ROSTERS 737 LGW APRIL 2010                                                     01APR-30APR 2010         03/17/10  14:50
 ------------------------------------------------------------------------------------------------------------------------------------
 BARYS          119181       FO-  LGW  SEN. = 2789  737                                                    DUTY DAYS: CR.     .00
-                                                                                                                     BLK.  68.10
+														     BLK.  68.10
       IN
-        33793308                    3379            3283        3317            3393        3319                3280
+	33793308                    3379            3283        3317            3393        3319                3280
  lgw     LGW JER LGW                 LGW             EDI JER LGW JER LGW         LGW         JER LGW  -          EDI JER LGW
-                                                                                   C
+										   C
  (01) 02  03  04  05  06  07  08  09  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  01  02
   TH  FR  SA  SU  MO  TU  WE  TH  FR  SA  SU  MO  TU  WE  TH  FR  SA  SU  MO  TU  WE  TH  FR  SA  SU  MO  TU  WE  TH  FR  sa  su
 ------------------------------------------------------------------------------------------------------------------------------------
  CONTROL:   .00   PAYABLE:   .00  NCP(BID):   .00  NCP(EXT):   .00 NCP(YTD):   .00
  PROTECT:   .00     UNION:   .00     DRAFT:   .00   GATWICK:   .00 NCP(TNG):   .00
     SICK:   .00      TASS:   .00  X-SECTOR:   .00   RESERVE:   .00
-             BANK INBOUND:   .00  WITHDRAW:   .00   BALANCE:   .00
+	     BANK INBOUND:   .00  WITHDRAW:   .00   BALANCE:   .00
 
 
 DAY    DUTY     F  L  I  G  H  T     S  E  Q  U  E  N  C  E
@@ -164,11 +167,37 @@ DAY    DUTY     F  L  I  G  H  T     S  E  Q  U  E  N  C  E
 
    NO REMARKS.
 
-Roster Processor v0.1.15 - written by Jon Lidgard (http://www.aircrewrosters.com)</textarea>
-	<div id="toolbar">
-		<input type="button" onClick="rosterProcessor.parseRoster();" name="parseButton" id="parseButton1" value="Parse" />
+Roster Processor v0.1.15 - written by Jon Lidgard (http://www.aircrewrosters.com)
+		</textarea>
+		<div id="toolbar">
+			<input type="button" onclick="rosterProcessor.parseRoster();" name="parseButton" id="parseButton1" value="Parse" />
+		</div>
 	</div>
-</div>
+<div id="testLogger"></div>
+
+<script src="unitTests/test1.js"></script>
+<script src="new/content/Wrapper_Test.js"></script>
+<script src="new/content/Wrapper.js"></script>
+<script src="new/content/BaFcParser.js"></script>
+
+<script type="text/javascript">
+
+    
+
+    YAHOO.rosterprocessor.yuitest.BaFcParserSuite = new YAHOO.tool.TestSuite("baFcParser Suite");
+    YAHOO.rosterprocessor.yuitest.BaFcParserSuite.add(YAHOO.rosterprocessor.yuitest.RosterTestCase);
+    YAHOO.rosterprocessor.yuitest.BaFcParserSuite.add(YAHOO.rosterprocessor.yuitest.ArrayTestCase);
+    
+     
+    YAHOO.util.Event.onDOMReady(function (){
+        //create the logger
+        var logger = new YAHOO.tool.TestLogger("testLogger");
+        YAHOO.tool.TestRunner.add(YAHOO.rosterprocessor.yuitest.BaFcParserSuite);
+
+        //run the tests
+        YAHOO.tool.TestRunner.run();
+    });
+
+</script>
 </body>
 </html>
-
