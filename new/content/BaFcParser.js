@@ -112,12 +112,6 @@ BaFcLookingForCrewLineState.prototype = new BaFcDefaultState();
 //-------------------------------------------------------------
 
 function Roster(rosterLines) {
-    this.WHOLEDAY = +86400000;
-    this.ONEMINUTE = +60000;
-    this.POSTFLIGHTDUTYTIME = +1800000; // 1/2 hour
-    this.PREFLIGHTDUTYTIME = +3600000; // 1 hour
-    this.LHRCCPREFLIGHTDUTYTIME = +4800000; // 01:20
-    this.MINREST = +39600000; // 11 hours
 
     this.createdDate = new Date(0);
     
@@ -164,6 +158,14 @@ function baseParser(roster) {
 
 function Parser(theRoster) {
 
+    // Constants
+    this.constants = {
+        WHOLEDAY : +86400000,
+        ONEMINUTE : +60000,
+        POSTFLIGHTDUTYTIME : +1800000, // 1/2 hour
+        PREFLIGHTDUTYTIME : +3600000, // 1 hour
+        MINREST : +39600000 // 11 hours
+    }
     // Error messages
     this.errorMsg = {
         MSG_ROSTER_DATE_LINE : "Unexpected Roster date line",
@@ -235,6 +237,37 @@ function Parser(theRoster) {
         throw new Error(errorMessage + " found - line " + this.lineNo);
     };
     //--------------------------------------------------------------------------
+
+
+    this.addEvent = function (summaryField, startDayField, endDayField) {
+
+	var e = new Event();
+	line = getMatcher().group(summaryGroup);
+		
+	e.summary = this.matchedFields[summaryField];
+	e.description = this.line;
+	e.startTime = new Date(this.baseDate.valueOf());
+        e.startTime.setUTCDate(this.matchedFields.startDayField);
+	e.endTime = new Date(e.startTime.valueOf() + this.constants.WHOLEDAY);
+        
+                parseFCNonFlyingLine(myDuty);
+                myDuty.summary = modLine(myDuty.summary);
+
+        
+        
+        
+		gc.set(Calendar.DAY_OF_MONTH, startDay);
+		e.setStartDate(gc.getTime());
+//ADD ROLLOVER CODE
+		gc.set(Calendar.DAY_OF_MONTH, endDay);
+		e.setEndDate(gc.getTime());
+		
+		setDutyTimes(line, e);
+		
+	this.roster.add(e);
+		lastDutyDate = gc.getTime();
+//		mergeEvents();
+	}
 
 
     /**
