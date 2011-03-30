@@ -2,45 +2,48 @@
 
 "use strict";
 
+/* For description of 'that' & it's use in inheritance, see
+  Doug Crockford JS 3 - Functions video at yui theater
+*/
+
 function BaFcDefaultState(parser) {
     return {
         name : "Default State",
-        parser : parser,
 
         // !!! Functions added in constructor will overide ones added as prototypes. !!!    
         foundRosterDateLine : function() {
-            this.parser.decodeError(this.parser.errorMsg.MSG_ROSTER_DATE_LINE);
+            parser.decodeError(parser.errorMsg.MSG_ROSTER_DATE_LINE);
         },
         foundRosterTypeLine : function() {
-            this.parser.decodeError(this.parser.errorMsg.MSG_ROSTER_TYPE_LINE);
+            parser.decodeError(parser.errorMsg.MSG_ROSTER_TYPE_LINE);
         },
         foundCrewInfoLine : function() {
-            this.parser.decodeError(this.parser.errorMsg.MSG_CREW_INFO_LINE);
+            parser.decodeError(parser.errorMsg.MSG_CREW_INFO_LINE);
         },
         foundBLKLine : function() {
-            this.parser.decodeError(this.parser.errorMsg.MSG_BLK_LINE);
+            parser.decodeError(parser.errorMsg.MSG_BLK_LINE);
         },
         foundCrewNamesLine : function() {
-            this.parser.decodeError(this.parser.errorMsg.MSG_CREW_LINE);
+            parser.decodeError(parser.errorMsg.MSG_CREW_LINE);
         },
         foundTripCrewLine : function() {
-            this.parser.decodeError(this.parser.errorMsg.MSG_TRIP_CREW_LINE);
+            parser.decodeError(parser.errorMsg.MSG_TRIP_CREW_LINE);
         },
         foundDayDutyFSLine : function() {
-            this.parser.decodeError(this.parser.errorMsg.MSG_DAY_DUTY_FS_LINE);
+            parser.decodeError(parser.errorMsg.MSG_DAY_DUTY_FS_LINE);
         },
         foundMultiDayLine : function() {
-            this.parser.decodeError(this.parser.errorMsg.MSG_DUTY_LINE);
+            parser.decodeError(parser.errorMsg.MSG_DUTY_LINE);
         },
         foundFlyingDutyLine : function() {
-            this.parser.decodeError(this.parser.errorMsg.MSG_DUTY_LINE);
+            parser.decodeError(parser.errorMsg.MSG_DUTY_LINE);
         },
         foundGndDutyLine : function() {
-            this.parser.decodeError(this.parser.errorMsg.MSG_DUTY_LINE);
+            parser.decodeError(parser.errorMsg.MSG_DUTY_LINE);
         },
         foundOtherLine : function() {
-            if (this.parser.ignoreUnrecognisedLines === false) {
-                this.parser.decodeError(this.parser.errorMsg.MSG_ANY_OTHER_LINE);
+            if (parser.ignoreUnrecognisedLines === false) {
+                parser.decodeError(parser.errorMsg.MSG_ANY_OTHER_LINE);
             }
         }
     }
@@ -53,26 +56,26 @@ function BaFcLookingForMetaDataState(parser) { // old - startState
     that.name = "MetaData State";
 
     that.foundRosterDateLine = function() {
-        this.parser.doRosterDateLineAction();
+        parser.doRosterDateLineAction();
     };
     
     that.foundRosterTypeLine = function() {
-        this.parser.doRosterTypeLineAction();
+        parser.doRosterTypeLineAction();
     };
 
     that.foundCrewInfoLine = function() {
-        this.parser.doCrewInfoLineAction();
+        parser.doCrewInfoLineAction();
     };
 
     that.foundBLKLine = function() {
-        this.parser.doBLKLineAction();
-        this.parser.ignoreUnrecognisedLines = true; // Ignore the cruft between BLK & DAY DUTY FS
+        parser.doBLKLineAction();
+        parser.ignoreUnrecognisedLines = true; // Ignore the cruft between BLK & DAY DUTY FS
     };
 
     that.foundDayDutyFSLine = function() {
-        this.parser.doDayDutyFSLineAction();
-        this.parser.state = this.parser.lookingForDutyLineState;
-        this.parser.ignoreUnrecognisedLines = false; // Don't ignore lines frome here-on.
+        parser.doDayDutyFSLineAction();
+        parser.state = parser.lookingForDutyLineState;
+        parser.ignoreUnrecognisedLines = false; // Don't ignore lines frome here-on.
     };
     return that;
 }
@@ -83,18 +86,18 @@ function BaFcLookingForDutyLineState(parser) { // old - startState
     that.name = "Duty State";
 
     that.foundMultiDayLine = function() {
-        this.parser.doMultiDayLineAction();
+        parser.doMultiDayLineAction();
     };
     that.foundFlyingDutyLine = function() {
-        this.parser.doFlyingDutyLineAction();
+        parser.doFlyingDutyLineAction();
     };
     that.foundGndDutyLine = function() {
-        this.parser.doGndDutyLineAction();
+        parser.doGndDutyLineAction();
     };
 
     that.foundTripCrewLine = function() {
-        this.parser.doTripCrewLineAction();
-        this.parser.state = this.parser.lookingForCrewLineState;
+        parser.doTripCrewLineAction();
+        parser.state = parser.lookingForCrewLineState;
     };
     return that;
 }
@@ -104,8 +107,8 @@ function BaFcLookingForCrewLineState(parser) { // old - startState
     var that = BaFcDefaultState(parser);
     that.name = "Crew Names State";
     that.foundCrewNamesLine = function() {
-        this.parser.doCrewLineAction();
-        this.parser.ignoreUnrecognisedLines = true;
+        parser.doCrewLineAction();
+        parser.ignoreUnrecognisedLines = true;
     };
     return that;
 }
@@ -148,12 +151,12 @@ function Roster(rosterLines) {
 }
 
 //Constructor
-function baseParser(roster) {
+rosterProcessor.baseParser = function baseParser(roster) {
     this.roster = new Roster();
     this.dutyDate = new Date(); // RPDate.Create ??
     this.line = '';
     this.lineNo = 0;
-}
+};
 
 
 function Parser(theRoster) {
