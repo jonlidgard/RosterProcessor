@@ -93,7 +93,6 @@
 	}
 
 	</style>
-<script type="text/javascript" src="yui 3/build/yui/yui-min.js"></script>
 
 	<script type="text/javascript" src="yui 2/build/yuiloader/yuiloader-min.js"></script>
 	<script type="text/javascript" src="yui 2/build/event/event-min.js"></script>
@@ -175,51 +174,32 @@ Roster Processor v0.1.15 - written by Jon Lidgard (http://www.aircrewrosters.com
 		</div>
 	</div>
 <div id="testLogger"></div>
-
-
 <script type="text/javascript">
-
-YUI(	{ modules: 	{
-			'test1': {
-				fullpath: 'test1.js',
-				requires: 'test'
-			}
-	}
-}).use("test", "event", "console",
-
-function(Y) {
-
-	Y.namespace("rosterProcessor");
-	Y.namespace("RPTest.yuitest");
-
-    Y.RPTest.yuitest.BaFcParserSuite = new Y.tool.TestSuite("baFcParser Suite");
-    Y.RPTest.yuitest.BaFcParserSuite.add(Y.RPTest.yuitest.RosterTestCase);
-    Y.RPTest.yuitest.BaFcParserSuite.add(Y.RPTest.yuitest.ArrayTestCase);
-    
-     
-    Y.util.Event.onDOMReady(function (){
-        //create the logger
-        var logger = new Y.tool.TestLogger("testLogger");
-        Y.tool.TestRunner.add(Y.RPTest.yuitest.BaFcParserSuite);
-
-        //run the tests
-        Y.tool.TestRunner.run();
-    });
-
-
-});
-
-
-
 	YAHOO.namespace("rosterProcessor");
-//	YAHOO.namespace("RPTest.yuitest");
+	
 </script>
-//<script src="unitTests/test1.js"></script>
+<script src="unitTests/test1.js"></script>
 <script src="new/content/Wrapper.js"></script>
 <script src="new/content/BaFcParser.js"></script>
 
 <script type="text/javascript">
 
+//    YAHOO.namespace("rosterprocessor.yuitest");
+    
+
+    YAHOO.rpTest.yuitest.BaFcParserSuite = new YAHOO.tool.TestSuite("baFcParser Suite");
+    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.RosterTestCase);
+    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.ArrayTestCase);
+    
+     
+    YAHOO.util.Event.onDOMReady(function (){
+        //create the logger
+        var logger = new YAHOO.tool.TestLogger("testLogger");
+        YAHOO.tool.TestRunner.add(YAHOO.rpTest.yuitest.BaFcParserSuite);
+
+        //run the tests
+        YAHOO.tool.TestRunner.run();
+    });
 
 </script>
 </body>
