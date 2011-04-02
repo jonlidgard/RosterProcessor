@@ -6,7 +6,7 @@
   Doug Crockford JS 3 - Functions video at yui theater
 */
 
-function BaFcDefaultState(parser) {
+YAHOO.rosterProcessor.BaFcDefaultState = function (parser) {
     return {
         name : "Default State",
 
@@ -50,8 +50,8 @@ function BaFcDefaultState(parser) {
 }
 //----
 
-function BaFcLookingForMetaDataState(parser) { // old - startState
-    var that = BaFcDefaultState(parser);
+YAHOO.rosterProcessor.BaFcLookingForMetaDataState = function (parser) { // old - startState
+    var that = YAHOO.rosterProcessor.BaFcDefaultState(parser);
 
     that.name = "MetaData State";
 
@@ -81,8 +81,8 @@ function BaFcLookingForMetaDataState(parser) { // old - startState
 }
 
 //---
-function BaFcLookingForDutyLineState(parser) { // old - startState
-    var that = BaFcDefaultState(parser);
+YAHOO.rosterProcessor.BaFcLookingForDutyLineState = function (parser) { // old - startState
+    var that = YAHOO.rosterProcessor.BaFcDefaultState(parser);
     that.name = "Duty State";
 
     that.foundMultiDayLine = function() {
@@ -103,8 +103,8 @@ function BaFcLookingForDutyLineState(parser) { // old - startState
 }
 
 //---
-function BaFcLookingForCrewLineState(parser) { // old - startState
-    var that = BaFcDefaultState(parser);
+YAHOO.rosterProcessor.BaFcLookingForCrewLineState = function(parser) { // old - startState
+    var that = YAHOO.rosterProcessor.BaFcDefaultState(parser);
     that.name = "Crew Names State";
     that.foundCrewNamesLine = function() {
         parser.doCrewLineAction();
@@ -114,7 +114,7 @@ function BaFcLookingForCrewLineState(parser) { // old - startState
 }
 //-------------------------------------------------------------
 
-function Roster(rosterLines) {
+YAHOO.rosterProcessor.Roster = function (rosterLines) {
 
     this.createdDate = new Date(0);
     
@@ -151,7 +151,7 @@ function Roster(rosterLines) {
 }
 
 //Constructor
-rosterProcessor.baseParser = function baseParser(roster) {
+YAHOO.rosterProcessor.baseParser = function baseParser(roster) {
     this.roster = new Roster();
     this.dutyDate = new Date(); // RPDate.Create ??
     this.line = '';
@@ -159,7 +159,7 @@ rosterProcessor.baseParser = function baseParser(roster) {
 };
 
 
-function Parser(theRoster) {
+YAHOO.rosterProcessor.parser = function(theRoster) {
 
     // Constants
     this.constants = {
@@ -206,9 +206,9 @@ function Parser(theRoster) {
     };
 
 
-    this.lookingForMetaDataState = new BaFcLookingForMetaDataState(this);
-    this.lookingForDutyLineState = new BaFcLookingForDutyLineState(this);
-    this.lookingForCrewLineState = new BaFcLookingForCrewLineState(this);
+    this.lookingForMetaDataState = new YAHOO.rosterProcessor.BaFcLookingForMetaDataState(this);
+    this.lookingForDutyLineState = new YAHOO.rosterProcessor.BaFcLookingForDutyLineState(this);
+    this.lookingForCrewLineState = new YAHOO.rosterProcessor.BaFcLookingForCrewLineState(this);
 
     this.lineTypeEnum = {
         unrecognised : 0,
@@ -539,7 +539,7 @@ function Parser(theRoster) {
 
 }
 
-Parser.prototype.parse = function() {
+YAHOO.rosterProcessor.parser.prototype.parse = function() {
 
     var parsing = false;
     this.state = this.lookingForMetaDataState;

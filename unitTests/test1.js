@@ -1,6 +1,4 @@
-YAHOO.namespace("rosterprocessor.yuitest");
-
-YAHOO.rosterprocessor.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
+Y.RPTest.yuitest.RosterTestCase = new Y.tool.TestCase({
 
     //name of the test case - if not provided, one is auto-generated
     name: "Roster Tests",
@@ -13,7 +11,7 @@ YAHOO.rosterprocessor.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
          */
     setUp: function() {
         var theText = "line 1\nline 2\nline 3";
-        this.roster = new Roster(theText);
+        this.roster = new YAHOO.rosterProcessor.Roster(theText);
     },
 
     /*
@@ -27,7 +25,8 @@ YAHOO.rosterprocessor.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
     // Test methods - names must begin with "test"
     //---------------------------------------------------------------------
     
-    testConstants: function() {
+/*  Now part of the parser object
+     testConstants: function() {
         var Assert = YAHOO.util.Assert;
 
         Assert.isNumber(this.roster.WHOLEDAY);
@@ -44,9 +43,9 @@ YAHOO.rosterprocessor.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
         Assert.areSame(+4800000, this.roster.LHRCCPREFLIGHTDUTYTIME);
         Assert.areSame(+39600000, this.roster.MINREST);
     },
-    
+*/   
     testcreatedDate: function() {
-        var Assert = YAHOO.util.Assert;
+        var Assert = Y.util.Assert;
 
         Assert.isObject(this.roster);
         Assert.isInstanceOf(Date,this.roster.createdDate);
@@ -54,7 +53,7 @@ YAHOO.rosterprocessor.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
 
     // Test rosterText functionality
     testLineNo: function() {
-        var Assert = YAHOO.util.Assert;
+        var Assert = Y.util.Assert;
 
         Assert.isFunction(this.roster.rosterText.getLineNo);
         Assert.isNumber(this.roster.rosterText.getLineNo());
@@ -65,7 +64,7 @@ YAHOO.rosterprocessor.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
     },
 
     testHasNext: function() {
-        var Assert = YAHOO.util.Assert;
+        var Assert = Y.util.Assert;
     
         Assert.isFunction(this.roster.rosterText.hasNext);
         Assert.isTrue(this.roster.rosterText.hasNext());
@@ -73,7 +72,7 @@ YAHOO.rosterprocessor.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
     },
 
     testNext: function() {
-        var Assert = YAHOO.util.Assert,
+        var Assert = Y.util.Assert,
             txt;
     
         Assert.isFunction(this.roster.rosterText.next);
@@ -98,7 +97,7 @@ YAHOO.rosterprocessor.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
     },
 
     testReset: function() {
-        var Assert = YAHOO.util.Assert,
+        var Assert = Y.util.Assert,
             txt;
     
         Assert.isFunction(this.roster.rosterText.reset);
@@ -112,7 +111,7 @@ YAHOO.rosterprocessor.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
 
 });
 
-YAHOO.rosterprocessor.yuitest.ArrayTestCase = new YAHOO.tool.TestCase({
+Y.RPTest.yuitest.ArrayTestCase = new Y.tool.TestCase({
 
     //name of the test case - if not provided, one is auto-generated
     name: "Array Tests",
@@ -138,7 +137,7 @@ YAHOO.rosterprocessor.yuitest.ArrayTestCase = new YAHOO.tool.TestCase({
     // Test methods - names must begin with "test"
     //---------------------------------------------------------------------
     testPop: function() {
-        var Assert = YAHOO.util.Assert;
+        var Assert = Y.util.Assert;
 
         var value = this.data.pop();
 
@@ -147,7 +146,7 @@ YAHOO.rosterprocessor.yuitest.ArrayTestCase = new YAHOO.tool.TestCase({
     },
 
     testPush: function() {
-        var Assert = YAHOO.util.Assert;
+        var Assert = Y.util.Assert;
 
         this.data.push(5);
 
@@ -156,7 +155,7 @@ YAHOO.rosterprocessor.yuitest.ArrayTestCase = new YAHOO.tool.TestCase({
     },
 
     testSplice: function() {
-        var Assert = YAHOO.util.Assert;
+        var Assert = Y.util.Assert;
 
         this.data.splice(2, 1, 6, 7);
 

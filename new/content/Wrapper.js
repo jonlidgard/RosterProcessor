@@ -6,7 +6,7 @@
 
 
 "use strict";
-
+/*
 var RP = RP || {
     VERSION : '0.3',
     myRoster : null,
@@ -31,9 +31,9 @@ RP.namespace = function (ns_string) {
     }
     return parent;
 };
+*/
 
-
-var rosterProcessor = {
+YAHOO.rosterProcessor = {
     VERSION : '0.3',
     myRoster : null,
     ICAL_EXT : '.ics',
@@ -109,8 +109,8 @@ var rosterProcessor = {
 
     parseRoster : function () {
         var lines = document.getElementById("roster").innerHTML,
-            roster = new Roster(lines),
-            parser = new Parser(roster);
+            roster = new YAHOO.rosterProcessor.Roster(lines),
+            parser = new YAHOO.rosterProcessor.parser(roster);
         parser.parse();
     }
 
