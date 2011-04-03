@@ -178,7 +178,8 @@ Roster Processor v0.1.15 - written by Jon Lidgard (http://www.aircrewrosters.com
 	YAHOO.namespace("rosterProcessor");
 	
 </script>
-<script src="unitTests/test1.js"></script>
+<script src="unitTests/testRoster.js"></script>
+<script src="unitTests/testParser.js"></script>
 <script src="new/content/Wrapper.js"></script>
 <script src="new/content/BaFcParser.js"></script>
 
@@ -189,7 +190,7 @@ Roster Processor v0.1.15 - written by Jon Lidgard (http://www.aircrewrosters.com
 
     YAHOO.rpTest.yuitest.BaFcParserSuite = new YAHOO.tool.TestSuite("baFcParser Suite");
     YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.RosterTestCase);
-    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.ArrayTestCase);
+    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.ParserTestCase);
     
      
     YAHOO.util.Event.onDOMReady(function (){

@@ -27,28 +27,15 @@ YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
     // Test methods - names must begin with "test"
     //---------------------------------------------------------------------
     
-    testConstants: function() {
-        var Assert = YAHOO.util.Assert;
-
-        Assert.isNumber(this.roster.WHOLEDAY);
-        Assert.isNumber(this.roster.ONEMINUTE);
-        Assert.isNumber(this.roster.POSTFLIGHTDUTYTIME);
-        Assert.isNumber(this.roster.PREFLIGHTDUTYTIME);
-        Assert.isNumber(this.roster.LHRCCPREFLIGHTDUTYTIME);
-        Assert.isNumber(this.roster.MINREST);
-
-        Assert.areSame(+86400000, this.roster.WHOLEDAY);
-        Assert.areSame(+60000, this.roster.ONEMINUTE);
-        Assert.areSame(+1800000, this.roster.POSTFLIGHTDUTYTIME);
-        Assert.areSame(+3600000, this.roster.PREFLIGHTDUTYTIME);
-        Assert.areSame(+4800000, this.roster.LHRCCPREFLIGHTDUTYTIME);
-        Assert.areSame(+39600000, this.roster.MINREST);
-    },
-    
-    testcreatedDate: function() {
+    testIsObject: function() {
         var Assert = YAHOO.util.Assert;
 
         Assert.isObject(this.roster);
+    },
+
+    testcreatedDate: function() {
+        var Assert = YAHOO.util.Assert;
+
         Assert.isInstanceOf(Date,this.roster.createdDate);
     },
 
@@ -109,60 +96,5 @@ YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
         Assert.areSame(0, this.roster.rosterText.getLineNo());
     }
     
-
-});
-
-YAHOO.rpTest.yuitest.ArrayTestCase = new YAHOO.tool.TestCase({
-
-    //name of the test case - if not provided, one is auto-generated
-    name: "Array Tests",
-
-    //---------------------------------------------------------------------
-    // setUp and tearDown methods - optional
-    //---------------------------------------------------------------------
-    /*
-         * Sets up data that is needed by each test.
-         */
-    setUp: function() {
-        this.data = [0, 1, 2, 3, 4]
-    },
-
-    /*
-         * Cleans up everything that was created by setUp().
-         */
-    tearDown: function() {
-        delete this.data;
-    },
-
-    //---------------------------------------------------------------------
-    // Test methods - names must begin with "test"
-    //---------------------------------------------------------------------
-    testPop: function() {
-        var Assert = YAHOO.util.Assert;
-
-        var value = this.data.pop();
-
-        Assert.areEqual(4, this.data.length);
-        Assert.areEqual(4, value);
-    },
-
-    testPush: function() {
-        var Assert = YAHOO.util.Assert;
-
-        this.data.push(5);
-
-        Assert.areEqual(6, this.data.length);
-        Assert.areEqual(5, this.data[5]);
-    },
-
-    testSplice: function() {
-        var Assert = YAHOO.util.Assert;
-
-        this.data.splice(2, 1, 6, 7);
-
-        Assert.areEqual(6, this.data.length);
-        Assert.areEqual(6, this.data[2]);
-        Assert.areEqual(7, this.data[3]);
-    }
 
 });

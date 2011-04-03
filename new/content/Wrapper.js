@@ -110,7 +110,7 @@ YAHOO.rosterProcessor = {
     parseRoster : function () {
         var lines = document.getElementById("roster").innerHTML,
             roster = new YAHOO.rosterProcessor.Roster(lines),
-            parser = new YAHOO.rosterProcessor.parser(roster);
+            parser = new YAHOO.rosterProcessor.Parser(roster);
         parser.parse();
     }
 

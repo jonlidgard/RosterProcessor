@@ -159,7 +159,7 @@ YAHOO.rosterProcessor.baseParser = function baseParser(roster) {
 };
 
 
-YAHOO.rosterProcessor.parser = function(theRoster) {
+YAHOO.rosterProcessor.Parser = function(theRoster) {
 
     // Constants
     this.constants = {
@@ -539,7 +539,7 @@ YAHOO.rosterProcessor.parser = function(theRoster) {
 
 }
 
-YAHOO.rosterProcessor.parser.prototype.parse = function() {
+YAHOO.rosterProcessor.Parser.prototype.parse = function() {
 
     var parsing = false;
     this.state = this.lookingForMetaDataState;
