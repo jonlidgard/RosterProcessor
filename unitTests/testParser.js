@@ -38,7 +38,7 @@ YAHOO.rpTest.yuitest.ParserTestCase = new YAHOO.tool.TestCase({
     
     testConstants: function() {
         var Assert = YAHOO.util.Assert;
-        var c = this.parser.constants;
+        var c = YAHOO.rosterProcessor.constants;
         
         Assert.isNumber(c.WHOLEDAY);
         Assert.isNumber(c.ONEMINUTE);
@@ -51,8 +51,16 @@ YAHOO.rpTest.yuitest.ParserTestCase = new YAHOO.tool.TestCase({
         Assert.areSame(+1800000, c.POSTFLIGHTDUTYTIME);
         Assert.areSame(+3600000, c.PREFLIGHTDUTYTIME);
         Assert.areSame(+39600000, c.MINREST);
-    }
+    },
     
+    testParse: function() {
+        var Assert = YAHOO.util.Assert,
+            element = document.getElementById("parseButton1");
+ 
+        //simulate a click
+        YAHOO.util.UserAction.click(element);
+ 
+    }    
     
 
 });

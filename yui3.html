@@ -1,0 +1,110 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=us-ascii"/>
+	<title>YUI 3 Test Page</title>
+
+
+<!-- CSS -->
+	<link rel="stylesheet" type="text/css" href="yui 3/assets/yui.css">
+	<link rel="stylesheet" type="text/css" href="yui 3/build/widget/assets/skins/sam/widget.css" />
+	<link rel="stylesheet" type="text/css" href="yui 3/build/console/assets/skins/sam/console.css" />	
+
+
+	<style type="text/css">
+	body {
+	background-color: #CCF;
+	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	color: #000;
+	}
+	h1 {
+	font-size: 18px;
+	color: #F60;
+	}
+	h2 {
+	font-size: 16px;
+	color: #000;
+	}
+	h3 {
+	font-size: 14px;
+	color: #F60;
+	}
+	#title {
+	position:absolute;
+	left:29px;
+	top:10px;
+	width:374px;
+	height:37px;
+	z-index:1;
+	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	font-size: 24px;
+	color: #000;
+	background-color: #CCF;
+	border-top-color: #000;
+	border-right-color: #000;
+	border-bottom-color: #000;
+	border-left-color: #000;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+	padding: 0px;
+	}
+	#yconsole {
+	position:absolute;
+	left:29px;
+	top:50px;
+		
+	}
+	</style>
+
+ 
+</head>
+
+<body>
+	<div id="title">
+		YUI3 Test Page
+	</div>
+    <div class="yui-u" id="yconsole">
+    </div>
+		<div id="toolbar">
+			<input type="button" name="parseButton" id="parseButton1" value="Parse" />
+		</div>
+
+
+
+<script type="text/javascript" src="yui 3/build/yui/yui-min.js" ></script>
+<script type="text/javascript" src="yui3mod1.js" ></script>
+<script type="text/javascript">
+
+YUI().use('console','overlay', function (Y) {
+ 
+    // Create a universal Console
+    new Y.Console({ logSource: Y.Global,
+			style: 'block',
+			newestOnTop: false,
+			width: "250px"
+	}).render( "#yconsole" );
+ 
+    /* YOUR CODE HERE */
+ 
+    });
+ 
+YUI().use('test1', "node", function(Y) {
+	var testButton = function(e) {
+	    Y.utils.testFunc();
+        Y.log(e);
+	};
+
+    Y.log(Y.today);
+ 
+    Y.on("click", testButton, "#parseButton1");
+
+});
+
+</script>
+
+</body>
+</html>

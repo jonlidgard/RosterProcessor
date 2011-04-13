@@ -34,13 +34,31 @@ RP.namespace = function (ns_string) {
 */
 
 YAHOO.rosterProcessor = {
-    VERSION : '0.3',
-    myRoster : null,
-    ICAL_EXT : '.ics',
-    RP_EMAIL : 'rosterprocessor@gmail.com',
-    RP_STATEMENTS_URL : 'https://crewlink.baplc.com/crewlink/portal.jsp',
-    RP_HELP_URL : 'http://www.aircrewrosters.com/help.html',
+    
+    // Constants
+    constants : {
+        VERSION : '0.3',
 
+        ICALNS : 'urn:ietf:params:xml:ns:xcal',
+        IROSTER : 'http://www.myflightcrewroster.com/xroster',
+        ICAL_EXT : '.ics',
+
+        RP_EMAIL : 'rosterprocessor@gmail.com',
+        RP_STATEMENTS_URL : 'https://crewlink.baplc.com/crewlink/portal.jsp',
+        RP_HELP_URL : 'http://www.aircrewrosters.com/help.html',
+
+        WHOLEDAY : +86400000,
+        ONEMINUTE : +60000,
+        POSTFLIGHTDUTYTIME : +1800000, // 1/2 hour
+        PREFLIGHTDUTYTIME : +3600000, // 1 hour
+        MINREST : +39600000, // 11 hours
+
+        DAYSOFWEEK : ["SU","MO","TU","WE","TH","FR","SA"],
+        MONTHSOFYEAR : ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"]
+    },
+
+    // vars    
+    myRoster : null,
 
     /**
      * General initialisations
@@ -48,7 +66,8 @@ YAHOO.rosterProcessor = {
      *
      */
     init : function () {
-        this.rosterTypes = [BaFcRoster, BaCcRoster];
+        this.utils.init();
+//        this.rosterTypes = [BaFcRoster, BaCcRoster];
     },
 
     /**
@@ -108,6 +127,7 @@ YAHOO.rosterProcessor = {
 
 
     parseRoster : function () {
+        this.init();
         var lines = document.getElementById("roster").innerHTML,
             roster = new YAHOO.rosterProcessor.Roster(lines),
             parser = new YAHOO.rosterProcessor.Parser(roster);

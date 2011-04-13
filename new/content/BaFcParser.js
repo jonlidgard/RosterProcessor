@@ -150,6 +150,10 @@ YAHOO.rosterProcessor.Roster = function (rosterLines) {
     } ());
 }
 
+
+
+
+
 //Constructor
 YAHOO.rosterProcessor.baseParser = function baseParser(roster) {
     this.roster = new Roster();
@@ -161,14 +165,8 @@ YAHOO.rosterProcessor.baseParser = function baseParser(roster) {
 
 YAHOO.rosterProcessor.Parser = function(theRoster) {
 
-    // Constants
-    this.constants = {
-        WHOLEDAY : +86400000,
-        ONEMINUTE : +60000,
-        POSTFLIGHTDUTYTIME : +1800000, // 1/2 hour
-        PREFLIGHTDUTYTIME : +3600000, // 1 hour
-        MINREST : +39600000 // 11 hours
-    }
+//    var constants = YAHOO.rosterProcessor.constants;
+    
     // Error messages
     this.errorMsg = {
         MSG_ROSTER_DATE_LINE : "Unexpected Roster date line",
