@@ -5,8 +5,10 @@
 /* For description of 'that' & it's use in inheritance, see
   Doug Crockford JS 3 - Functions video at yui theater
 */
+YUI().add('rpParser', function (Y) {
+    Y.namespace('rp.bafc');
 
-YAHOO.rosterProcessor.BaFcDefaultState = function (parser) {
+Y.rp.bafc.DefaultState = function (parser) {
     return {
         name : "Default State",
 
@@ -46,12 +48,12 @@ YAHOO.rosterProcessor.BaFcDefaultState = function (parser) {
                 parser.decodeError(parser.errorMsg.MSG_ANY_OTHER_LINE);
             }
         }
-    }
-}
+    };
+};
 //----
 
-YAHOO.rosterProcessor.BaFcLookingForMetaDataState = function (parser) { // old - startState
-    var that = YAHOO.rosterProcessor.BaFcDefaultState(parser);
+Y.rp.bafcLookingForMetaDataState = function (parser) { // old - startState
+    var that = Y.rp.bafc.DefaultState(parser);
 
     that.name = "MetaData State";
 
@@ -78,11 +80,11 @@ YAHOO.rosterProcessor.BaFcLookingForMetaDataState = function (parser) { // old -
         parser.ignoreUnrecognisedLines = false; // Don't ignore lines frome here-on.
     };
     return that;
-}
+};
 
 //---
-YAHOO.rosterProcessor.BaFcLookingForDutyLineState = function (parser) { // old - startState
-    var that = YAHOO.rosterProcessor.BaFcDefaultState(parser);
+Y.rp.bafc.LookingForDutyLineState = function (parser) { // old - startState
+    var that = Y.rp.bafc.DefaultState(parser);
     that.name = "Duty State";
 
     that.foundMultiDayLine = function() {
@@ -100,22 +102,24 @@ YAHOO.rosterProcessor.BaFcLookingForDutyLineState = function (parser) { // old -
         parser.state = parser.lookingForCrewLineState;
     };
     return that;
-}
+};
 
 //---
-YAHOO.rosterProcessor.BaFcLookingForCrewLineState = function(parser) { // old - startState
-    var that = YAHOO.rosterProcessor.BaFcDefaultState(parser);
+Y.rp.bafc.LookingForCrewLineState = function(parser) { // old - startState
+    var that = Y.rp.bafc.DefaultState(parser);
     that.name = "Crew Names State";
     that.foundCrewNamesLine = function() {
         parser.doCrewLineAction();
         parser.ignoreUnrecognisedLines = true;
     };
     return that;
-}
+};
 //-------------------------------------------------------------
 
-YAHOO.rosterProcessor.Roster = function (rosterLines) {
-
+Y.rp.Roster = function (rosterLines) {
+    var x = 1;
+};
+/*
     this.createdDate = new Date(0);
     
     this.rosterText = (function() {
@@ -148,24 +152,12 @@ YAHOO.rosterProcessor.Roster = function (rosterLines) {
             }
         };
     } ());
-}
-
-
-
-
-
-//Constructor
-YAHOO.rosterProcessor.baseParser = function baseParser(roster) {
-    this.roster = new Roster();
-    this.dutyDate = new Date(); // RPDate.Create ??
-    this.line = '';
-    this.lineNo = 0;
 };
+*/
 
+Y.rp.Parser = function(theRoster) {
 
-YAHOO.rosterProcessor.Parser = function(theRoster) {
-
-//    var constants = YAHOO.rosterProcessor.constants;
+//    var constants = Y.rp.constants;
     
     // Error messages
     this.errorMsg = {
@@ -204,9 +196,9 @@ YAHOO.rosterProcessor.Parser = function(theRoster) {
     };
 
 
-    this.lookingForMetaDataState = new YAHOO.rosterProcessor.BaFcLookingForMetaDataState(this);
-    this.lookingForDutyLineState = new YAHOO.rosterProcessor.BaFcLookingForDutyLineState(this);
-    this.lookingForCrewLineState = new YAHOO.rosterProcessor.BaFcLookingForCrewLineState(this);
+    this.lookingForMetaDataState = new Y.rp.bafc.LookingForMetaDataState(this);
+    this.lookingForDutyLineState = new Y.rp.bafc.LookingForDutyLineState(this);
+    this.lookingForCrewLineState = new Y.rp.bafc.LookingForCrewLineState(this);
 
     this.lineTypeEnum = {
         unrecognised : 0,
@@ -239,11 +231,11 @@ YAHOO.rosterProcessor.Parser = function(theRoster) {
     };
     //--------------------------------------------------------------------------
 
-
+/*
     this.addEvent = function (summaryField, startDayField, endDayField) {
 
-	var e = new Event();
-	line = getMatcher().group(summaryGroup);
+	var e = new Y.rp.Event();
+	var line = getMatcher().group(summaryGroup);
 		
 	e.summary = this.matchedFields[summaryField];
 	e.description = this.line;
@@ -269,7 +261,7 @@ YAHOO.rosterProcessor.Parser = function(theRoster) {
 		lastDutyDate = gc.getTime();
 //		mergeEvents();
 	}
-
+*/
 
     /**
      * Sets the lineType & returns true if a line matches ddmmm-ddmmm yyyy mm/dd/yy hh:mm
@@ -284,6 +276,7 @@ YAHOO.rosterProcessor.Parser = function(theRoster) {
         }
         return false;
     };
+
     //--------------------------------------------------------------------------
 
     /**
@@ -535,9 +528,9 @@ YAHOO.rosterProcessor.Parser = function(theRoster) {
         console.log("Doing anyOtherLineAction");
     };
 
-}
+};
 
-YAHOO.rosterProcessor.Parser.prototype.parse = function() {
+Y.rp.Parser.prototype.parse = function() {
 
     var parsing = false;
     this.state = this.lookingForMetaDataState;
@@ -597,3 +590,4 @@ YAHOO.rosterProcessor.Parser.prototype.parse = function() {
         }
     }
 };
+}, '0.1', {requires: ['rpUtils', 'rpEvent']} );

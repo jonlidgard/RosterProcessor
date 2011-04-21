@@ -5,14 +5,23 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=us-ascii"/>
 	<title>RosterProcessor Test Page</title>
+<!-- CSS -->
+    	<link rel="stylesheet" type="text/css" href="yui 3/assets/yui.css">
+	<link rel="stylesheet" type="text/css" href="yui 3/assets/dpSyntaxHighlighter.css">
+	<link type="text/css" rel="stylesheet" href="yui 3/build/cssfonts/fonts-min.css" />
+	<link rel="stylesheet" type="text/css" href="yui 3/build/test/assets/skins/sam/test.css">
+	<link rel="stylesheet" type="text/css" href="yui 3/build/widget/assets/skins/sam/widget.css" />
+	<link rel="stylesheet" type="text/css" href="yui 3/build/console/assets/skins/sam/console.css" />	
 
-<!--	<link rel="stylesheet" type="text/css" href="yui 2/assets/yui.css" /> -->
+	<script type="text/javascript" src="yui 3/build/yui/yui-min.js"></script>
+
+<!--	<link rel="stylesheet" type="text/css" href="yui 2/assets/yui.css" /> 
 	<link rel="stylesheet" type="text/css" href="yui 2/assets/dpSyntaxHighlighter.css" />
 	<link rel="stylesheet" type="text/css" href="yui 2/build/logger/assets/skins/sam/logger.css" />
 	<link rel="stylesheet" type="text/css" href="yui 2/build/yuitest/assets/skins/sam/yuitest.css" />
 	<link rel="stylesheet" type="text/css" href="yui 2/build/yuitest/assets/testlogger.css" />
 	<link rel="stylesheet" type="text/css" href="yui 2/build/button/assets/skins/sam/button.css" />
-
+-->
 	<style type="text/css">
 	body {
 	background-color: #CCF;
@@ -93,19 +102,7 @@
 	.outline {
 	}
 
-	</style>
-
-	<script type="text/javascript" src="yui 2/build/yuiloader/yuiloader-min.js"></script>
-	<script type="text/javascript" src="yui 2/build/event/event-min.js"></script>
-	<script type="text/javascript" src="yui 2/build/dom/dom-min.js"></script>
-<!--	<script type="text/javascript" src="yui 2/build/yuiloader/yuiloader-dom-event.js"></script> -->
-	<script type="text/javascript" src="yui 2/build/yahoo-dom-event/yahoo-dom-event.js"></script>
-	<script type="text/javascript" src="yui 2/build/logger/logger-min.js"></script>
-	<script type="text/javascript" src="yui 2/build/yuitest/yuitest-min.js"></script>
-	<script type="text/javascript" src="yui 2/build/event-simulate/event-simulate-min.js"></script>
-	<script type="text/javascript" src="yui 2/build/element/element-min.js"></script>
-	<script type="text/javascript" src="yui 2/build/button/button-min.js"></script>
- 
+	</style> 
 </head>
 
 <body>
@@ -173,44 +170,93 @@ DAY    DUTY     F  L  I  G  H  T     S  E  Q  U  E  N  C  E
 Roster Processor v0.1.15 - written by Jon Lidgard (http://www.aircrewrosters.com)
 		</textarea>
 		<div id="toolbar">
-			<input type="button" onclick="YAHOO.rosterProcessor.parseRoster();" name="parseButton" id="parseButton1" value="Parse" />
+			<input type="button" name="parseButton" id="parseButton1" value="Parse" />
 		</div>
 	</div>
 <div id="testLogger"></div>
-<script type="text/javascript">
-	YAHOO.namespace("rosterProcessor");
-	
-</script>
+
+<!-- JS --><!--
+<script type="text/javascript" src="yui 3/build/substitute/substitute-min.js"></script>
+<script type="text/javascript" src="yui 3/build/oop/oop-min.js"></script>
+<script type="text/javascript" src="yui 3/build/dom/dom-base-min.js"></script>
+<script type="text/javascript" src="yui 3/build/dom/selector-native-min.js"></script>
+<script type="text/javascript" src="yui 3/build/dom/selector-css2-min.js"></script>
+<script type="text/javascript" src="yui 3/build/event-custom/event-custom-base-min.js"></script>
+<script type="text/javascript" src="yui 3/build/event/event-base-min.js"></script>
+<script type="text/javascript" src="yui 3/build/pluginhost/pluginhost-min.js"></script>
+<script type="text/javascript" src="yui 3/build/dom/dom-style-min.js"></script>
+<script type="text/javascript" src="yui 3/build/dom/dom-style-ie-min.js"></script>
+<script type="text/javascript" src="yui 3/build/dom/dom-screen-min.js"></script>
+<script type="text/javascript" src="yui 3/build/node/node-min.js"></script>
+<script type="text/javascript" src="yui 3/build/event/event-base-ie-min.js"></script>
+<script type="text/javascript" src="yui 3/build/event/event-delegate-min.js"></script>
+<script type="text/javascript" src="yui 3/build/json/json-min.js"></script>
+<script type="text/javascript" src="yui 3/build/event-simulate/event-simulate-min.js"></script>
+-->
+<script type="text/javascript" src="yui 3/build/test/test-min.js"></script>
+
+
 <script src="unitTests/testRoster.js"></script>
-<script src="unitTests/testParser.js"></script>
+<!-- <script src="unitTests/testParser.js"></script>
 <script src="unitTests/testUtils.js"></script>
 <script src="unitTests/testEvent.js"></script>
+-->
 <script src="new/content/Wrapper.js"></script>
 <script src="new/content/Utils.js"></script>
 <script src="new/content/BaFcParser.js"></script>
 <script src="new/content/Event.js"></script>
+<script type="text/javascript" src="yui3mod1.js" ></script>
 
 <script type="text/javascript">
+/*
+YUI().use('console','overlay', function (Y) {
+ 
+    // Create a universal Console
+    new Y.Console({ logSource: Y.Global,
+			style: 'block',
+			newestOnTop: false,
+			width: "250px"
+	}).render( "#yconsole" );
+ 
+  
+    });
+*/
 
-//    YAHOO.namespace("rosterprocessor.yuitest");
+YUI().use('rpWrapper', 'rpParser', 'rpEvent', 'rpUtils', 'console', 'overlay', 'test', function(Y) {
+
+	var testButton = function(e) {
+		Y.rp.parseRoster();
+        Y.log(e);
+	};
+ 
+    Y.on("click", testButton, "#parseButton1");
+  
+    Y.namespace("rp.test");
+	Y.rp.test.rpSuite = new Y.Test.Suite("baFcParser Suite");
+//	Y.rp.test.rpSuite.add(Y.rp.test.RosterTestCase);
+//	Y.rp.test.rpSuite.add(Y.rp.test.ArrayTestCase);
+
+	//create the console
+	var r = new Y.Console({ 
+			style: 'block',
+			newestOnTop: false,
+			width: "250px",
+			verbose : true
+	});
+ 
+	r.render('#testLogger');
+ 
+	Y.Test.Runner.add(Y.rp.test.rpSuite);
+ 
+	//run the tests
+	Y.Test.Runner.run();
+});
     
-
-    YAHOO.rpTest.yuitest.BaFcParserSuite = new YAHOO.tool.TestSuite("baFcParser Suite");
-    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.RosterTestCase);
-    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.ParserTestCase);
-    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.UtilsTestCase);
-    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.EventTestCase);
+//    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.ParserTestCase);
+//    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.UtilsTestCase);
+//    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.EventTestCase);
     
      
-    YAHOO.util.Event.onDOMReady(function (){
-        //create the logger
-        var logger = new YAHOO.tool.TestLogger("testLogger");
-        YAHOO.tool.TestRunner.add(YAHOO.rpTest.yuitest.BaFcParserSuite);
-
-        //run the tests
-        YAHOO.tool.TestRunner.run();
-    });
-
 </script>
 </body>
 </html>

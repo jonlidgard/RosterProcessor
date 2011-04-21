@@ -1,6 +1,12 @@
-YAHOO.namespace("rpTest.yuitest");
+/*jslint white: false, devel: true */
 
-YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
+"use strict";
+
+
+YUI().add('rpRosterTests', function (Y) {
+    Y.namespace("rp.test");
+
+    Y.rp.test.RosterTestCase = new Y.Test.Case({
 
     //name of the test case - if not provided, one is auto-generated
     name: "Roster Tests",
@@ -13,7 +19,7 @@ YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
          */
     setUp: function() {
         var theText = "line 1\nline 2\nline 3";
-        this.roster = new YAHOO.rosterProcessor.Roster(theText);
+        this.roster = new Y.rp.Roster(theText);
     },
 
     /*
@@ -28,20 +34,20 @@ YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
     //---------------------------------------------------------------------
     
     testIsObject: function() {
-        var Assert = YAHOO.util.Assert;
+        var Assert = Y.Assert;
 
         Assert.isObject(this.roster);
     },
 
     testcreatedDate: function() {
-        var Assert = YAHOO.util.Assert;
+        var Assert = Y.Assert;
 
         Assert.isInstanceOf(Date,this.roster.createdDate);
     },
 
     // Test rosterText functionality
     testLineNo: function() {
-        var Assert = YAHOO.util.Assert;
+        var Assert = Y.Assert;
 
         Assert.isFunction(this.roster.rosterText.getLineNo);
         Assert.isNumber(this.roster.rosterText.getLineNo());
@@ -52,7 +58,7 @@ YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
     },
 
     testHasNext: function() {
-        var Assert = YAHOO.util.Assert;
+        var Assert = Y.Assert;
     
         Assert.isFunction(this.roster.rosterText.hasNext);
         Assert.isTrue(this.roster.rosterText.hasNext());
@@ -60,7 +66,7 @@ YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
     },
 
     testNext: function() {
-        var Assert = YAHOO.util.Assert,
+        var Assert = Y.Assert,
             txt;
     
         Assert.isFunction(this.roster.rosterText.next);
@@ -85,7 +91,7 @@ YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
     },
 
     testReset: function() {
-        var Assert = YAHOO.util.Assert,
+        var Assert = Y.Assert,
             txt;
     
         Assert.isFunction(this.roster.rosterText.reset);
@@ -98,3 +104,4 @@ YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
     
 
 });
+}, '0.1', {requires: ['test', 'rpParser']} );

@@ -2,66 +2,68 @@
    See the file LICENSE.txt for licensing information. */
 
 
+YUI().add('rpEvent', function (Y) {
+//    Y.namespace('rp.event');
 
-YAHOO.rosterProcessor.Event = function () {
-    this.summary = '';
-    this.description = '';
-}
+    Y.rp.Event = function () {
+        this.summary = '';
+        this.description = '';
+    },
 
 
-YAHOO.rosterProcessor.EventCollection = (function () {
+    Y.rp.EventCollection = (function () {
 
-    var events = [],
-        index = 0;
-    
-    return {
-        newEvent: function () {
-	    var event = new YAHOO.rosterProcessor.Event;
-            events.push(event);
-	    return event;
-        },
-        
-        next: function() {
-            var element;
-            if (!this.hasNext()) {
-                return null;
-            }
-            element = events[index]; // Do not trim - whitespace is important to parser
-            index += 1;
-
-            // skip blank lines
-            return element;
-        },
-
-        hasNext: function() {
-            return index < events.length;
-        },
-
-        reset: function() {
+        var events = [],
             index = 0;
-        },
+    
+        return {
+            newEvent: function () {
+        	var event = new YAHOO.rosterProcessor.Event;
+                events.push(event);
+	  	return event;
+	    },
+        
+	    next: function() {
+	        var element;
+	        if (!this.hasNext()) {
+	            return null;
+	        }
+	        element = events[index]; // Do not trim - whitespace is important to parser
+	        index += 1;
+    
+	        // skip blank lines
+	        return element;
+	    },
+    
+	    hasNext: function() {
+	        return index < events.length;
+	    },
 
-	print: function(indent) {
-            var event,
-		tab ="",
-                i = 0;
-	    
-	    for (; i< indent; i += 1) {
-                tab = tab + "-";
-            } 
-	    
-	    infoLines = getInfo().split("\n");
-	    for (i=0; i < infoLines.length; i++) {
-		console.( tab  + infoLines[i] );
-	    }
+	    reset: function() {
+	        index = 0;
+	    },
 
-	    while (this.hasNext()) {
-		event = this.next();
-		event.print(indent + 5);
-	    }
-	}
-    }
-} ());
+	    print: function(indent) {
+	        var event,
+	            tab ="",
+	            i = 0;
+	    
+                for (; i< indent; i += 1) {
+	            tab = tab + "-";
+	        } 
+	    
+	        infoLines = getInfo().split("\n");
+	        for (i=0; i < infoLines.length; i++) {
+		    console.( tab  + infoLines[i] );
+		}
+
+		while (this.hasNext()) {
+		    event = this.next();
+		    event.print(indent + 5);
+		}
+	    }	
+        }
+    } ());
 
 /*
 function trip() {
@@ -424,3 +426,4 @@ public class Trip extends EventCollection {
 
 }
 */
+}, '0.1', {requires: ['rpUtils']} );

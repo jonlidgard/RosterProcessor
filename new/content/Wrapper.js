@@ -4,8 +4,10 @@
  * @module rosterProcessor
  */
 
+/*jslint white: false, devel: true */
 
 "use strict";
+
 /*
 var RP = RP || {
     VERSION : '0.3',
@@ -32,8 +34,10 @@ RP.namespace = function (ns_string) {
     return parent;
 };
 */
+YUI().add('rpWrapper', function (Y) {
+    Y.namespace('rp');
 
-YAHOO.rosterProcessor = {
+Y.rp = {
     
     // Constants
     constants : {
@@ -66,7 +70,7 @@ YAHOO.rosterProcessor = {
      *
      */
     init : function () {
-        this.utils.init();
+        Y.rp.utils.init();
 //        this.rosterTypes = [BaFcRoster, BaCcRoster];
     },
 
@@ -127,10 +131,10 @@ YAHOO.rosterProcessor = {
 
 
     parseRoster : function () {
-        this.init();
+   //     this.init();
         var lines = document.getElementById("roster").innerHTML,
-            roster = new YAHOO.rosterProcessor.Roster(lines),
-            parser = new YAHOO.rosterProcessor.Parser(roster);
+            roster = new Y.rp.Roster(lines),
+            parser = new Y.rp.Parser(roster);
         parser.parse();
     }
 
@@ -138,7 +142,7 @@ YAHOO.rosterProcessor = {
 
 
 };
-
+}, '0.1', {use: ['rpUtils', 'rpParser']} );
 
 /*  onSaveAsCal: function() {
     // Set to the os home directory

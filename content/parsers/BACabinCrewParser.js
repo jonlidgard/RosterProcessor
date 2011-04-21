@@ -191,9 +191,13 @@ function BaCcRoster()
 
        function preProcessBACabinCrewRoster(that)
        {
-           // Get the entire roster into rosterText
+if (regex.global) {
+    regex.lastIndex = 0;
+}           // Get the entire roster into rosterText
            var a = null, leftTrim = /^[\s\n]*\w/ig, rightTrim = /[\s\n]*$/;
+//           var a = null, leftTrim = /^[\s\n]*\w/i, rightTrim = /[\s\n]*$/;
            var removeHTML = /<.*?>/g;
+//           var removeHTML = /<.*?>/;
            var nameString;
            that.text.all = "NOT FOUND!";
            //Get name   
@@ -204,11 +208,22 @@ function BaCcRoster()
            {
               throw new RosterException("Unrecognised roster format");
            }
+if (regex.global) {
+    regex.lastIndex = 0;
+}           // Get the entire roster into rosterText
 
-           bodyHTML = bodyHTML.replace(removeHTML,'');
+//           bodyHTML = bodyHTML.replace(removeHTML,'');
            bodyHTML = bodyHTML.replace(/(\s\s)+$/g,"");
-//           bodyHTML = bodyHTML.replace(/(\n\n)+$/g,"");
+//           bodyHTML = bodyHTML.replace(/(\s\s)+$/,"");
+if (regex.global) {
+    regex.lastIndex = 0;
+}           // Get the entire roster into rosterText
+           bodyHTML = bodyHTML.replace(/(\n\n)+$/g,"");
+if (regex.global) {
+    regex.lastIndex = 0;
+}           // Get the entire roster into rosterText
            bodyHTML = bodyHTML.replace(/^\s+(?=[A-W]{2}\s\d{2}\s[A-Y]{3})/mg,"");
+//           bodyHTML = bodyHTML.replace(/^\s+(?=[A-W]{2}\s\d{2}\s[A-Y]{3})/m,"");
 
            dump(bodyHTML);
            dump("\n---------------------------------------------------\n");

@@ -92,14 +92,22 @@ YUI().use('console','overlay', function (Y) {
  
     });
  
-YUI().use('test1', "node", function(Y) {
+YUI().use('test1', function(Y) {
 	var testButton = function(e) {
-	    Y.utils.testFunc();
+	    Y.foo.bar.testFunc();
         Y.log(e);
 	};
 
     Y.log(Y.today);
- 
+    Y.log(Y.UA.gecko,"warn");
+ //   Y.error("test error");
+    Y.foo2();
+    
+    var f = new Y.foo2(5);
+    var g = new Y.foo2(6);
+	f.hello();
+	g.hello();
+
     Y.on("click", testButton, "#parseButton1");
 
 });
