@@ -1,24 +1,44 @@
+/*globals YAHOO */
+
 /* Copyright (c) 2006 YourNameHere
    See the file LICENSE.txt for licensing information. */
+/*jslint white: false, devel: true */
+
+"use strict";
 
 
 
-YAHOO.rosterProcessor.Event = function () {
-    this.summary = '';
-    this.description = '';
-}
+YAHOO.rp.EventCollection = function () {
+  
+    var c = YAHOO.rp.constants,
+	Event = function () {
+            this.startDate = new Date(0);
+	    this.endDate = new Date(0);	
+	    this.summary = '';
+	    this.description = '';
+	
+	    this.isWholeDay = function () {
+	        return( (this.endDate.valueOf() - this.startDate.valueOf() + c.ONEMINUTE) % c.WHOLEDAY === 0);
+	    };
+	
+	    this.print = function () {
+	        console.log("Summary: " + this.summary);
+	        console.log("Description: " + this.description);
+	        console.log("Start: " + this.startDate);
+	        console.log("End: " + this.endDate);
+	    };
+	};	
 
-
-YAHOO.rosterProcessor.EventCollection = (function () {
-
-    var events = [],
+    this.events = (function () {
+	    
+    var eventsList = [],
         index = 0;
     
     return {
         newEvent: function () {
-	    var event = new YAHOO.rosterProcessor.Event;
-            events.push(event);
-	    return event;
+	    var e = new Event();
+            eventsList.push(e);
+	    return e;
         },
         
         next: function() {
@@ -26,7 +46,7 @@ YAHOO.rosterProcessor.EventCollection = (function () {
             if (!this.hasNext()) {
                 return null;
             }
-            element = events[index]; // Do not trim - whitespace is important to parser
+            element = eventsList[index]; // Do not trim - whitespace is important to parser
             index += 1;
 
             // skip blank lines
@@ -34,17 +54,26 @@ YAHOO.rosterProcessor.EventCollection = (function () {
         },
 
         hasNext: function() {
-            return index < events.length;
+            return index < eventsList.length;
         },
 
         reset: function() {
             index = 0;
         },
+	
+	push: function(e) {
+            eventsList.push(e);
+	},
+
+	pop: function(e) {
+            return eventsList.pop();
+	},
 
 	print: function(indent) {
-            var event,
+/*            var event,
 		tab ="",
-                i = 0;
+                i = 0,
+		infoLines;
 	    
 	    for (; i< indent; i += 1) {
                 tab = tab + "-";
@@ -52,16 +81,17 @@ YAHOO.rosterProcessor.EventCollection = (function () {
 	    
 	    infoLines = getInfo().split("\n");
 	    for (i=0; i < infoLines.length; i++) {
-		console.( tab  + infoLines[i] );
+		//console.( tab  + infoLines[i] );
 	    }
 
 	    while (this.hasNext()) {
 		event = this.next();
 		event.print(indent + 5);
 	    }
-	}
-    }
+*/	}
+    };
 } ());
+};
 
 /*
 function trip() {
@@ -70,7 +100,7 @@ function trip() {
        this.crewList = [];
 }
 
-YAHOO.rosterProcessor.Event = function () {
+YAHOO.rp.Event = function () {
        var dtStamp = new Date();
        this.created = new Date(0);
        this.lastModified = new Date(0);
@@ -119,7 +149,6 @@ YAHOO.rosterProcessor.Event = function () {
 }
 
 
-/*
 public class Event {
 
 	Event parent;

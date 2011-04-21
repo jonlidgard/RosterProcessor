@@ -1,6 +1,11 @@
+/*globals YAHOO */
+
 /* Copyright (c) 2006 YourNameHere
    See the file LICENSE.txt for licensing information. */
 
+/*jslint white: false, devel: true */
+
+"use strict";
 
 YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
 
@@ -14,7 +19,7 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
          * Sets up data that is needed by each test.
          */
     setUp: function() {
-        this.utils = YAHOO.rosterProcessor.utils;
+        this.utils = YAHOO.rp.utils;
     },
 
     /*
@@ -29,7 +34,9 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
         },
         error: {
             testIndexOfMonthBadInput : TypeError,
-            testDaysInMonthBadInput : TypeError
+            testDaysInMonthBadInput : TypeError,
+            testDaysInMonth2BadInput : TypeError,
+            testDaysSince1970BadInput : TypeError
         }
     },
     //---------------------------------------------------------------------
@@ -128,13 +135,13 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
         result = this.utils.daysInMonth2(new Date("FEB 20 2012"));
         Assert.areSame(29,result);
 
-        result = this.utils.daysInMonth2(undefined);
-        Assert.isNaN(result);
-
-        result = this.utils.daysInMonth2("string");
-        Assert.isNaN(result);
     },
     
+    testDaysInMonth2BadInput: function() {
+        // should throw a type error
+        var result = this.utils.daysInMonth2(undefined);
+    },
+
     testDaysSince1970: function() {
         var Assert = YAHOO.util.Assert,
             result;            
@@ -146,11 +153,40 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
         result = this.utils.daysSince1970(new Date("JAN 01 1971"));
         Assert.areSame(364,result);
 
-        result = this.utils.daysSince1970(undefined);
-        Assert.isNaN(result);
+    },
 
-        result = this.utils.daysSince1970("string");
-        Assert.isNaN(result);
+    testIncDecUTCMonth: function() {
+        var Assert = YAHOO.util.Assert,
+            c = YAHOO.rp.constants,
+            result;            
+
+        Assert.isFunction(this.utils.incUTCMonth, 'incUTCMonth not defined');
+        result = this.utils.incUTCMonth(new Date("JAN 01, 2011 00:00:00 UTC"));
+        Assert.areSame(new Date("FEB 01 2011 00:00:00 UTC"), result, 'did not increment month correctly');
+
+        Assert.isFunction(this.utils.decUTCMonth, 'decUTCMonth not defined');
+        result = this.utils.decUTCMonth(new Date("FEB 01 2011 00:00:00 UTC"));
+        Assert.areSame(new Date("JAN 01, 2011 00:00:00 UTC"),result, 'did not decrement month correctly');
+    },
+
+    testIncDecUTCDay: function() {
+        var Assert = YAHOO.util.Assert,
+            c = YAHOO.rp.constants,
+            result;            
+
+        Assert.isFunction(this.utils.incUTCDay, 'incUTCDay not defined');
+        result = this.utils.incUTCDay(new Date(0));
+        Assert.areSame(c.WHOLEDAY,result.valueOf(), 'did not increment day correctly');
+
+        Assert.isFunction(this.utils.decUTCDay, 'decUTCDay not defined');
+        result = this.utils.decUTCDay(new Date(c.WHOLEDAY));
+        Assert.areSame(0,result.valueOf(), 'did not decrement day correctly');
+
+    },
+
+    testDaysSince1970BadInput: function() {
+        // should throw a type error
+        var result = this.utils.daysSince1970(undefined);
     },
 
     testAbbrevBase: function() {
@@ -173,24 +209,29 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
     
     testAbbrevName: function() {
         var Assert = YAHOO.util.Assert,
+            an = this.utils.abbrevName,
             result,
             testString1 = "",
             testString2 = "No Colon",
             testString3 = "  First Person. ",
-            testString4 = "  First Person.   Second Person.  ";
+            testString4 = "  First Person.   Second Person.  ",
+            testString5 = "  First-Second Name.  ";
 
-        Assert.isFunction(this.utils.abbrevName);
-        result = this.utils.abbrevName(testString1);
+        Assert.isFunction(an);
+        result = an(testString1);
         Assert.areSame("",result);
  
-        result = this.utils.abbrevName(testString2);
+        result = an(testString2);
         Assert.areSame("",result);
 
-        result = this.utils.abbrevName(testString3);
+        result = an(testString3);
         Assert.areSame("F Person.",result);
 
-        result = this.utils.abbrevName(testString4);
+        result = an(testString4);
         Assert.areSame("F Person. S Person.",result);
+
+        result = an(testString5);
+        Assert.areSame("FS Name.",result);
     }
 
     

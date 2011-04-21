@@ -1,3 +1,7 @@
+/*globals YAHOO */
+
+/*jslint white: false, devel: true, browser: true */
+
 /**
  * RosterProcessor Extension
  *
@@ -33,7 +37,7 @@ RP.namespace = function (ns_string) {
 };
 */
 
-YAHOO.rosterProcessor = {
+YAHOO.rp = {
     
     // Constants
     constants : {
@@ -53,8 +57,8 @@ YAHOO.rosterProcessor = {
         PREFLIGHTDUTYTIME : +3600000, // 1 hour
         MINREST : +39600000, // 11 hours
 
-        DAYSOFWEEK : ["SU","MO","TU","WE","TH","FR","SA"],
-        MONTHSOFYEAR : ["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"]
+        DAYSOFWEEK : ["SU", "MO", "TU", "WE", "TH", "FR", "SA"],
+        MONTHSOFYEAR : ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
     },
 
     // vars    
@@ -93,8 +97,9 @@ YAHOO.rosterProcessor = {
     
     isValidRoster : function () {
         var i = this.rosterTypes.length, theRoster;
-        while (i--) {
+        while (i > 0) {
             try {
+                i = i - 1;
                 theRoster = new this.rosterTypes[i]();
                 theRoster.getRosterInfo();
                 break;
@@ -113,10 +118,10 @@ YAHOO.rosterProcessor = {
     onSaveAsCal: function () {
 
         // Grab a copy of the roster
-        var _valid_Roster = this.isValidRoster(this.myRoster);
-        if (_valid_Roster === undefined) {
-            this.myRoster = new Roster();
-            this.myRoster.text.all = rp_getContentDocument().body.textContent;
+        var valid_Roster = this.isValidRoster(this.myRoster);
+        if (valid_Roster === undefined) {
+            this.myRoster = new YAHOO.rp.Roster();
+            this.myRoster.text.all = YAHOO.rp.utils.getContentDocument().body.textContent;
             if (this.isvalidRoster(this.myRoster) === undefined) {
                 alert("Unrecognised roster");
                 return;
@@ -129,8 +134,8 @@ YAHOO.rosterProcessor = {
     parseRoster : function () {
         this.init();
         var lines = document.getElementById("roster").innerHTML,
-            roster = new YAHOO.rosterProcessor.Roster(lines),
-            parser = new YAHOO.rosterProcessor.Parser(roster);
+            roster = new YAHOO.rp.Roster(lines),
+            parser = new YAHOO.rp.BaFcParser(roster);
         parser.parse();
     }
 

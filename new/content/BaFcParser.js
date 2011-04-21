@@ -1,3 +1,5 @@
+/*globals YAHOO */
+
 /*jslint white: false, devel: true */
 
 "use strict";
@@ -5,8 +7,7 @@
 /* For description of 'that' & it's use in inheritance, see
   Doug Crockford JS 3 - Functions video at yui theater
 */
-
-YAHOO.rosterProcessor.BaFcDefaultState = function (parser) {
+YAHOO.rp.BaFcDefaultState = function (parser) {
     return {
         name : "Default State",
 
@@ -46,12 +47,11 @@ YAHOO.rosterProcessor.BaFcDefaultState = function (parser) {
                 parser.decodeError(parser.errorMsg.MSG_ANY_OTHER_LINE);
             }
         }
-    }
-}
+    };
+};
 //----
-
-YAHOO.rosterProcessor.BaFcLookingForMetaDataState = function (parser) { // old - startState
-    var that = YAHOO.rosterProcessor.BaFcDefaultState(parser);
+YAHOO.rp.BaFcLookingForMetaDataState = function (parser) { // old - startState
+    var that = YAHOO.rp.BaFcDefaultState(parser);
 
     that.name = "MetaData State";
 
@@ -78,11 +78,11 @@ YAHOO.rosterProcessor.BaFcLookingForMetaDataState = function (parser) { // old -
         parser.ignoreUnrecognisedLines = false; // Don't ignore lines frome here-on.
     };
     return that;
-}
+};
 
 //---
-YAHOO.rosterProcessor.BaFcLookingForDutyLineState = function (parser) { // old - startState
-    var that = YAHOO.rosterProcessor.BaFcDefaultState(parser);
+YAHOO.rp.BaFcLookingForDutyLineState = function (parser) { // old - startState
+    var that = YAHOO.rp.BaFcDefaultState(parser);
     that.name = "Duty State";
 
     that.foundMultiDayLine = function() {
@@ -100,21 +100,20 @@ YAHOO.rosterProcessor.BaFcLookingForDutyLineState = function (parser) { // old -
         parser.state = parser.lookingForCrewLineState;
     };
     return that;
-}
+};
 
 //---
-YAHOO.rosterProcessor.BaFcLookingForCrewLineState = function(parser) { // old - startState
-    var that = YAHOO.rosterProcessor.BaFcDefaultState(parser);
+YAHOO.rp.BaFcLookingForCrewLineState = function(parser) { // old - startState
+    var that = YAHOO.rp.BaFcDefaultState(parser);
     that.name = "Crew Names State";
     that.foundCrewNamesLine = function() {
         parser.doCrewLineAction();
         parser.ignoreUnrecognisedLines = true;
     };
     return that;
-}
+};
 //-------------------------------------------------------------
-
-YAHOO.rosterProcessor.Roster = function (rosterLines) {
+YAHOO.rp.Roster = function (rosterLines) {
 
     this.createdDate = new Date(0);
     
@@ -148,24 +147,22 @@ YAHOO.rosterProcessor.Roster = function (rosterLines) {
             }
         };
     } ());
-}
+};
 
 
 
 
 
 //Constructor
-YAHOO.rosterProcessor.baseParser = function baseParser(roster) {
-    this.roster = new Roster();
+YAHOO.rp.baseParser = function baseParser(roster) {
+    this.roster = new YAHOO.rp.Roster();
     this.dutyDate = new Date(); // RPDate.Create ??
     this.line = '';
     this.lineNo = 0;
 };
+YAHOO.rp.BaFcParser = function(theRoster) {
 
-
-YAHOO.rosterProcessor.Parser = function(theRoster) {
-
-//    var constants = YAHOO.rosterProcessor.constants;
+//    var constants = rp.constants;
     
     // Error messages
     this.errorMsg = {
@@ -200,13 +197,15 @@ YAHOO.rosterProcessor.Parser = function(theRoster) {
         dashedLine : /^-+$/,
         multiDayLine : /^ *([ \d| ]\d)-([ \d| ]\d) (.*)$/,
         flyingDutyLine : /^ *(\d{1,2}) (MO|TU|WE|TH|FR|SA|SU) (\d{4})\s+(.*$)/,
-        gndDutyLine : /^ *(\d{1,2}) (MO|TU|WE|TH|FR|SA|SU) \s+(.*)$/
+        gndDutyLine : /^ *(\d{1,2}) (MO|TU|WE|TH|FR|SA|SU) \s+(.*)$/,
+	beginEnd : /BEGIN\s*(\d{4})\s+END\s*(\d{4})/
+
     };
 
 
-    this.lookingForMetaDataState = new YAHOO.rosterProcessor.BaFcLookingForMetaDataState(this);
-    this.lookingForDutyLineState = new YAHOO.rosterProcessor.BaFcLookingForDutyLineState(this);
-    this.lookingForCrewLineState = new YAHOO.rosterProcessor.BaFcLookingForCrewLineState(this);
+    this.lookingForMetaDataState = new YAHOO.rp.BaFcLookingForMetaDataState(this);
+    this.lookingForDutyLineState = new YAHOO.rp.BaFcLookingForDutyLineState(this);
+    this.lookingForCrewLineState = new YAHOO.rp.BaFcLookingForCrewLineState(this);
 
     this.lineTypeEnum = {
         unrecognised : 0,
@@ -222,7 +221,7 @@ YAHOO.rosterProcessor.Parser = function(theRoster) {
         rosterType : 10,
         tripCrewLine : 11
     };
-    
+    this.eventCollection = new YAHOO.rp.EventCollection();
     this.roster = theRoster;
     this.dutyDate = new Date(); // RPDate.Create ??
     this.line = '';
@@ -240,36 +239,184 @@ YAHOO.rosterProcessor.Parser = function(theRoster) {
     //--------------------------------------------------------------------------
 
 
-    this.addEvent = function (summaryField, startDayField, endDayField) {
+    this.checkDate = function (shortDay, rosterDate) {
+	var dayOfWeek,
+	    c = YAHOO.rp.constants;
+	
+	dayOfWeek = shortDay.trim().toUpperCase();
+	return (dayOfWeek === c.DAYSOFWEEK[rosterDate.getDay()]);	
+    };
+    //--------------------------------------------------------------------------
+	
+    this.setDutyTimes = function(line, duty) {
+	var wholeDay = true,
+	    f;
 
-	var e = new Event();
-	line = getMatcher().group(summaryGroup);
-		
-	e.summary = this.matchedFields[summaryField];
-	e.description = this.line;
-	e.startTime = new Date(this.baseDate.valueOf());
-        e.startTime.setUTCDate(this.matchedFields.startDayField);
-	e.endTime = new Date(e.startTime.valueOf() + this.constants.WHOLEDAY);
-        
-                parseFCNonFlyingLine(myDuty);
-                myDuty.summary = modLine(myDuty.summary);
-
-        
-        
-        
-		gc.set(Calendar.DAY_OF_MONTH, startDay);
-		e.setStartDate(gc.getTime());
-//ADD ROLLOVER CODE
-		gc.set(Calendar.DAY_OF_MONTH, endDay);
-		e.setEndDate(gc.getTime());
-		
-		setDutyTimes(line, e);
-		
-	this.roster.add(e);
-		lastDutyDate = gc.getTime();
-//		mergeEvents();
+	// Search line for 'BEGIN hhmm END hhmm'
+	if ((f = this.matches.beginEnd.exec(line)) !== null) {
+	    wholeDay = (f[1] === '0001' && f[2] === '2400') ? true : false;
+	}
+	// line was 'BEGIN 0001 END 2400' or does not contain a BEGIN END
+	if (wholeDay === true) {
+	    duty.startDate.setUTCHours(0, 0, 0, 0);
+	    duty.endDate.setUTCHours(0, 0, 0, 0);
+	    duty.endDate = YAHOO.rp.utils.incUTCDay(duty.endDate);
+	    console.log("WholeDay!");
+	}
+	// line contained a BEGIN hhmm END hhmm but not BEGIN 0001 END 2400
+	else {
+	    YAHOO.rp.utils.setHHMM({date: duty.startDate, time: f[1]});
+	    YAHOO.rp.utils.setHHMM({date: duty.endDate, time: f[2]});
 	}
 
+	if (duty.endDate.valueOf() < duty.startDate.valueOf()) {
+	    duty.endDate = YAHOO.rp.utils.incUTCDay(duty.endDate);
+	}
+    };
+    
+    this.formatSummaryandDescription = function (e) {
+	
+//	line = line.replace(/^\s+|\s+$/g,"");
+//       line = line.replace(/\s+/g," ");
+       e.summary = e.summary.replace(/\s+BEGIN 0001 END 2400/," DAY");
+       e.summary = e.summary.replace(/\s+BEGIN (\d{4}) END (\d{4})/," $1Z $2Z");
+
+    };
+
+    //  ------mergeDuties-------------------------------------------------
+    /* This function will for example merge individual WR day lines into one WR event covering multiple days*/
+    this.mergeEvents = function (e) {
+	var thisEvent,
+	    prevEvent;
+
+	e.reset();	    
+	if (e.hasNext()) {
+	    thisEvent = e.pop();
+	}
+	else {
+	    return;
+	}
+
+	if (e.hasNext()) {
+	    prevEvent = e.pop();
+	}
+	else {
+            e.push(thisEvent);
+	    return;
+	}
+	    
+        if ( prevEvent.summary === thisEvent.summary && prevEvent.isWholeDay() && thisEvent.isWholeDay() ) {
+            prevEvent.endDate = new Date(thisEvent.endDate.valueOf());
+            e.push(prevEvent);
+        }
+        else {
+	    e.push(prevEvent);
+            e.push(thisEvent);
+        }
+    };
+    //  ------/mergeDuties-------------------------------------------------
+
+    this.addEvent = function ({summary: summaryField, start: startDayField, end: endDayField, day: dayOfWeekField}) {
+
+	var e = this.eventCollection.events.newEvent(),
+	    d,
+	    u = YAHOO.rp.utils;
+			
+	e.summary = this.matchedFields[summaryField];
+	e.description = this.line;
+	e.startDate = new Date(this.baseDate.valueOf());
+        e.startDate.setUTCDate(this.matchedFields[startDayField]);
+	
+	if (typeof dayOfWeekField !== 'undefined' &&
+	    !this.checkDate(this.matchedFields[dayOfWeekField], e.startDate)) {
+	    // Failed to match Date so try next month
+	    d = new Date(this.baseDate.valueOf());
+	    d = u.incUTCMonth(d);
+	    if (!this.checkDate(this.matchedFields[dayOfWeekField], d)) {
+		throw new Error({name: 'RosterProcessor Error',
+				message: 'Incorrect day of week for date on line ' + this.lineNo});
+	    }
+	    else {
+		this.baseDate = u.incUTCMonth(this.baseDate);
+		e.startDate = u.incUTCMonth(e.startDate);
+	    }
+	}
+	
+	d = new Date(e.startDate.valueOf());
+        d.setUTCDate(this.matchedFields[endDayField]);
+	e.endDate = new Date(d.valueOf());
+	this.setDutyTimes(this.line, e);
+	this.formatSummaryandDescription(e);
+	this.mergeEvents(this.eventCollection.events);
+	e.print();
+	
+   };
+ /*            	myDuty.summary = modLine(myDuty.summary);
+		lastDutyDate = gc.getTime();
+		mergeEvents();
+	}
+
+*/
+    this.isLessThanMinRest = function (e) {
+		
+	var lessThanMinRest = false,
+	    restPeriod,
+	    clearTime,
+	    reportTime,
+	    prevDuty,
+	    c = YAHOO.rp.constants;
+		
+	if( roster.events.size() > 1) {
+            prevDuty = roster.events.peek();
+            clearTime = prevDuty.getEndDate();
+            reportTime = thisDuty.getStartDate();
+
+            restPeriod = clearTime.valueOf() - reportTime.valueOf();
+            
+            lessThanMinRest = ( restPeriod <  c.MINREST ) ? true : false;
+        }
+	return lessThanMinRest;
+    }
+
+	private String nextSector(String sectorsLine, Sector sector) {
+		
+        System.out.println("Sector:0123456789012345678901234567890123456789012345678901234567890");
+        System.out.println("      :" + sectorsLine);
+
+        int beginIndex, endIndex;
+        
+        setMatcher(matchFlightSector.matcher(sectorsLine));
+		if ( getMatcher().matches() ) {
+	        System.out.println("      :" + sectorsLine);
+			beginIndex = getMatcher().start(1);
+	        endIndex = beginIndex + SECTORSECTIONLENGTH;
+	        // If the sector contains a report time then account for this
+	        if (getMatcher().group(4) != null) { // Found a report time
+				endIndex = endIndex + 5;
+			}
+	        System.out.println(String.format("begin %d, end %d",beginIndex,endIndex));
+	        // Run the line through the matcher again with the subsequent sectors removed
+	        // so that the codes at the end of the sector can be captured.
+
+	        endIndex = ( endIndex > sectorsLine.length() ) ? sectorsLine.length() : endIndex;
+	        
+	        setMatcher(matchFlightSector.matcher(sectorsLine.substring(beginIndex, endIndex)));
+
+			sector.setFlightNo(getMatcher().group(1));
+			sector.setOrigin(getMatcher().group(2));
+//			sector.setStartDate(getMatcher().group(2));
+//			sector.setDest(getMatcher().group(5));
+//			sector.setOrigin(getMatcher().group(2));
+
+	        sectorsLine = sectorsLine.substring(endIndex);
+		}
+		else {
+			sectorsLine = "";
+		}
+
+		return sectorsLine;
+	}
+	
 
     /**
      * Sets the lineType & returns true if a line matches ddmmm-ddmmm yyyy mm/dd/yy hh:mm
@@ -499,6 +646,7 @@ YAHOO.rosterProcessor.Parser = function(theRoster) {
 
     this.doMultiDayLineAction = function() {
         console.log("Doing multi-day lineAction");
+	this.addEvent({summary: 3, start: 1, end: 2});
     };
 
     this.testForGndDutyLine = function() {
@@ -512,6 +660,7 @@ YAHOO.rosterProcessor.Parser = function(theRoster) {
 
     this.doGndDutyLineAction = function() {
         console.log("Doing gnd dutyLineAction");
+	this.addEvent({summary: 3, start: 1, end: 1, day: 2});
     };
 
     this.testForFlyingDutyLine = function() {
@@ -525,6 +674,40 @@ YAHOO.rosterProcessor.Parser = function(theRoster) {
 
     this.doFlyingDutyLineAction = function() {
         console.log("Doing flying dutyLineAction");
+
+	var tripNo;	
+        checkDate(lastDutyDate);
+        tripNo = +this.matchedFields[3].trim();
+
+
+        /* PSEUDOCODE
+         * 
+         * GET SECTOR & POPULATE A SCTOR EVENT
+         * IF PREV EVENT WAS A TRIP & TRIP NO THE SAME & LAST SECTOR OF LAST DUTY WAS DEST NOT LGW OR LHR < MINREST
+         * 
+         * 
+         * 
+         */
+        
+        Trip trip = getTrip();
+        trip.setTripNo(tripNo);
+        Duty duty = getDuty(trip); // check for split duties
+
+        String sectorLine = getMatcher().group(4);
+		while (sectorLine.length() > 0) {
+			Sector sector = new Sector();
+			sectorLine = nextSector(sectorLine, sector);
+			duty.add(sector);
+		}
+        
+        trip.add(duty);
+        roster.add(trip);
+//        addEvent(4,1,1);
+	}
+
+
+
+
     };
 
     this.doTripCrewLineAction = function() {
@@ -535,9 +718,8 @@ YAHOO.rosterProcessor.Parser = function(theRoster) {
         console.log("Doing anyOtherLineAction");
     };
 
-}
-
-YAHOO.rosterProcessor.Parser.prototype.parse = function() {
+};
+YAHOO.rp.BaFcParser.prototype.parse = function() {
 
     var parsing = false;
     this.state = this.lookingForMetaDataState;

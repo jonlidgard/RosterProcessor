@@ -1,3 +1,9 @@
+/*globals YAHOO */
+
+/*jslint white: false, devel: true*/
+
+"use strict";
+
 YAHOO.namespace("rpTest.yuitest");
 
 YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
@@ -13,7 +19,7 @@ YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
          */
     setUp: function() {
         var theText = "line 1\nline 2\nline 3";
-        this.roster = new YAHOO.rosterProcessor.Roster(theText);
+        this.roster = new YAHOO.rp.Roster(theText);
     },
 
     /*
@@ -41,59 +47,65 @@ YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
 
     // Test rosterText functionality
     testLineNo: function() {
-        var Assert = YAHOO.util.Assert;
+        var Assert = YAHOO.util.Assert,
+            r = this.roster.rosterText;
 
-        Assert.isFunction(this.roster.rosterText.getLineNo);
-        Assert.isNumber(this.roster.rosterText.getLineNo());
-        Assert.areSame(0, this.roster.rosterText.getLineNo());
-        
-        this.roster.rosterText.next();
+        Assert.isFunction(r.getLineNo);
+        Assert.isNumber(r.getLineNo());
+        Assert.areSame(0, r.getLineNo());        
+        r.next();
+        Assert.areSame(1, r.getLineNo());        
 
     },
 
     testHasNext: function() {
-        var Assert = YAHOO.util.Assert;
+        var Assert = YAHOO.util.Assert,
+            r = this.roster.rosterText;
     
-        Assert.isFunction(this.roster.rosterText.hasNext);
-        Assert.isTrue(this.roster.rosterText.hasNext());
+        Assert.isFunction(r.hasNext);
+        Assert.isTrue(r.hasNext());
         
     },
 
     testNext: function() {
         var Assert = YAHOO.util.Assert,
-            txt;
+            txt,
+            r = this.roster.rosterText;
+
     
-        Assert.isFunction(this.roster.rosterText.next);
-        txt = this.roster.rosterText.next();
+        Assert.isFunction(r.next);
+        txt = r.next();
         Assert.isString(txt);
         Assert.areSame("line 1",txt);
-        Assert.isTrue(this.roster.rosterText.hasNext());
-        Assert.areSame(1, this.roster.rosterText.getLineNo());
+        Assert.isTrue(r.hasNext());
+        Assert.areSame(1, r.getLineNo());
         
-        txt = this.roster.rosterText.next();
+        txt = r.next();
         Assert.isString(txt);
         Assert.areSame("line 2",txt);
-        Assert.isTrue(this.roster.rosterText.hasNext());
-        Assert.areSame(2, this.roster.rosterText.getLineNo());
+        Assert.isTrue(r.hasNext());
+        Assert.areSame(2, r.getLineNo());
 
-        txt = this.roster.rosterText.next();
+        txt = r.next();
         Assert.isString(txt);
         Assert.areSame("line 3",txt);
-        Assert.isFalse(this.roster.rosterText.hasNext());
-        Assert.areSame(3, this.roster.rosterText.getLineNo());
+        Assert.isFalse(r.hasNext());
+        Assert.areSame(3, r.getLineNo());
 
     },
 
     testReset: function() {
         var Assert = YAHOO.util.Assert,
-            txt;
+            txt,
+            r = this.roster.rosterText;
+            
     
-        Assert.isFunction(this.roster.rosterText.reset);
-        txt = this.roster.rosterText.next();
+        Assert.isFunction(r.reset);
+        txt = r.next();
 
-        Assert.areSame(1, this.roster.rosterText.getLineNo());
-        this.roster.rosterText.reset();        
-        Assert.areSame(0, this.roster.rosterText.getLineNo());
+        Assert.areSame(1, r.getLineNo());
+        r.reset();        
+        Assert.areSame(0, r.getLineNo());
     }
     
 

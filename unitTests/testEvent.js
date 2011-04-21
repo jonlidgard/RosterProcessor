@@ -1,5 +1,11 @@
+/*globals YAHOO */
+
 /* Copyright (c) 2006 YourNameHere
    See the file LICENSE.txt for licensing information. */
+
+/*jslint white: false, devel: true */
+
+"use strict";
 
 
 YAHOO.rpTest.yuitest.EventTestCase = new YAHOO.tool.TestCase({
@@ -14,14 +20,14 @@ YAHOO.rpTest.yuitest.EventTestCase = new YAHOO.tool.TestCase({
          * Sets up data that is needed by each test.
          */
     setUp: function() {
-        this.event = new YAHOO.rosterProcessor.Event();
+        this.eventCollection = new YAHOO.rp.EventCollection();
     },
 
     /*
          * Cleans up everything that was created by setUp().
          */
     tearDown: function() {
-        delete this.event;
+        delete this.events;
     },
 
     //---------------------------------------------------------------------
@@ -30,7 +36,20 @@ YAHOO.rpTest.yuitest.EventTestCase = new YAHOO.tool.TestCase({
     testIsObject: function() {
         var Assert = YAHOO.util.Assert;
 
-        Assert.isObject(this.event);
+        Assert.isObject(this.eventCollection);
     },
+    
+        // Test rosterText functionality
+    testNewEvent: function() {
+        var Assert = YAHOO.util.Assert,
+            e = this.eventCollection.events,
+            myEvent;
+
+        Assert.isFunction(e.newEvent);
+        myEvent = e.newEvent();
+        Assert.isObject(myEvent);
+        Assert.isString(myEvent.summary);
+
+    }
     
 });
