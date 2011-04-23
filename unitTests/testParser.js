@@ -112,12 +112,56 @@ YAHOO.rpTest.yuitest.ParserTestCase = new YAHOO.tool.TestCase({
     },
     
 
+    testNextSector: function () {
+        var Assert = YAHOO.util.Assert,
+            c = YAHOO.rp.constants,
+            l1 = "   2578 LGW 1245 1345 TRN 1530  CK,CP   2579 TRN 1615 LGW 1800  CK,CP",
+            l2 = "   2931 EDI 0425 0525 LGW 0700 F        8033 LGW 0735 JER 0835          8036 JER 0915 LGW 1010 F        8037 LGW 1045 JER 1145       ",
+            parser = this.parser,
+            s;
+
+            Assert.isFunction(parser.nextSector);
+            s = parser.nextSector(l1);
+            Assert.isString(s.line);
+            Assert.areSame('',s.preCode);
+            Assert.areSame('2578',s.flightNo);
+            Assert.areSame('LGW',s.origin);
+            Assert.areSame('1245',s.report);
+            Assert.areSame('1345',s.start);
+            Assert.areSame('TRN',s.dest);
+            Assert.areSame('1530',s.end);
+            Assert.areSame('CK,CP',s.postCodes);
+            s = parser.nextSector(s.line);
+            Assert.areSame('',s.preCode);
+            Assert.areSame('2579',s.flightNo);
+            Assert.areSame('TRN',s.origin);
+            Assert.isUndefined(s.report);
+            Assert.areSame('1615',s.start);
+            Assert.areSame('LGW',s.dest);
+            Assert.areSame('1800',s.end);
+            Assert.areSame('CK,CP',s.postCodes);
+            Assert.isUndefined(s.line);
+
+            s = parser.nextSector(l2);
+            Assert.isString(s.line);
+            Assert.areSame('F',s.postCodes);
+            s = parser.nextSector(s.line);
+            Assert.isString(s.line);
+            s = parser.nextSector(s.line);
+            Assert.isString(s.line);
+            s = parser.nextSector(s.line);
+            Assert.isUndefined(s.line);
+            Assert.areSame('1145',s.end);
+            Assert.areSame('',s.postCodes);
+    },
+
+
     testParse: function() {
         var Assert = YAHOO.util.Assert,
             element = document.getElementById("parseButton1");
  
         //simulate a click
-        YAHOO.util.UserAction.click(element);
+//        YAHOO.util.UserAction.click(element);
  
     }    
     

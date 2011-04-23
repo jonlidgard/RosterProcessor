@@ -57,6 +57,10 @@ YAHOO.rp = {
         PREFLIGHTDUTYTIME : +3600000, // 1 hour
         MINREST : +39600000, // 11 hours
 
+        SECTORSECTIONLENGTH : 32,
+        PREFLIGHTCODESLENGTH : 6,
+        STARTOFPOSTFLIGHTCODES : 18,
+        REPORTLENGTHMODIFIER : 5,
         DAYSOFWEEK : ["SU", "MO", "TU", "WE", "TH", "FR", "SA"],
         MONTHSOFYEAR : ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
     },

@@ -196,10 +196,11 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         crewNamesLine : /^\s*(\d{4})\/(\d{2})(\s+([A-Za-z]+)\s+([A-Za-z]+)\.?)+\s*$/,
         dashedLine : /^-+$/,
         multiDayLine : /^ *([ \d| ]\d)-([ \d| ]\d) (.*)$/,
-        flyingDutyLine : /^ *(\d{1,2}) (MO|TU|WE|TH|FR|SA|SU) (\d{4})\s+(.*$)/,
+        flyingDutyLine : /^ *(\d{1,2}) (MO|TU|WE|TH|FR|SA|SU) (\d{4})(.*$)/,
         gndDutyLine : /^ *(\d{1,2}) (MO|TU|WE|TH|FR|SA|SU) \s+(.*)$/,
-	beginEnd : /BEGIN\s*(\d{4})\s+END\s*(\d{4})/
-
+	beginEnd : /BEGIN\s*(\d{4})\s+END\s*(\d{4})/,
+	flightSector : / ([A-Z]{3}) (\d{4} )?(\d{4} )([A-Z]{3}) (\d{4})(.*)/,
+	tripLine : /^([ \d]\d{3}) (.+)$/
     };
 
 
@@ -224,6 +225,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
     this.eventCollection = new YAHOO.rp.EventCollection();
     this.roster = theRoster;
     this.dutyDate = new Date(); // RPDate.Create ??
+    this.lastDutyDate = undefined;
     this.line = '';
     this.lineNo = 0;
     this.state = undefined;
@@ -315,24 +317,28 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         }
     };
     //  ------/mergeDuties-------------------------------------------------
-
-    this.addEvent = function ({summary: summaryField, start: startDayField, end: endDayField, day: dayOfWeekField}) {
+/*
+    this.populateEvent = function (e) {
+	
+    };
+*/
+    this.addEvent = function (fields) {
 
 	var e = this.eventCollection.events.newEvent(),
 	    d,
 	    u = YAHOO.rp.utils;
 			
-	e.summary = this.matchedFields[summaryField];
+	e.summary = this.matchedFields[fields.summary];
 	e.description = this.line;
 	e.startDate = new Date(this.baseDate.valueOf());
-        e.startDate.setUTCDate(this.matchedFields[startDayField]);
+        e.startDate.setUTCDate(this.matchedFields[fields.startDay]);
 	
-	if (typeof dayOfWeekField !== 'undefined' &&
-	    !this.checkDate(this.matchedFields[dayOfWeekField], e.startDate)) {
+	if (typeof fields.dayOfWeekField !== 'undefined' &&
+	    !this.checkDate(this.matchedFields[fields.dayOfWeek], e.startDate)) {
 	    // Failed to match Date so try next month
 	    d = new Date(this.baseDate.valueOf());
 	    d = u.incUTCMonth(d);
-	    if (!this.checkDate(this.matchedFields[dayOfWeekField], d)) {
+	    if (!this.checkDate(this.matchedFields[fields.dayOfWeekField], d)) {
 		throw new Error({name: 'RosterProcessor Error',
 				message: 'Incorrect day of week for date on line ' + this.lineNo});
 	    }
@@ -343,7 +349,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	}
 	
 	d = new Date(e.startDate.valueOf());
-        d.setUTCDate(this.matchedFields[endDayField]);
+        d.setUTCDate(this.matchedFields[fields.endDay]);
 	e.endDate = new Date(d.valueOf());
 	this.setDutyTimes(this.line, e);
 	this.formatSummaryandDescription(e);
@@ -351,12 +357,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	e.print();
 	
    };
- /*            	myDuty.summary = modLine(myDuty.summary);
-		lastDutyDate = gc.getTime();
-		mergeEvents();
-	}
-
-*/
+/*
     this.isLessThanMinRest = function (e) {
 		
 	var lessThanMinRest = false,
@@ -377,46 +378,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         }
 	return lessThanMinRest;
     }
-
-	private String nextSector(String sectorsLine, Sector sector) {
-		
-        System.out.println("Sector:0123456789012345678901234567890123456789012345678901234567890");
-        System.out.println("      :" + sectorsLine);
-
-        int beginIndex, endIndex;
-        
-        setMatcher(matchFlightSector.matcher(sectorsLine));
-		if ( getMatcher().matches() ) {
-	        System.out.println("      :" + sectorsLine);
-			beginIndex = getMatcher().start(1);
-	        endIndex = beginIndex + SECTORSECTIONLENGTH;
-	        // If the sector contains a report time then account for this
-	        if (getMatcher().group(4) != null) { // Found a report time
-				endIndex = endIndex + 5;
-			}
-	        System.out.println(String.format("begin %d, end %d",beginIndex,endIndex));
-	        // Run the line through the matcher again with the subsequent sectors removed
-	        // so that the codes at the end of the sector can be captured.
-
-	        endIndex = ( endIndex > sectorsLine.length() ) ? sectorsLine.length() : endIndex;
-	        
-	        setMatcher(matchFlightSector.matcher(sectorsLine.substring(beginIndex, endIndex)));
-
-			sector.setFlightNo(getMatcher().group(1));
-			sector.setOrigin(getMatcher().group(2));
-//			sector.setStartDate(getMatcher().group(2));
-//			sector.setDest(getMatcher().group(5));
-//			sector.setOrigin(getMatcher().group(2));
-
-	        sectorsLine = sectorsLine.substring(endIndex);
-		}
-		else {
-			sectorsLine = "";
-		}
-
-		return sectorsLine;
-	}
-	
+*/	
 
     /**
      * Sets the lineType & returns true if a line matches ddmmm-ddmmm yyyy mm/dd/yy hh:mm
@@ -442,7 +404,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         
         // If we already have a base date defined then we must have already
         // processed a roster date line so throw an error.
-        if (this.baseDate !== undefined) {
+        if (typeof this.baseDate !== 'undefined') {
             this.parser.decodeError(this.parser.errorMsg.MSG_ROSTER_DATE_LINE);
 
         }
@@ -455,6 +417,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         this.month = f[2];
         this.year = f[5];
         this.baseDate = new Date(this.month + this.startDay + ", " + this.year + " 00:00:00 UTC");
+	this.lastDutyDate = new Date(this.baseDate.valueOf());
         console.log("Roster baseDate: " + this.baseDate);
 
         // Get the timestamp of when the roster was created by BA.
@@ -646,7 +609,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 
     this.doMultiDayLineAction = function() {
         console.log("Doing multi-day lineAction");
-	this.addEvent({summary: 3, start: 1, end: 2});
+	this.addEvent({summary: 3, startDay: 1, endDay: 2});
     };
 
     this.testForGndDutyLine = function() {
@@ -660,7 +623,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 
     this.doGndDutyLineAction = function() {
         console.log("Doing gnd dutyLineAction");
-	this.addEvent({summary: 3, start: 1, end: 1, day: 2});
+	this.addEvent({summary: 3, startDay: 1, endDay: 1, dayOfWeek: 2});
     };
 
     this.testForFlyingDutyLine = function() {
@@ -672,42 +635,99 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         return false;
     };
 
+    this.nextSector = function (sectorsLine) {
+		
+        var startIndex,
+	    endIndex,
+	    nextStartIndex,
+	    c = YAHOO.rp.constants,
+	    reportTime = null,
+	    preCodes,
+	    postCodes,
+	    m,
+	    sector = {},
+	    reportLength = 0,
+	    postCodesIndex;
+        
+        if ((m = this.matches.flightSector.exec(sectorsLine)) !== null) {
+
+	    startIndex = m.index;
+	    endIndex = startIndex + c.SECTORSECTIONLENGTH;
+
+	    // 'LGW'
+	    sector.origin = m[1];
+	    preCodes = sectorsLine.slice(startIndex-c.PREFLIGHTCODESLENGTH, startIndex);
+	    // 'DH'
+	    sector.preCode = preCodes.slice(0,2).trim();
+	    // '1234'
+	    sector.flightNo = preCodes.slice(2).trim();
+
+	    // If the sector contains a report time then account for this
+	    if (typeof m[2] !== 'undefined') { // Found a report time
+		reportLength = c.REPORTLENGTHMODIFIER;
+		endIndex = endIndex + reportLength;
+		sector.report = m[2].trim();
+	    }
+	
+	    sector.start = m[3].trim();
+	    sector.dest = m[4];
+	    sector.end = m[5];
+	    
+	    // Run the line through the matcher again with the subsequent sectors removed
+	    // so that the codes at the end of the sector can be captured.
+
+	    if ((m = this.matches.flightSector.exec(sectorsLine.slice(endIndex))) !== null) {
+		nextStartIndex = endIndex + m.index - c.PREFLIGHTCODESLENGTH;
+	    }
+	    else {
+		nextStartIndex = sectorsLine.length;
+	    }
+	    postCodesIndex = startIndex + reportLength + c.STARTOFPOSTFLIGHTCODES;
+	    sector.postCodes = sectorsLine.slice(postCodesIndex, nextStartIndex).trim();
+
+	    sector.line = sectorsLine.slice(nextStartIndex);
+	    if (sector.line.trim() === '') {
+		delete sector.line;
+	    }
+	}
+	return sector;
+    };
+
+    // Make a duty from an array of sectors
+    this.makeDuty = function(s) {
+	
+    };
+
     this.doFlyingDutyLineAction = function() {
         console.log("Doing flying dutyLineAction");
 
-	var tripNo;	
-        checkDate(lastDutyDate);
+	var trip,
+	    tripNo,
+	    duty,
+	    sectors = [],
+	    sector = {};	
+       // this.checkDate(lastDutyDate);
         tripNo = +this.matchedFields[3].trim();
-
-
-        /* PSEUDOCODE
-         * 
-         * GET SECTOR & POPULATE A SCTOR EVENT
-         * IF PREV EVENT WAS A TRIP & TRIP NO THE SAME & LAST SECTOR OF LAST DUTY WAS DEST NOT LGW OR LHR < MINREST
-         * 
-         * 
-         * 
-         */
-        
-        Trip trip = getTrip();
-        trip.setTripNo(tripNo);
-        Duty duty = getDuty(trip); // check for split duties
-
-        String sectorLine = getMatcher().group(4);
-		while (sectorLine.length() > 0) {
-			Sector sector = new Sector();
-			sectorLine = nextSector(sectorLine, sector);
-			duty.add(sector);
-		}
-        
-        trip.add(duty);
-        roster.add(trip);
-//        addEvent(4,1,1);
+    
+	console.log('trip:' + tripNo);
+        sector.line = this.matchedFields[4];
+	while (typeof sector.line !== 'undefined') {
+	    sector = this.nextSector(sector.line);
+	    sectors[sectors.length] = sector;
+//	    console.log('preFlt: ' + sector.preFltCode);
+//	    console.log('flightNo: ' + sector.flightNo);
+//	    console.log('origin: ' + sector.origin);
+//	    console.log('report: ' + sector.report);
+//	    console.log('start: ' + sector.start);
+//	    console.log('dest: ' + sector.dest);
+//	    console.log('end: ' + sector.end);
+//	    console.log('post: ' + sector.postCodes);
+//			duty.add(sector);
 	}
-
-
-
-
+        
+        //trip.add(duty);
+        //roster.add(trip);
+//        addEvent(4,1,1);
     };
 
     this.doTripCrewLineAction = function() {
