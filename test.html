@@ -92,8 +92,6 @@
 	left: 10px;
 	top: 580px;
 	}
-	.outline {
-	}
 
 	</style>
 
@@ -180,17 +178,19 @@ Roster Processor v0.1.15 - written by Jon Lidgard (http://www.aircrewrosters.com
 	</div>
 <div id="testLogger"></div>
 <script type="text/javascript">
-	YAHOO.namespace("rp");
+YAHOO.namespace("rp");
 	
 </script>
 <script src="unitTests/testRoster.js"></script>
 <script src="unitTests/testParser.js"></script>
 <script src="unitTests/testUtils.js"></script>
 <script src="unitTests/testEvent.js"></script>
+<script src="unitTests/testOutputIcal.js"></script>
 <script src="new/content/Wrapper.js"></script>
 <script src="new/content/Utils.js"></script>
 <script src="new/content/Event.js"></script>
 <script src="new/content/BaFcParser.js"></script>
+<script src="new/content/outputIcal.js"></script>
 
 <script type="text/javascript">
 
@@ -202,6 +202,7 @@ Roster Processor v0.1.15 - written by Jon Lidgard (http://www.aircrewrosters.com
     YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.ParserTestCase);
     YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.UtilsTestCase);
     YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.EventTestCase);
+    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.OutputIcalTestCase);
     
      
     YAHOO.util.Event.onDOMReady(function (){

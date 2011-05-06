@@ -4,80 +4,151 @@
    See the file LICENSE.txt for licensing information. */
 /*jslint white: false, devel: true */
 
+
+
+/*
+Example:
+  4 SU 3308   2362 LGW 0445 0545 MRS 0735          2363 MRS 0810 LGW 1000 F        8037 LGW 1045 JER 1145       
+  5 MO 3308   8034 JER 0505 0605 LGW 0700 F        2560 LGW 0745 BLQ 0950          2561 BLQ 1035 LGW 1240       
+
+Sector:
+    getStart - return start of flight 0545
+    getEnd - return end of flight 0735
+    getSummary - 2362 LGW-MRS
+    getDescription 2362 LGW 0445 0545 MRS 0735
+    getFlyingHours
+Duty:
+    getStart - return report 0445
+    getEnd - return clear 1215
+    getSummary - R0445 G-MRS-GfJER C1215
+    getDescription 2362 LGW 0445 0545 MRS 0735          2363 MRS 0810 LGW 1000 F        8037 LGW 1045 JER 1145
+    getDutyHours
+    
+Trip:
+    getTrip - return trip no 3308
+    getCrew - return Crew names for trip
+    getStart - return report 0445
+    getEnd - return clear 1310
+    getSummary - R0445 G-MRS-GfJER C1215
+    getDescription:
+	  4 SU 3308   2362 LGW 0445 0545 MRS 0735          2363 MRS 0810 LGW 1000 F        8037 LGW 1045 JER 1145       
+	  5 MO 3308   8034 JER 0505 0605 LGW 0700 F        2560 LGW 0745 BLQ 0950          2561 BLQ 1035 LGW 1240       
+
+
 "use strict";
 
+YAHOO.rp.Event = function() {
 
+    this.startDate = new Date(0);
+    this.endDate = new Date(0);
 
-YAHOO.rp.EventCollection = function () {
-  
     var c = YAHOO.rp.constants,
-	Event = function () {
-            this.startDate = new Date(0);
-	    this.endDate = new Date(0);	
-	    this.summary = '';
-	    this.description = '';
-	
-	    this.isWholeDay = function () {
-	        return( (this.endDate.valueOf() - this.startDate.valueOf() + c.ONEMINUTE) % c.WHOLEDAY === 0);
-	    };
-	
-	    this.print = function () {
-	        console.log("Summary: " + this.summary);
-	        console.log("Description: " + this.description);
-	        console.log("Start: " + this.startDate);
-	        console.log("End: " + this.endDate);
-	    };
-	};	
+	summary = '',
+	description = '';
 
-    this.events = (function () {
-	    
-    var eventsList = [],
-        index = 0;
+    this.getSummary = function () {
+	return summary;
+    };
     
-    return {
-        newEvent: function () {
-	    var e = new Event();
-            eventsList.push(e);
-	    return e;
-        },
-        
-        next: function() {
-            var element;
-            if (!this.hasNext()) {
-                return null;
-            }
-            element = eventsList[index]; // Do not trim - whitespace is important to parser
-            index += 1;
+    this.setSummary = function (s) {
+	summary = s;
+    };
 
-            // skip blank lines
-            return element;
-        },
+    this.getDescription = function () {
+	return description;
+    };
+    
+    this.setDescription = function (d) {
+	description = d;
+    };
 
-        hasNext: function() {
-            return index < eventsList.length;
-        },
+    this.isWholeDay = function() {
+	return ((this.endDate.valueOf() - this.startDate.valueOf() + c.ONEMINUTE) % c.WHOLEDAY === 0);
+    };
 
-        reset: function() {
-            index = 0;
-        },
-	
-	push: function(e) {
-            eventsList.push(e);
-	},
+    this.print = function() {
+	console.log("Summary: " + getSummary());
+	console.log("Description: " + getDescription());
+	console.log("Start: " + this.startDate);
+	console.log("End: " + this.endDate);
+    };
+};
 
-	pop: function(e) {
-            return eventsList.pop();
-	},
+YAHOO.rp.EventCollection = function() {
 
-	print: function(indent) {
-/*            var event,
+    var c = YAHOO.rp.constants
+
+    Event = function() {
+	this.startDate = new Date(0);
+	this.endDate = new Date(0);
+	this.summary = '';
+	this.description = '';
+
+	this.isWholeDay = function() {
+	    return ((this.endDate.valueOf() - this.startDate.valueOf() + c.ONEMINUTE) % c.WHOLEDAY === 0);
+	};
+
+	this.print = function() {
+	    console.log("Summary: " + this.summary);
+	    console.log("Description: " + this.description);
+	    console.log("Start: " + this.startDate);
+	    console.log("End: " + this.endDate);
+	};
+    };
+
+    this.events = (function() {
+
+	var eventsList = [],
+	index = 0;
+
+	return {
+	    newEvent: function() {
+		var e = new Event();
+		eventsList.push(e);
+		return e;
+	    },
+
+	    next: function() {
+		var element;
+		if (!this.hasNext()) {
+		    return null;
+		}
+		element = eventsList[index]; // Do not trim - whitespace is important to parser
+		index += 1;
+
+		// skip blank lines
+		return element;
+	    },
+
+	    hasNext: function() {
+		return index < eventsList.length;
+	    },
+
+	    rewind: function() {
+		index = 0;
+	    },
+
+	    current: function() {
+		return eventsList[index];
+	    },
+
+	    push: function(e) {
+		eventsList.push(e);
+	    },
+
+	    pop: function(e) {
+		return eventsList.pop();
+	    },
+
+	    print: function(indent) {
+		/*            var event,
 		tab ="",
-                i = 0,
+		i = 0,
 		infoLines;
 	    
 	    for (; i< indent; i += 1) {
-                tab = tab + "-";
-            } 
+		tab = tab + "-";
+	    } 
 	    
 	    infoLines = getInfo().split("\n");
 	    for (i=0; i < infoLines.length; i++) {
@@ -88,9 +159,10 @@ YAHOO.rp.EventCollection = function () {
 		event = this.next();
 		event.print(indent + 5);
 	    }
-*/	}
-    };
-} ());
+*/
+	    }
+	};
+    } ());
 };
 
 /*
@@ -115,29 +187,29 @@ YAHOO.rp.Event = function () {
        var uuid = generateGUID();
        this.getUUID = function () { return( uuid ); };
        this.getCreated = function () {
-              return( this.created.toISO8601String(5));
+	      return( this.created.toISO8601String(5));
        }
        this.getLastModified = function () {
-              return( this.lastModified.toISO8601String(5));
+	      return( this.lastModified.toISO8601String(5));
        }
        this.getDtStamp = function () {
-              return( dtStamp.toISO8601String(5));
+	      return( dtStamp.toISO8601String(5));
        }
        this.getStartTime = function () {
-              if( this.wholeDay ) {
-                     return( this.startTime.toISO8601String(3, true));                     
-              }
-              else {
-                     return( this.startTime.toISO8601String(5, rosterprocessor_getBooleanPreference("rosterprocessor.useUTC", true)));
-              }
+	      if( this.wholeDay ) {
+		     return( this.startTime.toISO8601String(3, true));                     
+	      }
+	      else {
+		     return( this.startTime.toISO8601String(5, rosterprocessor_getBooleanPreference("rosterprocessor.useUTC", true)));
+	      }
        }
        this.getEndTime = function () {
 	    if( this.wholeDay ) {
 		return( this.endTime.toISO8601String(3, true));                     
-            }
-            else {
-                return( this.endTime.toISO8601String(5, rosterprocessor_getBooleanPreference("rosterprocessor.useUTC", true)));
-            }
+	    }
+	    else {
+		return( this.endTime.toISO8601String(5, rosterprocessor_getBooleanPreference("rosterprocessor.useUTC", true)));
+	    }
        }
        this.getSummary = function () {
 	    // remove multiple spaces       
@@ -364,48 +436,48 @@ public class Sector extends Event {
        this.crewList = "";
        function abbrevBase(base) // Abbreviated the home base to L or G
        {
-              base = (base == 'LGW') ? 'G' : base;
-              base = (base == 'LHR') ? 'L' : base;
-              return base;
+	      base = (base == 'LGW') ? 'G' : base;
+	      base = (base == 'LHR') ? 'L' : base;
+	      return base;
        }
        this.getSummary = function()
        {
-              if ( rosterprocessor_getBooleanPreference("rosterprocessor.ccNoSummary", false) )
-                     return this.description;
+	      if ( rosterprocessor_getBooleanPreference("rosterprocessor.ccNoSummary", false) )
+		     return this.description;
 
-              var summaryLine,orig,dest,lastDest = '';
-              var tmpSector = this.sectors[0];
-              var separator; // normally '-' but  '*' for a positioning sector
+	      var summaryLine,orig,dest,lastDest = '';
+	      var tmpSector = this.sectors[0];
+	      var separator; // normally '-' but  '*' for a positioning sector
 //              summaryLine = "R" + this.startTime.toISO8601String(7,true) + "L ";
-              summaryLine = this.summary + ' ';
+	      summaryLine = this.summary + ' ';
 //               abbrevBase(tmpSector.origin.IATA);
 // Mod Ver 0.1.16 07/09/08 - Removes BA_ from flight no on summary line
-              if ( rosterprocessor_getBooleanPreference("rosterprocessor.ccShowFltNo", true))
-              {
-                     var fn = trimString(tmpSector.flightNo.replace(/BA/,""));
-                     
-                     summaryLine = summaryLine + fn + " ";
-              }
+	      if ( rosterprocessor_getBooleanPreference("rosterprocessor.ccShowFltNo", true))
+	      {
+		     var fn = trimString(tmpSector.flightNo.replace(/BA/,""));
+		     
+		     summaryLine = summaryLine + fn + " ";
+	      }
 
-              for( var s in this.sectors )
-              {
-                 tmpSector = this.sectors[s];
-                 separator = (tmpSector.preFltCode == '*') ? '*' : '-';
-                 if( tmpSector.origin.IATA != lastDest)
-                 {
-                     summaryLine = summaryLine + ((lastDest == '') ? '' : separator);
-                     summaryLine = summaryLine + abbrevBase(tmpSector.origin.IATA);
-                 }
-                 lastDest = tmpSector.dest.IATA;
-                 summaryLine = summaryLine + separator + abbrevBase(lastDest);
-              }
-              summaryLine = summaryLine + " C" + this.endTime.toISO8601String(7,true) + "L";
-              return summaryLine;
+	      for( var s in this.sectors )
+	      {
+		 tmpSector = this.sectors[s];
+		 separator = (tmpSector.preFltCode == '*') ? '*' : '-';
+		 if( tmpSector.origin.IATA != lastDest)
+		 {
+		     summaryLine = summaryLine + ((lastDest == '') ? '' : separator);
+		     summaryLine = summaryLine + abbrevBase(tmpSector.origin.IATA);
+		 }
+		 lastDest = tmpSector.dest.IATA;
+		 summaryLine = summaryLine + separator + abbrevBase(lastDest);
+	      }
+	      summaryLine = summaryLine + " C" + this.endTime.toISO8601String(7,true) + "L";
+	      return summaryLine;
        }
        this.showSectors = function()
        {
        // Function added in 0.1.16 - NEED TO TEST
-              return ( rosterprocessor_getBooleanPreference("rosterprocessor.ccSplitTrip", true) );
+	      return ( rosterprocessor_getBooleanPreference("rosterprocessor.ccSplitTrip", true) );
        }
 
  
