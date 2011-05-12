@@ -8,93 +8,174 @@
 
 /*
 Example:
-  4 SU 3308   2362 LGW 0445 0545 MRS 0735          2363 MRS 0810 LGW 1000 F        8037 LGW 1045 JER 1145       
-  5 MO 3308   8034 JER 0505 0605 LGW 0700 F        2560 LGW 0745 BLQ 0950          2561 BLQ 1035 LGW 1240       
+  4 SU 3308   2362 LGW 0445 0545 MRS 0735          2363 MRS 0810 LGW 1000 F        8037 LGW 1045 JER 1145
+  5 MO 3308   8034 JER 0505 0605 LGW 0700 F        2560 LGW 0745 BLQ 0950          2561 BLQ 1035 LGW 1240
 
 Sector:
     getStart - return start of flight 0545
     getEnd - return end of flight 0735
     getSummary - 2362 LGW-MRS
     getDescription 2362 LGW 0445 0545 MRS 0735
-    getFlyingHours
+    getLength
+    getCrew - return Crew names for sector
+    getId - return Flight No
 Duty:
     getStart - return report 0445
     getEnd - return clear 1215
     getSummary - R0445 G-MRS-GfJER C1215
     getDescription 2362 LGW 0445 0545 MRS 0735          2363 MRS 0810 LGW 1000 F        8037 LGW 1045 JER 1145
-    getDutyHours
-    
+    getLength
+    getCrew - return Crew names for duty
+    getId - return trip no 3308
 Trip:
-    getTrip - return trip no 3308
+    getId - return trip no 3308
     getCrew - return Crew names for trip
     getStart - return report 0445
     getEnd - return clear 1310
     getSummary - R0445 G-MRS-GfJER C1215
     getDescription:
-	  4 SU 3308   2362 LGW 0445 0545 MRS 0735          2363 MRS 0810 LGW 1000 F        8037 LGW 1045 JER 1145       
-	  5 MO 3308   8034 JER 0505 0605 LGW 0700 F        2560 LGW 0745 BLQ 0950          2561 BLQ 1035 LGW 1240       
+	  4 SU 3308   2362 LGW 0445 0545 MRS 0735          2363 MRS 0810 LGW 1000 F        8037 LGW 1045 JER 1145
+	  5 MO 3308   8034 JER 0505 0605 LGW 0700 F        2560 LGW 0745 BLQ 0950          2561 BLQ 1035 LGW 1240
 
+*/
 
 "use strict";
 
-YAHOO.rp.Event = function() {
+YAHOO.rp.EventDate = function() {
+    var d = new Date(0),
+	u = YAHOO.rp.utils;
 
-    this.startDate = new Date(0);
-    this.endDate = new Date(0);
-
-    var c = YAHOO.rp.constants,
-	summary = '',
-	description = '';
-
-    this.getSummary = function () {
-	return summary;
+    this.setTime = function(tm) {
+	u.setHHMM({date: d, time: tm});
     };
-    
-    this.setSummary = function (s) {
-	summary = s;
+    this.setDate = function(bd) {
+	if (typeof bd === 'number') {
+	    d = new Date(bd);
+	}
+	else if (typeof bd === 'object') {
+	    d = new Date(bd.valueOf());
+	}
     };
+    this.setDayOfMonth = function(dy) {
+	d.setUTCDate(dy);
+    };
+    this.incDate = function() {
+	d = u.incUTCDay(d);
+    };
+    this.valueOf = function() {
+	return d.valueOf();
+    };
+    this.date = function() {
+	return d;
+    };
+    this.clone = function() {
+	var newEventDate = new YAHOO.rp.EventDate();
+	newEventDate.setDate(d);
+	return newEventDate;
+    };
+}
 
-    this.getDescription = function () {
-	return description;
-    };
-    
-    this.setDescription = function (d) {
-	description = d;
-    };
+YAHOO.rp.eventMaker = function() {
+    this.start = new YAHOO.rp.EventDate();
+    this.end = new YAHOO.rp.EventDate();
+    this.origin = '';
+    this.destination = '';
+    this.summary = '';
+    this.description = '';
 
-    this.isWholeDay = function() {
-	return ((this.endDate.valueOf() - this.startDate.valueOf() + c.ONEMINUTE) % c.WHOLEDAY === 0);
-    };
 
-    this.print = function() {
-	console.log("Summary: " + getSummary());
-	console.log("Description: " + getDescription());
+};
+
+YAHOO.rp.eventMaker.prototype.getSummary = function () {
+	return this.summary;
+};
+
+YAHOO.rp.eventMaker.prototype.setSummary = function (s) {
+	this.summary = s;
+};
+
+YAHOO.rp.eventMaker.prototype.getDescription = function () {
+	return this.description;
+};
+
+YAHOO.rp.eventMaker.prototype.setDescription = function (d) {
+	this.description = d;
+};
+
+YAHOO.rp.eventMaker.prototype.print = function() {
+	console.log("Summary: " + this.getSummary());
+	console.log("Description: " + this.getDescription());
 	console.log("Start: " + this.startDate);
 	console.log("End: " + this.endDate);
+};
+
+YAHOO.rp.eventMaker.prototype.getLength = function() {
+    return this.endDate.valueOf() - this.startDate.valueOf();
+};
+
+YAHOO.rp.eventMaker.prototype.getId = function() {
+    return '';
+};
+
+
+YAHOO.rp.eventMaker.prototype.postProcess = function() {
+    console.log('Post Processing');
+};
+
+// the static factory method
+YAHOO.rp.eventMaker.factory = function(eventType, defaultDate) {
+    var constr = eventType, newEvent,
+	em = YAHOO.rp.eventMaker;
+    // error if the constructor doesn't exist
+    if (typeof YAHOO.rp.eventMaker[constr] !== "function") {
+	throw {
+	    name: "Error",
+	    message: constr + " doesn't exist"
+	};
+    }
+    // at this point the constructor is known to exist
+    // let's have it inherit the parent but only once
+    if (typeof YAHOO.rp.eventMaker[constr].prototype.getSummary !== "function") {
+	YAHOO.rp.eventMaker[constr].prototype = new YAHOO.rp.eventMaker();
+    }
+    // create a new instance
+    newEvent = new YAHOO.rp.eventMaker[constr]();
+    // optionally call some methods and then return...
+    newEvent.start.setDate(defaultDate);
+    newEvent.end.setDate(defaultDate);
+    console.log("Creating new " + newEvent.name);
+    return newEvent;
+};
+
+// define specific car makers
+YAHOO.rp.eventMaker.Sector = function () {
+    this.name = 'sector';
+};
+
+YAHOO.rp.eventMaker.FlyingDuty = function () {
+    this.name = 'flyingDuty';
+    this.flightNo = '';
+    this.sectors = new YAHOO.rp.EventCollection();
+};
+
+YAHOO.rp.eventMaker.Trip = function () {
+    this.name = 'trip';
+    this.tripNo = '';
+    this.duties = new YAHOO.rp.EventCollection();
+};
+
+YAHOO.rp.eventMaker.GroundDuty = function () {
+    this.name = 'groundDuty';
+    this.isWholeDay = function() {
+	var c= YAHOO.rp.constants;
+	return ((this.getLength() + c.ONEMINUTE) % c.WHOLEDAY === 0);
     };
 };
 
+
 YAHOO.rp.EventCollection = function() {
 
-    var c = YAHOO.rp.constants
-
-    Event = function() {
-	this.startDate = new Date(0);
-	this.endDate = new Date(0);
-	this.summary = '';
-	this.description = '';
-
-	this.isWholeDay = function() {
-	    return ((this.endDate.valueOf() - this.startDate.valueOf() + c.ONEMINUTE) % c.WHOLEDAY === 0);
-	};
-
-	this.print = function() {
-	    console.log("Summary: " + this.summary);
-	    console.log("Description: " + this.description);
-	    console.log("Start: " + this.startDate);
-	    console.log("End: " + this.endDate);
-	};
-    };
+    var c = YAHOO.rp.constants;
 
     this.events = (function() {
 
@@ -102,10 +183,8 @@ YAHOO.rp.EventCollection = function() {
 	index = 0;
 
 	return {
-	    newEvent: function() {
-		var e = new Event();
-		eventsList.push(e);
-		return e;
+	    add: function(e) {
+		eventsList[eventsList.length] = e;
 	    },
 
 	    next: function() {
@@ -145,11 +224,11 @@ YAHOO.rp.EventCollection = function() {
 		tab ="",
 		i = 0,
 		infoLines;
-	    
+
 	    for (; i< indent; i += 1) {
 		tab = tab + "-";
-	    } 
-	    
+	    }
+
 	    infoLines = getInfo().split("\n");
 	    for (i=0; i < infoLines.length; i++) {
 		//console.( tab  + infoLines[i] );
@@ -197,7 +276,7 @@ YAHOO.rp.Event = function () {
        }
        this.getStartTime = function () {
 	      if( this.wholeDay ) {
-		     return( this.startTime.toISO8601String(3, true));                     
+		     return( this.startTime.toISO8601String(3, true));
 	      }
 	      else {
 		     return( this.startTime.toISO8601String(5, rosterprocessor_getBooleanPreference("rosterprocessor.useUTC", true)));
@@ -205,14 +284,14 @@ YAHOO.rp.Event = function () {
        }
        this.getEndTime = function () {
 	    if( this.wholeDay ) {
-		return( this.endTime.toISO8601String(3, true));                     
+		return( this.endTime.toISO8601String(3, true));
 	    }
 	    else {
 		return( this.endTime.toISO8601String(5, rosterprocessor_getBooleanPreference("rosterprocessor.useUTC", true)));
 	    }
        }
        this.getSummary = function () {
-	    // remove multiple spaces       
+	    // remove multiple spaces
 	    return(this.summary.replace(/ +/," "));
        }
        this.getDescription = function () {
@@ -231,7 +310,7 @@ public class Event {
 	private Date created;
 	private Date dateStamp;
 	private UUID uuid;
-	
+
 	public Event() {
 		this.created = new Date();
 		this.dateStamp = new Date();
@@ -240,7 +319,7 @@ public class Event {
 		this.parent = null;
 		uuid = UUID.randomUUID();
 	}
-	
+
 	public String getUUID() {
 		return uuid.toString();
 	}
@@ -312,11 +391,11 @@ public class Event {
 	public void setSummary(String summary) {
 		this.summary = summary.trim();
 	}
-	
+
 	public boolean includeEvent() {
 		return true;
 	}
-	
+
 	public boolean isAllDay() {
 		// Whole day time is 0000 - 2359 so add a minute
 		long diff = getEndDate().getTime() - getStartDate().getTime();
@@ -326,8 +405,8 @@ public class Event {
 
 	public String getInfo() {
 		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.UK);
-		String eventInfo = "<Event>-------------------------------------------\nCreated:" + 
-		df.format(this.getCreated() ) + "\nStart:" + df.format(this.getStartDate() ) + "\nEnd:" + 
+		String eventInfo = "<Event>-------------------------------------------\nCreated:" +
+		df.format(this.getCreated() ) + "\nStart:" + df.format(this.getStartDate() ) + "\nEnd:" +
 		df.format(this.getEndDate()) + "\nSummary:";
 		eventInfo += this.getSummary() + "\nDescription:\n" + this.getDescription() + "\n</Event>-------------------------------------------\n";
 		return eventInfo;
@@ -335,7 +414,7 @@ public class Event {
 
 	public void print(int indent) {
 		String tab ="";
-		for (int i=0; i< indent; i++) { tab = tab + "-"; } 
+		for (int i=0; i< indent; i++) { tab = tab + "-"; }
 		String [] infoLines = getInfo().split("\n");
 		for (int i=0; i < infoLines.length; i++) {
 			System.out.println( tab  + infoLines[i] );
@@ -411,8 +490,8 @@ public class Sector extends Event {
 	public Sector() {
 		crew = new ArrayList();
 	}
-	
-	
+
+
 	public String getInfo() {
 		DateFormat df = DateFormat.getDateTimeInstance(DateFormat.DEFAULT, DateFormat.DEFAULT, Locale.UK);
 		String eventInfo = "<Sector>-------------------------------------------\nCreated:";
@@ -455,7 +534,7 @@ public class Sector extends Event {
 	      if ( rosterprocessor_getBooleanPreference("rosterprocessor.ccShowFltNo", true))
 	      {
 		     var fn = trimString(tmpSector.flightNo.replace(/BA/,""));
-		     
+
 		     summaryLine = summaryLine + fn + " ";
 	      }
 
@@ -480,7 +559,7 @@ public class Sector extends Event {
 	      return ( rosterprocessor_getBooleanPreference("rosterprocessor.ccSplitTrip", true) );
        }
 
- 
+
 public class Duty extends EventCollection {
 
 	public String getInfo() {
@@ -489,17 +568,17 @@ public class Duty extends EventCollection {
 		eventInfo += "\n</Duty>-------------------------------------------\n";
 		return eventInfo;
 	}
-	
-	
-	
-	
+
+
+
+
 }
 
 public class Trip extends EventCollection {
 
 	private boolean fsSs;
 	private int tripNo;
-	
+
 	public boolean getFsSs() {
 		return fsSs;
 	}

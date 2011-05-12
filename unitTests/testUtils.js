@@ -47,7 +47,7 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
 
         Assert.isObject(this.utils);
     },
-    
+
     testEmailFunction: function() {
         var Assert = YAHOO.util.Assert,
             result,
@@ -72,7 +72,7 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
             testString1 = "      leading_spaces",
             testString2 = "trailing_spaces     ",
             testString3 = "      leading_&_trailing_spaces     ";
-            
+
         Assert.isFunction(String.trim);
         result = testString1.trim();
         Assert.areSame("leading_spaces",result,"didn't trim leading whitespace");
@@ -83,16 +83,16 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
         result = testString3.trim();
         Assert.areSame("leading_&_trailing_spaces",result,"didn't trim leading & trailing whitespace");
     },
-    
+
     /**
      * Checks that indexOfMonth returns 0 - 11 for jan - dec
      * and -1 for an unrecognised string
      * @returns {number} month index
      */
-    
+
     testIndexOfMonth: function() {
         var Assert = YAHOO.util.Assert,
-            result;            
+            result;
 
         Assert.isFunction(this.utils.indexOfMonth);
         result = this.utils.indexOfMonth("Jan");
@@ -101,7 +101,7 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
         result = this.utils.indexOfMonth("Dec");
         Assert.areSame(11,result,"Didn't recognise DEC");
     },
-    
+
     testIndexOfMonthBadInput: function() {
         // should throw a type error
         var result = this.utils.indexOfMonth("???");
@@ -109,7 +109,7 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
 
     testDaysInMonth: function() {
         var Assert = YAHOO.util.Assert,
-            result;            
+            result;
 
         Assert.isFunction(this.utils.daysInMonth);
         result = this.utils.daysInMonth("JAN",2011);
@@ -126,7 +126,7 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
 
     testDaysInMonth2: function() {
         var Assert = YAHOO.util.Assert,
-            result;            
+            result;
 
         Assert.isFunction(this.utils.daysInMonth2);
         result = this.utils.daysInMonth2(new Date(0));
@@ -136,7 +136,7 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
         Assert.areSame(29,result);
 
     },
-    
+
     testDaysInMonth2BadInput: function() {
         // should throw a type error
         var result = this.utils.daysInMonth2(undefined);
@@ -144,7 +144,7 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
 
     testDaysSince1970: function() {
         var Assert = YAHOO.util.Assert,
-            result;            
+            result;
 
         Assert.isFunction(this.utils.daysSince1970);
         result = this.utils.daysSince1970(new Date(0));
@@ -158,7 +158,7 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
     testIncDecUTCMonth: function() {
         var Assert = YAHOO.util.Assert,
             c = YAHOO.rp.constants,
-            result;            
+            result;
 
         Assert.isFunction(this.utils.incUTCMonth, 'incUTCMonth not defined');
         result = this.utils.incUTCMonth(new Date("JAN 01, 2011 00:00:00 UTC"));
@@ -172,7 +172,7 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
     testIncDecUTCDay: function() {
         var Assert = YAHOO.util.Assert,
             c = YAHOO.rp.constants,
-            result;            
+            result;
 
         Assert.isFunction(this.utils.incUTCDay, 'incUTCDay not defined');
         result = this.utils.incUTCDay(new Date(0));
@@ -206,7 +206,7 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
         result = this.utils.abbrevBase(testString3);
         Assert.areSame(testString3,result);
     },
-    
+
     testAbbrevName: function() {
         var Assert = YAHOO.util.Assert,
             an = this.utils.abbrevName,
@@ -220,7 +220,7 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
         Assert.isFunction(an);
         result = an(testString1);
         Assert.areSame("",result);
- 
+
         result = an(testString2);
         Assert.areSame("",result);
 
@@ -234,10 +234,9 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
         Assert.areSame("FS Name.",result);
     }
 
-    
 
-    
-    
-    
+
+
+
+
 });
-

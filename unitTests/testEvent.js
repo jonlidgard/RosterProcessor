@@ -38,18 +38,18 @@ YAHOO.rpTest.yuitest.EventTestCase = new YAHOO.tool.TestCase({
 
         Assert.isObject(this.eventCollection);
     },
-    
+
         // Test rosterText functionality
     testNewEvent: function() {
         var Assert = YAHOO.util.Assert,
             e = this.eventCollection.events,
             myEvent;
 
-        Assert.isFunction(e.newEvent);
-        myEvent = e.newEvent();
+        Assert.isFunction(e.add);
+        myEvent = YAHOO.rp.eventMaker.factory('GroundDuty');
         Assert.isObject(myEvent);
         Assert.isString(myEvent.summary);
-
+        e.add(myEvent);
     }
-    
+
 });

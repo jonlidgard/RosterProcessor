@@ -91,6 +91,7 @@ YAHOO.rp.BaFcLookingForMetaDataState = function (parser) { // old - startState
     that.foundDayDutyFSLine = function() {
         parser.doDayDutyFSLineAction();
         parser.state = parser.state.changeState(parser.lookingForDutyLineState);
+        console.log("PARSER STATE:" + parser.state.name);
 	parser.ignoreUnrecognisedLines = false; // Don't ignore lines frome here-on.
     };
     return that;
@@ -105,8 +106,9 @@ YAHOO.rp.BaFcLookingForDutyLineState = function (parser) { // old - startState
         parser.doMultiDayLineAction();
     };
     that.foundFlyingDutyLine = function() {
+	parser.doStartTripAction();
+        parser.state = parser.state.changeState(parser.inATripState);
         parser.state = parser.state.changeState(parser.inAFlyingDutyState);
-	parser.startNewTrip();
 	parser.doFlyingDutyLineAction();
     };
     that.foundGndDutyLine = function() {
@@ -117,6 +119,43 @@ YAHOO.rp.BaFcLookingForDutyLineState = function (parser) { // old - startState
         parser.doTripCrewLineAction();
         parser.state = parser.state.changeState(parser.lookingForCrewLineState);
     };
+    return that;
+};
+
+//---
+YAHOO.rp.BaFcInATripState = function (parser) { // old - startState
+    var that = YAHOO.rp.BaFcDefaultState(parser);
+    that.name = "Trip State";
+
+    that.enterState = function() {
+	parser.startTrip();
+	return this;
+    };
+
+    that.exitState = function() {
+	parser.endTrip();
+	return this;
+    };
+
+    that.foundFlyingDutyLine = function() {
+        parser.doFlyingDutyLineAction();
+    };
+
+    that.foundMultiDayLine = function() {
+        parser.doMultiDayLineAction();
+    };
+    that.foundFlyingDutyLine = function() {
+        parser.doFlyingDutyLineAction();
+    };
+    that.foundGndDutyLine = function() {
+        parser.doGndDutyLineAction();
+    };
+
+    that.foundTripCrewLine = function() {
+        parser.doTripCrewLineAction();
+        parser.state = parser.state.changeState(parser.lookingForCrewLineState);
+    };
+
     return that;
 };
 
@@ -135,28 +174,8 @@ YAHOO.rp.BaFcInAFlyingDutyState = function (parser) { // old - startState
 	return this;
     };
 
-    that.foundMultiDayLine = function() {
-	parser.finishTrip();
-        parser.state = parser.state.changeState(parser.lookingForDutyLineState);
-        parser.doMultiDayLineAction();
-    };
-
     that.foundFlyingDutyLine = function() {
-    // If it is a new trip, then wrap up the old one & start a new.
-	parser.checkIfNewTrip();
-	parser.doFlyingDutyLineAction();
-    };
-
-    that.foundGndDutyLine = function() {
-	parser.finishTrip();
-        parser.state = parser.state.changeState(parser.lookingForDutyLineState);
-        parser.doGndDutyLineAction();
-    };
-
-    that.foundTripCrewLine = function() {
-	parser.finishTrip();
-        parser.doTripCrewLineAction();
-        parser.state = parser.state.changeState(parser.lookingForCrewLineState);
+        parser.doFlyingDutyLineAction();
     };
     return that;
 };
@@ -265,6 +284,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 
     this.lookingForMetaDataState = new YAHOO.rp.BaFcLookingForMetaDataState(this);
     this.lookingForDutyLineState = new YAHOO.rp.BaFcLookingForDutyLineState(this);
+    this.inATripState = new YAHOO.rp.BaFcInATripState(this);
     this.inAFlyingDutyState = new YAHOO.rp.BaFcInAFlyingDutyState(this);
     this.lookingForCrewLineState = new YAHOO.rp.BaFcLookingForCrewLineState(this);
     this.lineTypeEnum = {
@@ -384,7 +404,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
     this.addEvent = function (fields) {
 
 //	var e = this.eventCollection.events.newEvent(),
-	var e = YAHOO.rp.eventMaker.factory('GroundDuty',this.baseDate),
+	var e = YAHOO.rp.eventMaker.factory('GroundDuty',baseDate),
 	    d,
 	    u = YAHOO.rp.utils;
 
@@ -760,91 +780,36 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 
     };
 
-    this.startNewTrip = function() {
+    this.doStartTripAction = function() {
 	var t = YAHOO.rp.eventMaker.factory('Trip');
-        t.tripNo = +this.matchedFields[3];
+        t.tripNo = +this.matchedFields[3].trim();
 	this.eventCollection.events.add(t);
 	console.log('trip:' + t.tripNo);
     };
 
-    this.finishTrip = function() {
-	var trip = this.eventCollection.events.current(),
-	    duty = trip.duties.events.current();
-
-	duty.postProcess();
-	trip.postProcess();
-    };
-
-    this.checkIfNewTrip = function() {
-	var trip = this.eventCollection.events.current(),
-	    duty = trip.duties.events.current(),
-	    tripNo = +this.matchedFields[3];
-/*
-	// If restPeriod > minRest then new Duty
-	// if (newDuty & at home base) or trip no changed then new trip.
-	if( (tripNo !== trip.tripNo) ||
-	    (this.isNewDuty() && this.atHomeBase())) {
-	    this.finishTrip();
-	    this.startNewTrip();
-	}
-*/    };
-
-    this.isNewDuty = function(sectorStart) {
-	var trip = this.eventCollection.events.current(),
-	    prevDuty, thisDuty,endDuty,startDuty,
-	    c = YAHOO.rp.constants;
-
-	if (typeof sectorStart !== 'undefined') {
-	    prevDuty = trip.duties.events.current();
-	    startDuty = sectorStart;
-	}
-	else {
-	    thisDuty = trip.duties.events.pop();
-	    prevDuty = trip.duties.events.current();
-	    trip.duties.events.push(thisDuty);
-	    startDuty = thisDuty.sectors.events.current().start.valueOf();
-	}
-
-	if (typeof prevDuty !== 'undefined') {
-	    endDuty = prevDuty.sectors.events.current().end.valueOf();
-	    if (startDuty - endDuty < c.MINREST) {
-	        return false;
-	    }
-	}
-	return true;
-    };
-
     this.doFlyingDutyLineAction = function() {
+        console.log("Doing flying dutyLineAction");
+
 	var trip = this.eventCollection.events.current(),
 	    duty = YAHOO.rp.eventMaker.factory('FlyingDuty'),
-	    sector,
+	    sector = YAHOO.rp.eventMaker.factory('Sector',baseDate),
 	    s = {};
-
-
-	console.log("Doing flying dutyLineAction");
-
        // this.checkDate(lastDutyDate);
         s.line = this.matchedFields[4];
+	sector.start.setDayOfMonth(this.matchedFields[1]);
+	sector.end.setDayOfMonth(this.matchedFields[1]);
+
 	while (typeof s.line !== 'undefined') {
 	    s = this.nextSector(s.line);
 	    if (typeof s.report !== 'undefined') {
-		duty.start.setTime(s.report);
+
+    		duty.start.setTime(s.report)
 	    }
-	    sector = YAHOO.rp.eventMaker.factory('Sector',this.baseDate);
-	    sector.start.setDayOfMonth(this.matchedFields[1]);
-	    sector.end.setDayOfMonth(this.matchedFields[1]);
+
 	    sector.start.setTime(s.start);
 	    sector.end.setTime(s.end);
-	    sector.origin = s.origin;
-	    sector.destination = s.dest;
-	    sector.flightNo = s.flightNo;
 
-	    if (this.isNewDuty(sector.start.valueOf())) {
-		duty.postProcess();
-		duty = YAHOO.rp.eventMaker.factory('FlyingDuty');
-	    }
-
-	    duty.sectors.events.add(sector);
+	    duty.sectors.add(sector);
 //	    console.log('preFlt: ' + sector.preFltCode);
 //	    console.log('flightNo: ' + sector.flightNo);
 //	    console.log('origin: ' + sector.origin);
@@ -855,7 +820,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 //	    console.log('post: ' + sector.postCodes);
 	}
 
-	trip.duties.events.add(duty);
+	trip.duties.add(duty);
         //roster.add(trip);
     };
 
