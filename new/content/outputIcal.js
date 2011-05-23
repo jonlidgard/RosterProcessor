@@ -21,75 +21,60 @@ YAHOO.rp.outputIcal = function (events, preferences) {
         TZID = preferences.useUTC ? ICAL.TZIDcode : ":",
         TZINFO = preferences.useUTC ? ICAL.TIMEZONE_INFO : "",
         event,
-        i = 0;
-        
-    function outputHeader()
-    {
+        i = 0,
+        u = YAHOO.rp.utils;
+
+    this.outputHeader = function() {
         // MS Outlook doesn't like V2.0 of ical spec so use v1.0 for windows machines
         var calHeader;
-        switch (BrowserDetect.OS)
+        switch (u.BrowserDetect.OS)
         {
             case 'Windows':
-                calHeader = ICAL.V1_HEADER + TZINFO;    
+                calHeader = ICAL.V1_HEADER + TZINFO;
                 break;
             case 'Mac':
-                calHeader = ICAL.V2_HEADER + TZINFO;    
+                calHeader = ICAL.V2_HEADER + TZINFO;
                 break;
             case 'Linux':
-                calHeader = ICAL.V2_HEADER + TZINFO;    
+                calHeader = ICAL.V2_HEADER + TZINFO;
                 break;
             default:
+                calHeader = ICAL.V2_HEADER + TZINFO;
                 break;
         }
         outputText = outputText.concat(calHeader);
-    }
-    function outputFooter()
-    {
-        outputText = outputText.concat(ICAL.CAL_FOOTER);
-    }
-    /*
-    function outputEvent(e)
-    { 
-        var mySector,crewLine,firstSector = true;
+    };
 
-        if ( e.showSectors() )
-        {
-            for ( mySector in e.sectors )
-            {
-                with (theEvent.sectors[mySector])
-                {
-                    outputText = outputText.concat(ICAL.EVENT_HEADER);
-                    outputText = outputText.concat('CREATED:' + getCreated() + "\n");
-                    outputText = outputText.concat('LAST_MODIFIED:' + getLastModified() + "\n");
-                    outputText = outputText.concat('DTSTAMP:' + getDtStamp() + "\n");
-                    outputText = outputText.concat('UID:' + getUUID() + "\n");
-                    if ( firstSector )
-                    {
-                        crewLine = " " + abbrevName(crewList);
-// Mod 0.1.25 - need to switch between L & Z for cc or fc rosters
-//                        rptText = "RPT" + theEvent.startTime.toISO8601String(7,false) + "Z ";
-                        rptText = '';
-                        outputText = outputText.concat('DTSTART' + TZID + theEvent.getStartTime() + "\n");
-                    }
-                    else
-                    {
-                        rptText = '';
-                        crewLine = '';
-                    }
-                    outputText = outputText.concat('DTSTART' + TZID + getStartTime() + "\n");
-                    firstSector = false;
-                    outputText = outputText.concat('DTEND' + TZID + getEndTime() + "\n");
-                    outputText = outputText.concat('SUMMARY:' + rptText + getSummary() + crewLine + "\n");
-                    outputText = outputText.concat('DESCRIPTION:' + getDescription() + "\n");
-                    outputText = outputText.concat('CATEGORIES:' + categories + "\n");
-                    outputText = outputText.concat(ICAL.EVENT_FOOTER);
-                }
-            }
+    this.outputFooter = function() {
+        outputText = outputText.concat(ICAL.CAL_FOOTER);
+    };
+
+    this.outputSector = function (s) {
+        outputText += ICAL.EVENT_HEADER +
+            'CREATED:' + getCreated() + '\n' +
+            'LAST_MODIFIED:' + getLastModified() + '\n' +
+            'DTSTAMP:' + getDtStamp() + '\n' +
+            'UID:' + getUUID() + '\n';
+
+        if ( firstSector ) {
+            crewLine = " " + abbrevName(crewList);
+            //  rptText = "RPT" + theEvent.startTime.toISO8601String(7,false) + "Z ";
+            rptText = '';
+            outputText += 'DTSTART' + TZID + theEvent.getStartTime() + '\n';
         }
-        else
-        {
-        if( e.showEvent() )
-        {
+        else {
+            rptText = '';
+            crewLine = '';
+        }
+        firstSector = false;
+        outputText += 'DTSTART' + TZID + getStartTime() + '\n' +
+            'DTEND' + TZID + getEndTime() + '\n' +
+            'SUMMARY:' + rptText + getSummary() + crewLine + '\n' +
+            'DESCRIPTION:' + getDescription() + '\n' +
+            'CATEGORIES:' + categories + '\n' + ICAL.EVENT_FOOTER;
+    };
+
+    this.outputDuty = function() {
         outputText += ICAL.EVENT_HEADER;
         outputText += 'CREATED:' + e.getCreated() + "\n";
         outputText += 'LAST-MODIFIED:' + e.getLastModified() + "\n";
@@ -108,17 +93,48 @@ YAHOO.rp.outputIcal = function (events, preferences) {
             outputText += 'CATEGORIES:' + e.categories + "\n";
         }
         outputText += ICAL.EVENT_FOOTER;
+    };
+
+    this.outputEvent = function(e) {
+        var mySector,crewLine,firstSector = true;
+
+        if (e.name === 'trip') {
+            switch (preferences.detailLevel) {
+                case 'showSectors':
+                    while (e.duties.events.hasNext()) {
+                        d = e.duties.events.next();
+                        while (d.sectors.hasNexy()) {
+                            s = d.sectors.events.next();
+                            this.outputSectors(s);
+                        }
+                    }
+                    break;
+
+                case 'showDuty':
+                    while (e.duties.events.hasNext()) {
+                        d = e.duties.events.next();
+                        this.outputDuties(d);
+                    }
+                    break;
+                case 'showTrip':
+                    this.outputTrip(e);
+                    break;
+                case 'showAtWork':
+                    this.outputAtWork(e);
+                    break;
+            }
         }
+        else {
+            this.outputDuty(e);
         }
     }
-    */
     // Add the header
     outputHeader();
     // Add the events
 
     for ( ;i < events.length; i += 1 )
     {
- //       outputEvent(events[i]);
+        outputEvent(events[i]);
     }
 
     outputFooter();

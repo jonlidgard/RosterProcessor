@@ -2,6 +2,38 @@
 
 /*jslint white: false, devel: true */
 
+
+/* Trip parsing:
+
+    Scan through until you come across first flying duty or end of month:
+    if origin != LGW or LHR then create a new trip, mark as incomplete,
+    add all duties up until this flying duty (which should only be downroute
+    rest days).
+
+
+
+
+  if not in a trip & duty line:
+    possibilities:
+	1) Start of new trip, ex home base
+	2) In a trip at start of month & returning home.
+
+    In a trip:
+	duty line:
+	1) another duty as part of trip
+	2) start of another trip
+
+	gnd duty or multi day:
+	1) If it's a rest day it could be
+		1) mid trip
+		2) at end of trip if clearing during next day
+
+    A trip is starting if:
+	flying duty & origin = LGW or LHR (even if LIMO sector) && not in a trip   OR
+	flying duty | rest
+
+*/
+
 "use strict";
 
 /* For description of 'that' & it's use in inheritance, see
@@ -21,13 +53,43 @@ YAHOO.rp.BaFcDefaultState = function (parser) {
 	    return this;
 	},
 	changeState : function(s) {
-	    var newState = s;
-
 	    this.exit();
 	    this.prevState = this;
 	    s.enter();
 	    return s;
 	},
+
+        testForRosterDateLine : function() {
+            return false;
+        },
+        testForRosterTypeLine : function() {
+            return false;
+        },
+        testForCrewInfoLine : function() {
+            return false;
+        },
+        testForBLKLine : function() {
+            return false;
+        },
+        testForCrewNamesLine : function() {
+            return false;
+        },
+        testForTripCrewLine : function() {
+            return false;
+        },
+        testForDayDutyFSLine : function() {
+            return false;
+        },
+        testForMultiDayLine : function() {
+            return false;
+        },
+        testForFlyingDutyLine : function() {
+            return false;
+        },
+        testForGndDutyLine : function() {
+            return false;
+        },
+
         foundRosterDateLine : function() {
             parser.decodeError(parser.errorMsg.MSG_ROSTER_DATE_LINE);
         },
@@ -39,6 +101,9 @@ YAHOO.rp.BaFcDefaultState = function (parser) {
         },
         foundBLKLine : function() {
             parser.decodeError(parser.errorMsg.MSG_BLK_LINE);
+        },
+        foundDatesLine : function() {
+            parser.decodeError(parser.errorMsg.MSG_DATES_LINE);
         },
         foundCrewNamesLine : function() {
             parser.decodeError(parser.errorMsg.MSG_CREW_LINE);
@@ -71,6 +136,25 @@ YAHOO.rp.BaFcLookingForMetaDataState = function (parser) { // old - startState
 
     that.name = "MetaData State";
 
+    that.testForRosterDateLine = function() {
+        return parser.testForRosterDateLine() ;
+    };
+    that.testForRosterTypeLine = function() {
+        return parser.testForRosterTypeLine();
+    };
+    that.testForCrewInfoLine = function() {
+        return parser.testForCrewInfoLine();
+    };
+    that.testForBLKLine = function() {
+        return parser.testForBLKLine();
+    };
+    that.testForDatesLine = function() {
+        return parser.testForDatesLine();
+    };
+    that.testForDayDutyFSLine = function() {
+        return parser.testForDayDutyFSLine();
+    };
+
     that.foundRosterDateLine = function() {
         parser.doRosterDateLineAction();
     };
@@ -88,18 +172,81 @@ YAHOO.rp.BaFcLookingForMetaDataState = function (parser) { // old - startState
         parser.ignoreUnrecognisedLines = true; // Ignore the cruft between BLK & DAY DUTY FS
     };
 
+    that.foundDatesLine = function() {
+        parser.doDatesLineAction();
+    };
+
     that.foundDayDutyFSLine = function() {
         parser.doDayDutyFSLineAction();
-        parser.state = parser.state.changeState(parser.lookingForDutyLineState);
+	if (parser.hasCarryInTrip === true ) {
+            parser.RetrieveCarryInTrip;
+            parser.state = parser.state.changeState(parser.inACarryInTripState);
+	}
+	else {
+            parser.state = parser.state.changeState(parser.lookingForDutyLineState);
+	}
 	parser.ignoreUnrecognisedLines = false; // Don't ignore lines frome here-on.
     };
     return that;
 };
 
+YAHOO.rp.BaFcInACarryInTripState = function (parser) { // old - startState
+    var that = YAHOO.rp.BaFcDefaultState(parser);
+    that.name = "Carry-In Trip State";
+
+    that.testForTripCrewLine = function() {
+        return parser.testForTripCrewLine();
+    };
+
+    that.testForMultiDayLine = function() {
+        return parser.testForMultiDayLine();
+    };
+    that.testForFlyingDutyLine = function() {
+        return parser.testForFlyingDutyLine();
+    };
+    that.testForGndDutyLine = function() {
+        return parser.testForGndDutyLine();
+    };
+
+    that.foundMultiDayLine = function() {
+        parser.doMultiRestDayLineAction();
+    };
+    that.foundFlyingDutyLine = function() {
+        parser.state = parser.state.changeState(parser.inAFlyingDutyState);
+	parser.startNewTrip();
+	parser.doFlyingDutyLineAction();
+    };
+    that.foundGndDutyLine = function() {
+        parser.doRestDayLineAction();
+    };
+
+    that.foundTripCrewLine = function() {
+        parser.doTripCrewLineAction();
+        parser.state = parser.state.changeState(parser.lookingForCrewLineState);
+    };
+    return that;
+};
+
+
+
 //---
 YAHOO.rp.BaFcLookingForDutyLineState = function (parser) { // old - startState
     var that = YAHOO.rp.BaFcDefaultState(parser);
     that.name = "Duty State";
+
+    that.testForTripCrewLine = function() {
+        return parser.testForTripCrewLine();
+    };
+
+    that.testForMultiDayLine = function() {
+        return parser.testForMultiDayLine();
+    };
+    that.testForFlyingDutyLine = function() {
+        return parser.testForFlyingDutyLine();
+    };
+    that.testForGndDutyLine = function() {
+        return parser.testForGndDutyLine();
+    };
 
     that.foundMultiDayLine = function() {
         parser.doMultiDayLineAction();
@@ -135,6 +282,20 @@ YAHOO.rp.BaFcInAFlyingDutyState = function (parser) { // old - startState
 	return this;
     };
 
+    that.testForTripCrewLine = function() {
+        return parser.testForTripCrewLine();
+    };
+
+    that.testForMultiDayLine = function() {
+        return parser.testForMultiDayLine();
+    };
+    that.testForFlyingDutyLine = function() {
+        return parser.testForFlyingDutyLine();
+    };
+    that.testForGndDutyLine = function() {
+        return parser.testForGndDutyLine();
+    };
+
     that.foundMultiDayLine = function() {
 	parser.finishTrip();
         parser.state = parser.state.changeState(parser.lookingForDutyLineState);
@@ -143,7 +304,7 @@ YAHOO.rp.BaFcInAFlyingDutyState = function (parser) { // old - startState
 
     that.foundFlyingDutyLine = function() {
     // If it is a new trip, then wrap up the old one & start a new.
-	parser.checkIfNewTrip();
+//	parser.checkIfNewTrip();
 	parser.doFlyingDutyLineAction();
     };
 
@@ -165,6 +326,11 @@ YAHOO.rp.BaFcInAFlyingDutyState = function (parser) { // old - startState
 YAHOO.rp.BaFcLookingForCrewLineState = function(parser) { // old - startState
     var that = YAHOO.rp.BaFcDefaultState(parser);
     that.name = "Crew Names State";
+
+    that.testForCrewNamesLine = function() {
+        return parser.testForCrewNamesLine();
+    };
+
     that.foundCrewNamesLine = function() {
         parser.doCrewLineAction();
         parser.ignoreUnrecognisedLines = true;
@@ -182,7 +348,29 @@ YAHOO.rp.Roster = function (rosterLines) {
             length = lines.length;
 
         return {
-            next: function() {
+            go: function(line) {
+		if ((line >= 0) && (line < length)) {
+		    index = line;
+		}
+	    },
+            hasPrev: function() {
+                return index > 0;
+            },
+	    prev: function() {
+                var element;
+                do {
+                    if (!this.hasPrev()) {
+                        return null;
+                    }
+                    index -= 1;
+                    element = lines[index]; // Do not trim - whitespace is important to parser
+
+                    // skip blank lines
+                } while ( element.length === 0 );
+                return element.replace(/\t/g,"        ");
+            },
+
+	    next: function() {
                 var element;
                 do {
                     if (!this.hasNext()) {
@@ -192,8 +380,8 @@ YAHOO.rp.Roster = function (rosterLines) {
                     index += 1;
 
                     // skip blank lines
-                } while ( element . length === 0 );
-                return element;
+                } while ( element.length === 0 );
+                return element.replace(/\t/g,"        ");
             },
             hasNext: function() {
                 return index < length;
@@ -201,7 +389,7 @@ YAHOO.rp.Roster = function (rosterLines) {
             getLineNo: function() {
                 return index;
             },
-            reset: function() {
+            rewind: function() {
                 index = 0;
             }
         };
@@ -233,8 +421,9 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         MSG_ANY_OTHER_LINE : "Unrecognised line",
         MSG_TRIP_CREW_LINE : "Unexpected Trip: Crew Names: line",
         MSG_CREW_LINE : "Unexpected Crew names line",
-        MSG_DUTY_LINE : "Unexpected Duty line"
-    };
+        MSG_DUTY_LINE : "Unexpected Duty line",
+        MSG_DATES_LINE : "Unexpected (01) 02  03.. line"
+   };
 
     this.matches = {
         rosterDateLine : /([0-3][0-9])([A-Z]{3})-([0-3][0-9])([A-Z]{3}) (\d{4})\s+([0-3][0-9])\/([0-9][0-9])\/([0-9][0-9])\s+([0-2][0-9]):([0-5][0-9])\s*$/,
@@ -259,32 +448,37 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         gndDutyLine : /^ *(\d{1,2}) (MO|TU|WE|TH|FR|SA|SU) \s+(.*)$/,
 	beginEnd : /BEGIN\s*(\d{4})\s+END\s*(\d{4})/,
 	flightSector : / ([A-Z]{3}) (\d{4} )?(\d{4} )([A-Z]{3}) (\d{4})(.*)/,
-	tripLine : /^([ \d]\d{3}) (.+)$/
+	tripLine : /^([ \d]\d{3}) (.+)$/,
+        monthDateLine : /^\s*\(01\) 02 {2}03/,
+        tripSummaryLine : /\d{4}/
     };
 
 
     this.lookingForMetaDataState = new YAHOO.rp.BaFcLookingForMetaDataState(this);
     this.lookingForDutyLineState = new YAHOO.rp.BaFcLookingForDutyLineState(this);
     this.inAFlyingDutyState = new YAHOO.rp.BaFcInAFlyingDutyState(this);
+    this.inACarryInTripState = new YAHOO.rp.BaFcInACarryInTripState(this);
     this.lookingForCrewLineState = new YAHOO.rp.BaFcLookingForCrewLineState(this);
     this.lineTypeEnum = {
         unrecognised : 0,
         rosterDateLine : 1,
         crewInfoLine : 2,
         blkLine : 3,
-        dayDutyFSLine : 4,
-        gndDuty : 5,
-        multiDay : 6,
-        flyingDuty : 7,
-        simDuty : 8,
-        crewLine : 9,
-        rosterType : 10,
-        tripCrewLine : 11
+	datesLine : 4,
+        dayDutyFSLine : 5,
+        gndDuty : 6,
+        multiDay : 7,
+        flyingDuty : 8,
+        simDuty : 9,
+        crewLine : 10,
+        rosterType : 11,
+        tripCrewLine : 12
     };
     this.eventCollection = new YAHOO.rp.EventCollection();
     this.roster = theRoster;
     this.dutyDate = new Date(); // RPDate.Create ??
     this.lastDutyDate = undefined;
+    this.prevClearTime = undefined;
     this.line = '';
     this.lineNo = 0;
     this.state = undefined;
@@ -292,12 +486,12 @@ YAHOO.rp.BaFcParser = function(theRoster) {
     this.strictChecking = true; // extra validation checks
     this.lineType = this.lineTypeEnum.unrecognised;
     this.matchedFields = undefined;
+    this.hasCarryInTrip = false;
 
     this.decodeError = function(errorMessage) {
         console.log(this.state.name);
         throw new Error(errorMessage + " found - line " + this.lineNo);
     };
-    //--------------------------------------------------------------------------
 
 
     this.checkDate = function (shortDay, rosterDate) {
@@ -585,7 +779,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         this.publishedDutyHours = this.getBlkHrs(this.matchedFields);
         console.log("dutyHours:" + this.publishedDutyHours);
         this.duties = [];
-
+	this.BLkLine = this.lineNo;
     };
     // Use a separate function to return the value so can be used more easily in unit testing
     this.getBlkHrs = function(match) {
@@ -609,6 +803,106 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         return (new Date(ms));
     };
 
+    //--------------------------------------------------------------------------
+
+    this.testForDatesLine = function() {
+        if ((this.matchedFields = this.matches.monthDateLine.exec(this.line)) !== null) {
+            console.log("Found a dates line");
+            this.lineType = this.lineTypeEnum.datesLine;
+            return true;
+        }
+        return false;
+    };
+    //-------------------------------------------------------------------------
+    // This function gets called when the parser finds the (01) 02  03  04.. line
+    this.doDatesLineAction = function() {
+        var lineNo = 0,
+	    dateLine, startLine, daysLineNo, daysOffLine='', daysLine, tripLine='', dutyEndLine='', offset,
+	    trip,theDate,theDay,theDaysOff,tripKey, theDest, rolledOverFlag = false,
+	    tripLineFound = true,
+	    lastDayOfMonth,i, rt = this.roster.rosterText,
+	    carryInFlag = false, processedFirstTripFlag = false;
+
+	// startLine points to the start of the roster summary block
+        startLine = this.BLkLine ? this.BLKLine+1 : 1;
+
+        dateLine = this.line;
+
+        // endLine points to the end of the roster summary block ( the day line MO  TU  WE.. etc)
+        daysLine = rt.next(); // next non-blank line
+	daysLineNo = rt.getLineNo();
+
+	this.line = rt.prev();
+	do {
+	    if (rt.getLineNo() === startLine) {
+		tripLineFound = false;
+		break;
+	    }
+	    tripLine = rt.prev();
+	}while (!this.matches.tripSummaryLine.exec(tripLine));
+	if (tripLineFound) {
+	    dutyEndLine = rt.next();
+	    rt.prev();
+	    daysOffLine = rt.prev();
+	}
+
+	// move the iterator forward to where it found the (01) 02   03.. line
+	rt.go(this.lineNo);
+        console.log(dateLine);
+        console.log(daysLine);
+        console.log(tripLine);
+        console.log(dutyEndLine);
+        console.log(daysOffLine);
+
+        // Find the whitespace offset from the start of the line to the (01) string in the dateLine
+        offset = dateLine.search(/ \(01\) 02 {2}03/);
+        console.log("Roster Summary Block\nstartLine: " + startLine + " , endLine: " + daysLineNo + " ,offset: " + offset);
+
+        lastDayOfMonth = YAHOO.rp.utils.daysInMonth2(this.baseDate);
+	console.log("Last day of month:" + lastDayOfMonth);
+        for( i = offset ; i < dateLine.length; i = i + 4) {
+
+            theDate = +dateLine.substring(i+2,i+4);
+            if (rolledOverFlag) {
+                theDate = theDate + lastDayOfMonth;
+            }
+            if ( !rolledOverFlag && theDate === lastDayOfMonth ) {
+                rolledOverFlag = true;
+            }
+
+            theDay = daysLine.substring(i+2,i+4);
+            theDaysOff = daysOffLine.substring(i,i+4).trim();
+            tripKey = tripLine.substring(i,i+4).trim();
+            theDest = dutyEndLine.substring(i,i+4).trim();
+
+	    // Test for carry in trip (no trip no & dest in lowercase)
+	    if ((tripKey === '' ) &&
+		(theDest === theDest.toLowerCase()) &&
+		(processedFirstTripFlag === false)) {
+		carryInFlag = true;
+	    }
+	    if (tripKey !== '' || carryInFlag === true) {
+		trip = YAHOO.rp.eventMaker.factory('Trip');
+                trip.start.setDate(this.baseDate);
+		if (carryInFlag === true) {
+		    trip.start.setDayOfMonth(1);
+		    trip.carryInTrip = true;
+		    this.hasCarryInTrip = true;
+		}
+		else {
+		    trip.start.setDayOfMonth(theDate);
+		}
+		trip.tripNo = +tripKey;
+		console.log(theDate + "_" + theDay + "_" + theDaysOff + "_" + tripKey + "_");
+		this.eventCollection.events.add(trip,tripKey);
+		carryInFlag = false;
+		processedFirstTripFlag = true;
+	    }
+	}
+        return theDate; // No of days of roster covers
+    };
+//  ------/decodeDutyDates-------------------------------------------------
+
     /**
      * Sets the lineType & returns true if a line matches ddmmm-ddmmm yyyy mm/dd/yy hh:mm
      * @returns {boolean} true if line matches
@@ -622,7 +916,8 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         }
         return false;
     };
-    //--------------------------------------------------------------------------
+    //-------------------------------------------------------------------------
+
     this.doDayDutyFSLineAction = function() {
         console.log("Doing dayDutyFSLineAction");
     };
@@ -704,11 +999,10 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    nextStartIndex,
 	    c = YAHOO.rp.constants,
 	    reportTime = null,
+	    reportLength = 0,
 	    preCodes,
-	    postCodes,
 	    m,
 	    sector = {},
-	    reportLength = 0,
 	    postCodesIndex;
 
         if ((m = this.matches.flightSector.exec(sectorsLine)) !== null) {
@@ -759,13 +1053,29 @@ YAHOO.rp.BaFcParser = function(theRoster) {
     this.makeDuty = function(s) {
 
     };
+/*
+    this.startNewTrip = function() {
+	var trip = YAHOO.rp.eventMaker.factory('Trip'),
+	    duty = YAHOO.rp.eventMaker.factory('FlyingDuty');
+        trip.tripNo = +this.matchedFields[3];
+	this.eventCollection.events.add(trip);
+	console.log('trip:' + trip.tripNo);
+	trip.duties.events.add(duty);
+	delete this.prevClearTime;
+	return trip;
+    };
+*/
 
     this.startNewTrip = function() {
-	var t = YAHOO.rp.eventMaker.factory('Trip');
-        t.tripNo = +this.matchedFields[3];
-	this.eventCollection.events.add(t);
-	console.log('trip:' + t.tripNo);
+	var tripNo = this.matchedFields[3],
+	trip = this.eventCollection.events.get(tripNo),
+	duty = YAHOO.rp.eventMaker.factory('FlyingDuty');
+	console.log('trip:' + trip.tripNo);
+	trip.duties.events.add(duty);
+	delete this.prevClearTime;
+	return trip;
     };
+
 
     this.finishTrip = function() {
 	var trip = this.eventCollection.events.current(),
@@ -789,37 +1099,29 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	}
 */    };
 
-    this.isNewDuty = function(sectorStart) {
+    this.isNewDuty = function(sectorStartTime) {
 	var trip = this.eventCollection.events.current(),
-	    prevDuty, thisDuty,endDuty,startDuty,
-	    c = YAHOO.rp.constants;
+	    thisDuty,lastSector,
+	    c = YAHOO.rp.constants,
+	    startNewDuty = false;
 
-	if (typeof sectorStart !== 'undefined') {
-	    prevDuty = trip.duties.events.current();
-	    startDuty = sectorStart;
-	}
-	else {
-	    thisDuty = trip.duties.events.pop();
-	    prevDuty = trip.duties.events.current();
-	    trip.duties.events.push(thisDuty);
-	    startDuty = thisDuty.sectors.events.current().start.valueOf();
-	}
+	thisDuty = trip.duties.events.current();
+	lastSector = thisDuty.sectors.events.current();
 
-	if (typeof prevDuty !== 'undefined') {
-	    endDuty = prevDuty.sectors.events.current().end.valueOf();
-	    if (startDuty - endDuty < c.MINREST) {
-	        return false;
+	if (typeof lastSector !== 'undefined') {
+	    if (sectorStartTime - lastSector.end.valueOf() >= c.MINREST) {
+	        startNewDuty = true;
 	    }
 	}
-	return true;
+	return startNewDuty;
     };
+
 
     this.doFlyingDutyLineAction = function() {
 	var trip = this.eventCollection.events.current(),
-	    duty = YAHOO.rp.eventMaker.factory('FlyingDuty'),
+	    duty = trip.duties.events.current(),
 	    sector,
 	    s = {};
-
 
 	console.log("Doing flying dutyLineAction");
 
@@ -842,6 +1144,12 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    if (this.isNewDuty(sector.start.valueOf())) {
 		duty.postProcess();
 		duty = YAHOO.rp.eventMaker.factory('FlyingDuty');
+		if (sector.origin === this.roster.base) {
+		    trip.postProcess();
+		    trip = this.startNewTrip();
+		    duty = trip.duties.events.current();
+		}
+		trip.duties.events.add(duty);
 	    }
 
 	    duty.sectors.events.add(sector);
@@ -855,8 +1163,6 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 //	    console.log('post: ' + sector.postCodes);
 	}
 
-	trip.duties.events.add(duty);
-        //roster.add(trip);
     };
 
     this.doTripCrewLineAction = function() {
@@ -878,26 +1184,41 @@ YAHOO.rp.BaFcParser.prototype.parse = function() {
         this.line = this.roster.rosterText.next(); // next non-blank line
         this.lineNo = this.roster.rosterText.getLineNo();
         console.log(this.line);
+
         //skip dashed lines
         if (this.matches.dashedLine.exec(this.line)) {
             console.log("Found a dashed line");
             continue;
         }
 
-        if (this.testForTripCrewLine()) {
-            this.state.foundTripCrewLine();
-        }
-
-        if (this.testForMultiDayLine()) {
-            this.state.foundMultiDayLine();
-        }
-
         if (this.testForFlyingDutyLine()) {
             this.state.foundFlyingDutyLine();
+	    continue;
         }
 
         if (this.testForGndDutyLine()) {
             this.state.foundGndDutyLine();
+	    continue;
+        }
+
+        if (this.testForMultiDayLine()) {
+            this.state.foundMultiDayLine();
+	    continue;
+        }
+
+        if (this.testForTripCrewLine()) {
+            this.state.foundTripCrewLine();
+	    continue;
+        }
+
+        if (this.testForDayDutyFSLine()) {
+            this.state.foundDayDutyFSLine();
+	    continue;
+        }
+
+        if (this.testForCrewNamesLine()) {
+            this.state.foundCrewNamesLine();
+	    continue;
         }
 
         if (this.testForRosterDateLine()) {
@@ -916,12 +1237,8 @@ YAHOO.rp.BaFcParser.prototype.parse = function() {
             this.state.foundBLKLine();
         }
 
-        if (this.testForDayDutyFSLine()) {
-            this.state.foundDayDutyFSLine();
-        }
-
-        if (this.testForCrewNamesLine()) {
-            this.state.foundCrewNamesLine();
+        if (this.testForDatesLine()) {
+            this.state.foundDatesLine();
         }
 
         if (this.lineType === this.lineTypeEnum.unrecognised) {

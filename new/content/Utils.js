@@ -3,11 +3,11 @@
 "use strict";
 
 YAHOO.rp.utils = {
-    
+
     //--- Helper Functions ---
-    
+
         init : function() {
-        
+
             // Add the Object.create function
             if (typeof Object.create !== 'function') {
                 Object.create = function (o) {
@@ -16,22 +16,22 @@ YAHOO.rp.utils = {
                     return new F();
                 };
             }
-    
+
             if (typeof String.trim !== 'function') {
-                String.prototype.trim = function () { 
+                String.prototype.trim = function () {
                     return this.replace(/^\s+|\s+$/g,"");
                 };
             }
-    
+
         /* Returns a date as hh:mm, where hh shows total hours
             e.g. 3 days would be returned as 72:00
         */
             if (typeof Date.getHHMM !== 'function') {
                 Date.prototype.getHHMM = function(separator,round) {
                     var dutyHrs,dutyMins;
-        
+
                     separator = separator || ':';
-        
+
                     if (round === true) {
                         dutyHrs = this.getUTCHours();
                         dutyMins = this.getUTCMinutes();
@@ -41,20 +41,20 @@ YAHOO.rp.utils = {
                         dutyHrs = Math.floor(dutyMins / 60);
                         dutyMins = dutyMins - (dutyHrs * 60);
                     }
-        
+
                     dutyHrs = (dutyHrs < 10) ? "0" + dutyHrs : dutyHrs;
                     dutyMins = (dutyMins < 10) ? "0" + dutyMins : dutyMins;
                     return( dutyHrs + separator + dutyMins);
-                };  
+                };
             }
-    
+
             if (typeof Date.setHHMM !== 'function') {
                 Date.prototype.setHHMM = function(timeString, useLocalTime) {
                     var hrs,
                         mins;
 
                     mins = +timeString;
-            
+
                     if (isNaN(mins) ||
                         (mins < 0) ||
                         (mins > 2400) ||
@@ -64,7 +64,7 @@ YAHOO.rp.utils = {
 
                     hrs = +timeString.slice(0,2);
                     mins = +timeString.slice(2,4);
-                
+
                     /* Update the time in HHMM format */
                     if (typeof useLocalTime !== 'undefined' && useLocalTime === true) {
                         this.setHours(hrs);
@@ -77,11 +77,11 @@ YAHOO.rp.utils = {
                 };
             }
         },
-        
+
         zeropad : function (num) {
             return ((num < 10) ? '0' : '') + num;
         },
-        
+
         setHHMM: function(data) {
             var hrs,
                 mins,
@@ -109,17 +109,17 @@ YAHOO.rp.utils = {
             return d;
         },
 
-    
+
         isDate : function (theDate) {
             return ( theDate !== undefined && typeof theDate.getUTCMonth ==='function');
         },
-    
+
         sendToWeb : function (url,request,callback,errorMsg) {
             var http = new XMLHttpRequest(),
                 mode = request ? "POST":"GET";
-    
+
             http.open(mode,url,true);
-    
+
             if (mode==="POST") {
                 http.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
             }
@@ -134,7 +134,7 @@ YAHOO.rp.utils = {
                         }
                     }
                 }
-            };        
+            };
             http.onerror = function(e) {
                 alert(errorMsg + "(" + e.target.status + ").");
             };
@@ -165,7 +165,7 @@ YAHOO.rp.utils = {
             }
             return monthNo;
         },
-        
+
         daysInMonth : function (sMonth, iYear) {
             var days = 32 - new Date(sMonth + " 32 " + iYear).getDate();
             if (isNaN(days))  {
@@ -179,7 +179,7 @@ YAHOO.rp.utils = {
             if ( !this.isDate(theDate)) {
                 throw new TypeError("daysInMonth2: Invalid date");
             }
-        
+
             var iMonth = theDate.getUTCMonth(),
                 iYear =  theDate.getUTCFullYear();
             return 32 - new Date( iYear, iMonth, 32).getDate();
@@ -198,21 +198,21 @@ YAHOO.rp.utils = {
             if (!this.isDate(d1) || !this.isDate(d2)) {
                 throw new TypeError("timeDiff: Invalid date");
             }
-        
+
             d1 = d1.valueOf();
             d2 = d2.valueOf();
-    
+
             if ( d1 > d2 ) {
                 tmp = d2;
                 d2 = d1;
                 d1 = tmp;
             }
-    
+
             return new Date(d2 - d1);
         },
 
         abbrevName : function (namesLine) {
-        
+
             var fn1,
                 fn2,
                 fnsplit,
@@ -224,7 +224,7 @@ YAHOO.rp.utils = {
                 nameList = namesLine.split('.'),
                 n = 0;
 
-        
+
             for (; n < nameList.length - 1; n++) {
                 name = nameMatch.exec(nameList[n]);
                 fn1 = name ? name[1] : '';
@@ -234,11 +234,11 @@ YAHOO.rp.utils = {
 
                 fn2 = fnsplit ? fnsplit[2] : '';
                 fn1 = fnsplit ? fnsplit[1] : fn1;
-    
+
                 fn1 = typeof fn1[0] !== "undefined" ? fn1[0] : '';
                 fn2 = typeof fn2[0] !== "undefined" ? fn2[0] : '';
                 newNamesLine = newNamesLine + fn1 + fn2 + " " + ln + ". ";
-            }    
+            }
             return newNamesLine.trim();
         },
 
@@ -263,37 +263,37 @@ YAHOO.rp.utils = {
             }
             return result;
         },
-    
+
         incUTCMonth : function (d) {
             d.setUTCMonth(d.getUTCMonth() + 1);
             return d;
         },
-    
+
         decUTCMonth : function (d) {
             d.setUTCMonth(d.getUTCMonth() - 1);
             return d;
         },
-        
+
         incUTCDay : function (d) {
             d = new Date(d.valueOf() + YAHOO.rp.constants.WHOLEDAY);
             return d;
         },
- 
+
         decUTCDay : function (d) {
             d = new Date(d.valueOf() - YAHOO.rp.constants.WHOLEDAY);
             return d;
         },
 
         shortDate : function () {
- 
+
             var date = this,
                 str = "",
                 sep = "/",
                 yr = date.getUTCFullYear() - 2000;
-    
+
             str = this.zeropad(date.getUTCDate()) + sep;
             str += this.zeropad(date.getUTCMonth() + 1) + sep;
-         
+
             if ( yr < 0) { yr += 100; }
             str += this.zeropad( yr );
             return str;
@@ -301,76 +301,32 @@ YAHOO.rp.utils = {
 
 
 
-        ISO8601String : function (format, useLocal) {
-            /* accepted values for the format [1-6]:
-             1 Year:
-               YYYY (eg 1997)
-             2 Year and month:
-               YYYY-MM (eg 1997-07)
-             3 Complete date:
-               YYYY-MM-DD (eg 1997-07-16)
-             4 Complete date plus hours and minutes:
-               YYYY-MM-DDThh:mmTZD (eg 1997-07-16T19:20+01:00)
-             5 Complete date plus hours, minutes and seconds:
-               YYYY-MM-DDThh:mm:ssTZD (eg 1997-07-16T19:20:30+01:00)
-             6 Complete date plus hours, minutes, seconds and a decimal
-               fraction of a second
-               YYYY-MM-DDThh:mm:ss.sTZD (eg 1997-07-16T19:20:30.45+01:00)
-             7 Time as HHMM
+        ISO8601String : function (theDate, noTime) {
+            /* if noTime = true
+               YYYY-MM-DD (eg 1997-07-16Z)
+               else
+               YYYY-MM-DDThhmmZ (eg 1997-07-16T1920Z)
             */
-    
-            var offset = (useLocal === undefined) ? 'Z' : '',
-                date = this,
-                offsetnum,
-                d,
-                str = "",
-                secs;
-            
-            format = (format === undefined) ? 6 : format;
-    
-            if (!offset) {
-            } else {
-                d = offset.match(/([-+])([0-9]{2}):([0-9]{2})/);
-                offsetnum = (Number(d[2]) * 60) + Number(d[3]);
-                offsetnum *= ((d[1] === '-') ? -1 : 1);
-                date = new Date(Number(Number(this) + (offsetnum * 60000)));
-            }
-    
-            str += date.getUTCFullYear();
-            if (format > 1) { str += this.zeropad(date.getUTCMonth() + 1); }
-            if (format > 2) { str += this.zeropad(date.getUTCDate()); }
-            if (format > 3) {
+
+            var addTime = (typeof noTime === 'undefined') ? true : noTime,
+                date = theDate,
+                str;
+
+
+            str = date.getUTCFullYear();
+            str += this.zeropad(date.getUTCMonth() + 1);
+            str += this.zeropad(date.getUTCDate());
+            if (addTime === true) {
                 str += "T" + this.zeropad(date.getUTCHours()) +
-                       this.zeropad(date.getUTCMinutes());
-            }
-            if (format > 5) {
-                secs = Number(date.getUTCSeconds() + "." +
-                    ((date.getUTCMilliseconds() < 100) ? '0' : '') +
-                    this.zeropad(date.getUTCMilliseconds()));
-                str += ":" + this.zeropad(secs);
-            }
-            else if (format > 4) {
-                str += this.zeropad(date.getUTCSeconds());
-            }
-    
-            if (format > 3) { str += offset; }
-            if (format === 7) {
-                if ( useLocal) {
-                    str = this.zeropad(date.getHours()) +
-                        this.zeropad(date.getMinutes());
-                }
-                else {
-                    str = this.zeropad(date.getUTCHours()) +
-                        this.zeropad(date.getUTCMinutes());
-                }
+                this.zeropad(date.getUTCMinutes()) + 'Z';
             }
             return str;
         },
-    
+
         loadURL : function (url, preferences) {
             var generatedPage = null,
                 request = new XMLHttpRequest();
-    
+
             // If the open tabs preference is set to true
             if (preferences.openTab === true) {
                 getBrowser().selectedTab = getBrowser().addTab(url);
@@ -379,11 +335,11 @@ YAHOO.rp.utils = {
             else {
                 generatedPage = window.open(url);
             }
-    
+
             // This must be done to make generated content render
             request.open("get", "about:blank", false);
             request.send("");
-    
+
             return generatedPage.content.document;
         }
     };

@@ -73,6 +73,12 @@ YAHOO.rp.EventDate = function() {
 	newEventDate.setDate(d);
 	return newEventDate;
     };
+    this.ISO8601DateTime = function() {
+	return u.ISO8601String(d)
+    };
+    this.ISO8601Date = function() {
+
+    };
 }
 
 YAHOO.rp.eventMaker = function() {
@@ -183,10 +189,19 @@ YAHOO.rp.EventCollection = function() {
 	index = 0;
 
 	return {
-	    add: function(e) {
-		eventsList[eventsList.length] = e;
+	    add: function(e,key) {
+		if (typeof key === 'undefined') {
+		    eventsList[eventsList.length] = e;
+		}
+		else {
+		    eventsList[key] = e;
+		}
 	    },
 
+	    get: function(key) {
+		return eventsList[key];
+	    },
+	    
 	    next: function() {
 		var element;
 		if (!this.hasNext()) {
