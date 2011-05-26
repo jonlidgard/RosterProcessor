@@ -32,7 +32,7 @@ YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
     //---------------------------------------------------------------------
     // Test methods - names must begin with "test"
     //---------------------------------------------------------------------
-    
+
     testIsObject: function() {
         var Assert = YAHOO.util.Assert;
 
@@ -52,19 +52,19 @@ YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
 
         Assert.isFunction(r.getLineNo);
         Assert.isNumber(r.getLineNo());
-        Assert.areSame(0, r.getLineNo());        
+        Assert.areSame(0, r.getLineNo());
         r.next();
-        Assert.areSame(1, r.getLineNo());        
+        Assert.areSame(1, r.getLineNo());
 
     },
 
     testHasNext: function() {
         var Assert = YAHOO.util.Assert,
             r = this.roster.rosterText;
-    
+
         Assert.isFunction(r.hasNext);
         Assert.isTrue(r.hasNext());
-        
+
     },
 
     testNext: function() {
@@ -72,14 +72,14 @@ YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
             txt,
             r = this.roster.rosterText;
 
-    
+
         Assert.isFunction(r.next);
         txt = r.next();
         Assert.isString(txt);
         Assert.areSame("line 1",txt);
         Assert.isTrue(r.hasNext());
         Assert.areSame(1, r.getLineNo());
-        
+
         txt = r.next();
         Assert.isString(txt);
         Assert.areSame("line 2",txt);
@@ -98,15 +98,15 @@ YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
         var Assert = YAHOO.util.Assert,
             txt,
             r = this.roster.rosterText;
-            
-    
-        Assert.isFunction(r.reset);
+
+
+        Assert.isFunction(r.rewind);
         txt = r.next();
 
         Assert.areSame(1, r.getLineNo());
-        r.reset();        
+        r.rewind();
         Assert.areSame(0, r.getLineNo());
     }
-    
+
 
 });

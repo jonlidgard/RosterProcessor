@@ -111,12 +111,12 @@ YAHOO.rp.eventMaker.prototype.setDescription = function (d) {
 YAHOO.rp.eventMaker.prototype.print = function() {
 	console.log("Summary: " + this.getSummary());
 	console.log("Description: " + this.getDescription());
-	console.log("Start: " + this.startDate);
-	console.log("End: " + this.endDate);
+	console.log("Start: " + this.start.date());
+	console.log("End: " + this.end.date());
 };
 
 YAHOO.rp.eventMaker.prototype.getLength = function() {
-    return this.endDate.valueOf() - this.startDate.valueOf();
+    return this.end.valueOf() - this.start.valueOf();
 };
 
 YAHOO.rp.eventMaker.prototype.getId = function() {
@@ -201,7 +201,7 @@ YAHOO.rp.EventCollection = function() {
 	    get: function(key) {
 		return eventsList[key];
 	    },
-	    
+
 	    next: function() {
 		var element;
 		if (!this.hasNext()) {
