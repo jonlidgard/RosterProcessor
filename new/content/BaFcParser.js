@@ -48,14 +48,23 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         tripSummaryLine : /\d{4}/
     };
 
+    this.states = { lookingForMetaDataState: new YAHOO.rp.BaFcStateMaker.factory('LookingForMetaDataState',this),
+		    buildingSummaryState: new YAHOO.rp.BaFcStateMaker.factory('BuildingSummaryState',this),
+		    getGndDutiesState: new YAHOO.rp.BaFcStateMaker.factory('GetGndDutiesState',this),
+		    inACarryInTripState: new YAHOO.rp.BaFcStateMaker.factory('InACarryInTripState',this),
+		    lookingForTripState: new YAHOO.rp.BaFcStateMaker.factory('LookingForTripState',this),
+		    inATripState: new YAHOO.rp.BaFcStateMaker.factory('InATripState',this),
+		    inAFlyingDutyState: new YAHOO.rp.BaFcStateMaker.factory('InAFlyingDutyState',this),
+		    getCrewNamesState: new YAHOO.rp.BaFcStateMaker.factory('GetCrewNamesState',this)};
 
-    this.lookingForMetaDataState = new YAHOO.rp.BaFcLookingForMetaDataState(this);
-    this.lookingForGndDutyState = new YAHOO.rp.BaFcLookingForGndDutyState(this);
-    this.lookingForFlyingDutyState = new YAHOO.rp.BaFcLookingForFlyingDutyState(this);
-    this.inAFlyingDutyState = new YAHOO.rp.BaFcInAFlyingDutyState(this);
-    this.inACarryInTripState = new YAHOO.rp.BaFcInACarryInTripState(this);
-    this.lookingForCrewLineState = new YAHOO.rp.BaFcLookingForCrewLineState(this);
-    this.lineTypeEnum = {
+/*    this.lookingForMetaDataState = new YAHOO.rp.BaFcStateMaker.factory('LookingForMetaDataState',this);
+    this.buildingSummaryState = new YAHOO.rp.BaFcStateMaker.factory('LookingForGndDutyState',this);
+    this.lookingForGndDutyState = new YAHOO.rp.BaFcStateMaker.factory('LookingForGndDutyState',this);
+    this.lookingForFlyingDutyState = new YAHOO.rp.BaFcStateMaker.factory('LookingForFlyingDutyState',this);
+    this.inAFlyingDutyState = new YAHOO.rp.BaFcStateMaker.factory('InAFlyingDutyState',this);
+    this.inACarryInTripState = new YAHOO.rp.BaFcStateMaker.factory('InACarryInTripState',this);
+    this.lookingForCrewLineState = new YAHOO.rp.BaFcStateMaker.factory('LookingForCrewLineState',this);
+ */    this.lineTypeEnum = {
         unrecognised : 0,
         rosterDateLine : 1,
         crewInfoLine : 2,
@@ -783,14 +792,6 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    }
 
 	    duty.sectors.events.add(sector);
-//	    console.log('preFlt: ' + sector.preFltCode);
-//	    console.log('flightNo: ' + sector.flightNo);
-//	    console.log('origin: ' + sector.origin);
-//	    console.log('report: ' + sector.report);
-//	    console.log('start: ' + sector.start);
-//	    console.log('dest: ' + sector.dest);
-//	    console.log('end: ' + sector.end);
-//	    console.log('post: ' + sector.postCodes);
 	}
 
     };
@@ -807,77 +808,15 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 YAHOO.rp.BaFcParser.prototype.parse = function() {
 
     var parsing = false;
-    this.state = this.lookingForMetaDataState;
+    this.state = this.states.lookingForMetaDataState;
     this.state.enter();
 
     while (this.roster.rosterText.hasNext()) {
-        this.line = this.roster.rosterText.next(); // next non-blank line
+        this.line = this.roster.rosterText.next().text; // next non-blank line
         this.lineNo = this.roster.rosterText.getLineNo();
         console.log(this.line);
 
-/*
-        //skip dashed lines
-        if (this.matches.dashedLine.exec(this.line)) {
-            console.log("Found a dashed line");
-            continue;
-        }
-*/
-	this.state.analyseLine(this.roster.rosterText);
-/*
-        if (this.testForFlyingDutyLine()) {
-            this.state.foundFlyingDutyLine();
-	    continue;
-        }
-
-        if (this.testForGndDutyLine()) {
-            this.state.foundGndDutyLine();
-	    continue;
-        }
-
-        if (this.testForMultiDayLine()) {
-            this.state.foundMultiDayLine();
-	    continue;
-        }
-
-        if (this.testForTripCrewLine()) {
-            this.state.foundTripCrewLine();
-	    continue;
-        }
-
-        if (this.testForDayDutyFSLine()) {
-            this.state.foundDayDutyFSLine();
-	    continue;
-        }
-
-        if (this.testForCrewNamesLine()) {
-            this.state.foundCrewNamesLine();
-	    continue;
-        }
-
-        if (this.testForRosterDateLine()) {
-            this.state.foundRosterDateLine();
-        }
-
-        if (this.testForRosterTypeLine()) {
-            this.state.foundRosterTypeLine();
-        }
-
-        if (this.testForCrewInfoLine()) {
-            this.state.foundCrewInfoLine();
-        }
-
-        if (this.testForBLKLine()) {
-            this.state.foundBLKLine();
-        }
-
-        if (this.testForDatesLine()) {
-            this.state.foundDatesLine();
-        }
-
-        if (this.lineType === this.lineTypeEnum.unrecognised) {
-            this.state.foundOtherLine();
-        }
-*/
+	this.state.analyseLine();
     }
     this.state.exit();
 };
