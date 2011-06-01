@@ -74,19 +74,19 @@ YAHOO.rpTest.yuitest.RosterTestCase = new YAHOO.tool.TestCase({
 
 
         Assert.isFunction(r.next);
-        txt = r.next();
+        txt = r.next().text;
         Assert.isString(txt);
         Assert.areSame("line 1",txt);
         Assert.isTrue(r.hasNext());
         Assert.areSame(1, r.getLineNo());
 
-        txt = r.next();
+        txt = r.next().text;
         Assert.isString(txt);
         Assert.areSame("line 2",txt);
         Assert.isTrue(r.hasNext());
         Assert.areSame(2, r.getLineNo());
 
-        txt = r.next();
+        txt = r.next().text;
         Assert.isString(txt);
         Assert.areSame("line 3",txt);
         Assert.isFalse(r.hasNext());

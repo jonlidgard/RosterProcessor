@@ -31,6 +31,7 @@ YAHOO.rp.BaFcStateMaker = function () {
     this.name = 'Default State';
     this.parser = undefined;
     this.testList = [];
+    this.ignoreUnrecognisedLines = true;
 };
 
 YAHOO.rp.BaFcStateMaker.prototype.enter = function () {
@@ -45,12 +46,15 @@ YAHOO.rp.BaFcStateMaker.prototype.exit = function () {
 
 YAHOO.rp.BaFcStateMaker.prototype.changeState = function (s) {
     var newState = this.parser.states[s];
-    if (typeof newState === 'function') {
+    if (typeof newState === 'object') {
         this.exit();
         this.prevState = this;
         newState.enter();
         this.parser.state = newState;
         return newState;
+    }
+    else {
+	console.log('Unknown state: ' + s);
     }
     return undefined;
 };
@@ -59,12 +63,14 @@ YAHOO.rp.BaFcStateMaker.prototype.analyseLine = function () {
     var i = 0,
         nextState = undefined,
         x,test,action,
-	skipRestOfTests;
+	skipRestOfTests,
+	unrecognisedLine = true;
     if (typeof this.parser !== 'object') {
-        return;
+        throw "StateMaker.AnalyseLine: parser object not defined";
     }
     while (i < this.testList.length) {
         x = this.testList[i];
+	i += 1;
         test = this.parser[x['test']];
         if (typeof test !== 'function') {
             console.log('Unrecognised test function:' + x['test']);
@@ -77,6 +83,7 @@ YAHOO.rp.BaFcStateMaker.prototype.analyseLine = function () {
         }
         nextState = x['nstate'];
         if ( test.apply(this.parser) === true ) {
+	    unrecognisedLine = false;
             skipRestOfTests = action.apply(this.parser);
             if (typeof nextState !== 'undefined') {
                 this.changeState(nextState);
@@ -86,6 +93,7 @@ YAHOO.rp.BaFcStateMaker.prototype.analyseLine = function () {
             }
         }
     }
+    return (unrecognisedLine && !this.ignoreUnrecognisedLines);
 };
 
 // the static factory method
@@ -137,34 +145,38 @@ YAHOO.rp.BaFcStateMaker.LookingForMetaDataState = function () {
 YAHOO.rp.BaFcStateMaker.BuildingSummaryState = function () {
     this.name = 'Building summary';
 
-    this.analyseLine = function () {
+    this.enter = function() {
+	this.parser.buildSummaryEnter();
+    }
+    this.analyseLine = function() {
 	this.parser.buildSummary();
     };
-};
-YAHOO.rp.BaFcStateMaker.GetGndDutiesState = function () {
-    this.name = "Gnd Duty State";
+    this.exit = function() {
+	this.parser.buildSummaryExit();
+    }
 
-    this.testList =[{ test: 'testForTripCrewLine',
-                    action: 'doFirstPassTripCrewLineAction'},
-                    { test: 'testForMultiDayLine',
-                    action: 'doMultiNotRestDayLineAction'},
-                    { test: 'testForGndDutyLine',
-                    action: 'doGndNotRestDutyLineAction'}];
 };
 
 YAHOO.rp.BaFcStateMaker.InACarryInTripState = function () {
     this.name = "Carry-In Trip State";
 
     this.testList =[{ test: 'testForTripCrewLine',
-                    action: 'doSecondPassTripCrewLineAction',
+                    action: 'doTripCrewLineAction',
 		    nstate: 'lookingForCrewLineState'},
                     { test: 'testForFlyingDutyLine',
                     action: 'doFlyingDutyLineAction',
 		    nstate: 'inAFlyingDutyState'},
-                    { test: 'testForMultiDayLine',
+                    { test: 'testForMultiRestDayLine',
                     action: 'doMultiRestDayLineAction'},
+                    { test: 'testForRestDayLine',
+                    action: 'doRestDayLineAction'},
+		    { test: 'testForMultiDayLine',
+                    action: 'doMultiDayLineAction',
+		    nstate: 'lookingForTripState'},
                     { test: 'testForGndDutyLine',
-                    action: 'doRestDayLineAction'}];
+                    action: 'doGndDutyLineAction',
+		    nstate: 'lookingForTripState'}];
+
 
     this.enter = function () {
 	YAHOO.rp.BaFcStateMaker.prototype.enter.call(this);
@@ -174,7 +186,7 @@ YAHOO.rp.BaFcStateMaker.InACarryInTripState = function () {
 
     this.exit = function () {
 	YAHOO.rp.BaFcStateMaker.prototype.exit.call(this);
-	this.parser.finishTrip();
+	this.parser.finishTrip(this.parser.currentTrip);
 	return this;
     };
 };
@@ -183,7 +195,7 @@ YAHOO.rp.BaFcStateMaker.LookingForTripState = function () {
     this.name = "Looking for Trip State";
 
     this.testList =[{ test: 'testForTripCrewLine',
-                    action: 'doSecondPassTripCrewLineAction',
+                    action: 'doTripCrewLineAction',
 		    nstate: 'lookingForCrewLineState'},
                     { test: 'testForTripLine',
                     action: 'doTripLineAction',
@@ -194,15 +206,21 @@ YAHOO.rp.BaFcStateMaker.InATripState = function () {
     this.name = "In a Trip State";
 
     this.testList =[{ test: 'testForTripCrewLine',
-                    action: 'doSecondPassTripCrewLineAction',
+                    action: 'dTripCrewLineAction',
 		    nstate: 'lookingForCrewLineState'},
                     { test: 'testForFlyingDutyLine',
-                    action: 'doFlyingDutyLineAction',
-		    nstate: 'inAFlyingDutyState'},
-                    { test: 'testForMultiDayLine',
+                    action: 'doFlyingDutyLineAction'},
+//		    nstate: 'inAFlyingDutyState'},
+                    { test: 'testForMultiRestDayLine',
                     action: 'doMultiRestDayLineAction'},
+                    { test: 'testForRestDayLine',
+                    action: 'doRestDayLineAction'},
+                    { test: 'testForMultiDayLine',
+                    action: 'doMultiDayLineAction',
+		    nstate: 'lookingForTripState'},
                     { test: 'testForGndDutyLine',
-                    action: 'doRestDayLineAction'}];
+                    action: 'doGndDutyLineAction',
+		    nstate: 'lookingForTripState'}];
 
     this.enter = function () {
 	YAHOO.rp.BaFcStateMaker.prototype.enter.call(this);
@@ -212,7 +230,7 @@ YAHOO.rp.BaFcStateMaker.InATripState = function () {
 
     this.exit = function () {
 	YAHOO.rp.BaFcStateMaker.prototype.exit.call(this);
-	this.parser.finishTrip();
+	this.parser.finishTrip(this.parser.currentTrip);
 	return this;
     };
 
