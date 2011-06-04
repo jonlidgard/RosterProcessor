@@ -1,5 +1,41 @@
 
 
+Found a REST day
+    -   If at end of trip -
+            If disregard option
+                disregard
+            Else
+                add to trip
+            end trip
+        Else
+            If not in a trip && day 1
+                throw ERROR
+        Create a trip
+        Fill in with summary details
+        Add rest day
+
+Found a FLYING DUTY
+    -   If not in a trip
+            Create new trip
+            Fill in with summary details
+        If not in a duty
+            Add a duty
+        Add sectors
+        If summary.isEndOfDuty
+            end Duty
+        If summary.isEndOfTrip
+            end Trip
+
+
+Found a GND Duty
+    -   If in a trip
+            throw ERROR
+        Add duty
+
+
+
+
+
 Thoughts on re-writing rosterprocessor
 
 Use of javascript libraries such as 'Prototype' will help improbe OO coding.
@@ -11,21 +47,21 @@ Can re-write parser as:
                 Doesn't require a web server to be used.
                 Should be fairly future proof.
                 Could be used in a Safari extension
-                
+
     Disadvantges:
                 Harder to write & debug -(Maybe develop an Xcode widgit for easier debugging?)
                 Not readily portable to other platforms (iphone, android).
                 Relies on update mechanism to introduce new versions
-                
+
     To investigate:
-                Can javascript be called from iphone webkit ?                
+                Can javascript be called from iphone webkit ?
                 javascript to iphone code conversion utilitly
 
 2/ XPCOM
     Advantages:
                 Can be written in c & ported to iphone easily
                 Easier debugging - use xcode
-                
+
     Disadvantges:
                 Have to build firefox
                 Rebuild & update for new firefox versions - heavy maintenance
@@ -44,7 +80,7 @@ Can re-write parser as:
             Could be called from all platforms
             All users using latest code
             Can use SMC state machine compiler
-                
+
     Disadvantges:
             Relies on keeping a web server up & running
             Possible cost implication

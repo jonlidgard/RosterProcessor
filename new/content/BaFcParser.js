@@ -71,10 +71,10 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 
     this.states = { lookingForMetaDataState: new YAHOO.rp.BaFcStateMaker.factory('LookingForMetaDataState',this),
 		    buildingSummaryState: new YAHOO.rp.BaFcStateMaker.factory('BuildingSummaryState',this),
-		    inACarryInTripState: new YAHOO.rp.BaFcStateMaker.factory('InACarryInTripState',this),
+//		    inACarryInTripState: new YAHOO.rp.BaFcStateMaker.factory('InACarryInTripState',this),
 		    lookingForTripState: new YAHOO.rp.BaFcStateMaker.factory('LookingForTripState',this),
 		    inATripState: new YAHOO.rp.BaFcStateMaker.factory('InATripState',this),
-		    inAFlyingDutyState: new YAHOO.rp.BaFcStateMaker.factory('InAFlyingDutyState',this),
+//		    inAFlyingDutyState: new YAHOO.rp.BaFcStateMaker.factory('InAFlyingDutyState',this),
 		    getCrewNamesState: new YAHOO.rp.BaFcStateMaker.factory('GetCrewNamesState',this)};
 
     this.eventCollection = new YAHOO.rp.EventCollection();
@@ -365,7 +365,9 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	this.summaryBuilder = new YAHOO.rp.BaFcSummaryBuilder();
     };
     this.buildSummary = function() {
-	if (this.summaryBuilder.processLine(this.line) === true) {
+	this.summaryBuilder.processLine(this.line);
+
+/*	if (this.summaryBuilder.processLine(this.line) === true) {
 	    // Finished building summary
 	    if (this.summaryBuilder.hasACarryInTrip() === true) {
 		this.state = this.state.changeState('inACarryInTripState');
@@ -374,6 +376,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 		this.state = this.state.changeState('lookingForTripState');
 	    }
 	}
+*/
     };
 
     this.buildSummaryExit = function() {
@@ -408,83 +411,101 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         console.log("Doing crewLineAction");
     };
 
-    this.doDutyLineAction = function() {
-        console.log("Doing dutyLineAction");
-    };
-
-    this.testForMultiRestDayLine = function() {
-	var result = false;
-	if (this.testForMultiDayLine &&
-	    this.lineType === lte.multiRestDay) {
-	    result = true;
-	}
-	return result;
-    };
-
-    this.testForMultiDayLine = function() {
-        var result =false;
-	if ((this.matchedFields = this.matches.multiDayLine.exec(this.line)) !== null) {
-            result = true;
-	    if (this.matchedFields[3].trim() === 'REST') {
-                console.log("Found a Multi Rest Day line");
-                this.lineType = lte.multiRestDay;
-	    }
-	    else {
-                console.log("Found a Multi Day line");
-                this.lineType = lte.multiDay;
-	    }
-        }
-        return result;
-    };
-
-    this.doMultiDayLineAction = function() {
-	var e;
-        if (this.lineType === lte.multiDay) {
-	    console.log("Doing multi-day lineAction");
-	    e = this.addEvent({summary: 3, startDay: 1, endDay: 2});
-	    this.eventCollection.events.add(e);
-	    this.mergeEvents(this.eventCollection.events);
-	}
-    };
-
-    this.doMultiRestDayLineAction = function() {
-	var e;
-	console.log("Doing multi-rest-day lineAction");
-	e = this.addEvent({summary: 3, startDay: 1, endDay: 2});
-	this.trip.duties.add(e);
-    };
-
     this.testForRestDayLine = function() {
 	var result = false;
 	if (this.testForGndDutyLine &&
-	    this.lineType === lte.restDay) {
+	    (this.lineType === lte.restDay) ||
+	    (this.lineType === lte.multiRestDay)) {
 	    result = true;
 	}
 	return result;
     };
 
-
     this.testForGndDutyLine = function() {
-	var result = false;
+	var result = false, switchSelector = 0;
+	/* switchSelector
+	  bit 1 - sgl Day
+	  bit 2 - multi Day
+	  bit 3 - REST
+	*/
+
         if ((this.matchedFields = this.matches.gndDutyLine.exec(this.line)) !== null) {
 	    result = true;
+	    switchSelector = switchSelector | 1;
+	}
+	else { // is it a multi day
+	    if ((this.matchedFields = this.matches.multiDayLine.exec(this.line)) !== null) {
+		result = true;
+		switchSelector = switchSelector | 2;
+	    }
+	}
+	if (result === true) {
 	    if (this.matchedFields[3].trim() === 'REST') {
-                console.log("Found a Rest Day line");
-                this.lineType = lte.restDay;
+	        switchSelector = switchSelector | 4;
 	    }
-	    else {
-                console.log("Found a Gnd Duty line");
-                this.lineType = lte.gndDay;
+
+	    switch (switchSelector) {
+	        case 1:
+	            console.log("Found a Gnd Duty line");
+	       	this.lineType = lte.gndDay;
+			result = true;
+		    break;
+		case 2:
+		    console.log("Found a Multi Day line");
+		    this.lineType = lte.multiDay;
+		    break;
+		case 5:
+		    console.log("Found a REST day line");
+		    this.lineType = lte.restDay;
+		    break;
+		case 6:
+		    console.log("Found a multi REST day line");
+		    this.lineType = lte.multiRestDay;
+		    break;
 	    }
-        }
+	}
         return result;
     };
 
     this.doRestDayLineAction = function() {
-	var e;
-	console.log("Doing rest-day lineAction");
-	e = this.addEvent({summary: 3, startDay: 1, endDay: 1, dayOfWeek: 2});
-	this.trip.duties.add(e);
+	var trip = this.currentTrip,
+	    duty = trip.duties.events.current(),
+	    tripDate = this.matchedFields[1],
+	    summaryDays = this.summaryBuilder.getDays(),
+	    summaryDay = summaryDays[tripDate],
+	    e;
+
+	// Start a new trip if necessary
+	if (typeof trip === 'undefined') {
+	    if (+tripDate === 1) {
+		this.startNewTrip(); // carry in trip
+	    }
+	}
+	else {
+	    throw "Found REST day outside of a trip";
+	}
+	// Wrap up old duty
+	if (typeof duty !== 'undefined') {
+	    console.log("doRestDayLineAction: THOUGHT THIS CODE MIGHT BE REDUNDANT");
+	    duty.postProcess();
+	}
+
+	this.state.ignoreUnrecognisedLines = false;
+	if (this.lineType === lte.restDay) {
+	    console.log("Doing rest-day lineAction");
+	    e = this.addEvent({summary: 3, startDay: 1, endDay: 1, dayOfWeek: 2});
+	}
+	else {
+	    console.log("Doing multi-rest-day lineAction");
+	    e = this.addEvent({summary: 3, startDay: 1, endDay: 2});
+	}
+
+	if (summaryDays.endOfTrip(tripDate)) {
+	    this.finishTrip();
+	}
+	else {
+	    this.trip.duties.add(e);
+	}
     };
 
     this.doGndDutyLineAction = function() {
@@ -492,18 +513,23 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         if (this.lineType === lte.gndDay) {
 	    console.log("Doing gnd dutyLineAction");
 	    e = this.addEvent({summary: 3, startDay: 1, endDay: 1, dayOfWeek: 2});
-	    this.eventCollection.events.add(e);
-	    this.mergeEvents(this.eventCollection.events);
 	}
+	else {
+	    console.log("Doing multi-day lineAction");
+	    e = this.addEvent({summary: 3, startDay: 1, endDay: 2});
+	}
+	this.eventCollection.events.add(e);
+	this.mergeEvents(this.eventCollection.events);
     };
 
     this.testForFlyingDutyLine = function() {
+	var result = false;
         if ((this.matchedFields = this.matches.flyingDutyLine.exec(this.line)) !== null) {
             console.log("Found a Flying Duty line");
-            this.lineType = lte.multiDay;
-            return true;
+            this.lineType = lte.flyingDuty;
+            result = true;
         }
-        return false;
+        return result;
     };
 
     this.nextSector = function (sectorsLine) {
@@ -563,41 +589,53 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	return sector;
     };
 
-    // Make a duty from an array of sectors
-    this.makeDuty = function(s) {
 
-    };
     this.startNewTrip = function() {
-	var tripNo = this.matchedFields[3],
-	    trip = this.eventCollection.events.get(tripNo),
-	    duty = YAHOO.rp.eventMaker.factory('FlyingDuty');
+	var em = YAHOO.rp.eventMaker,
+	    tripDate = this.matchedFields[1],
+	    tripNo = this.matchedFields[3],
+	    summaryDays = this.summaryBuilder.getDays(),
+	    summaryDay = summaryDays[tripDate],
+	    trip = em.factory('Trip');
+
+	// Make sure trip no's match
+	if (trip.tripNo !== summaryDay.tripNo) {
+	    throw "Trip no's don't match for: tripDate";
+	}
+
+	this.eventCollection.events.add(trip);
 	console.log('trip:' + trip.tripNo);
-	trip.duties.events.add(duty);
 	delete this.prevClearTime;
 	this.currentTrip = trip;
 	return trip;
     };
 
-
-    this.finishTrip = function(trip) {
-	var duty = trip.duties.events.current();
-
-	duty.postProcess();
-	trip.postProcess();
-    };
-
-    this.checkIfNewTrip = function(trip) {
-	var duty = trip.duties.events.current(),
-	    tripNo = +this.matchedFields[3];
-/*
-	// If restPeriod > minRest then new Duty
-	// if (newDuty & at home base) or trip no changed then new trip.
-	if( (tripNo !== trip.tripNo) ||
-	    (this.isNewDuty() && this.atHomeBase())) {
-	    this.finishTrip();
+    this.startNewFlyingDuty = function() {
+	var em = YAHOO.rp.eventMaker,
+	    duty = em.factory('FlyingDuty');
+	this.finishFlyingDuty();
+	if (typeof this.currentTrip !== 'object') {
 	    this.startNewTrip();
 	}
-*/    };
+	this.currentTrip.duties.events.add(duty);
+	this.currentFlyingDuty = duty;
+	return duty;
+    };
+
+    this.finishTrip = function() {
+	if (typeof this.currentTrip === 'object' &&
+	    typeof this.currentTrip.postProcess === 'function') {
+	    this.currentTrip.postProcess();
+	    delete this.currentTrip; // set to undefined
+	}
+    };
+    this.finishFlyingDuty = function() {
+	if (typeof this.currentTrip === 'object' &&
+	    typeof this.currentFlyingDuty.postProcess === 'function') {
+	    this.currentFlyingDuty.postProcess();
+	    delete this.currentFlyingDuty; // set to undefined
+	}
+    };
 
     this.isNewDuty = function(sectorStartTime) {
 	var trip = this.currentTrip,
@@ -616,21 +654,23 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	return startNewDuty;
     };
 
-
     this.doFlyingDutyLineAction = function() {
 	var trip = this.currentTrip,
-	    duty = trip.duties.events.current(),
+	    duty = this.currentFlyingDuty,
 	    sector,
-	    s = {};
+	    s = {},
+	    tripDate = this.matchedFields[1],
+	    summaryDays = this.summaryBuilder.getDays(),
+	    summaryDay = summaryDays[tripDate];
 
-	if (typeof duty === 'undefined') {
-	    duty = YAHOO.rp.eventMaker.factory('FlyingDuty');
-	    trip.duties.events.add(duty);
-	}
 	console.log("Doing flying dutyLineAction");
 	this.state.ignoreUnrecognisedLines = false;
 
-       // this.checkDate(lastDutyDate);
+	// Start a new duty ( and trip ) if neccessary
+	if (typeof duty !== 'object') {
+	    this.startNewFlyingDuty();
+	}
+	// Add sectors
         s.line = this.matchedFields[4];
 	while (typeof s.line !== 'undefined') {
 	    s = this.nextSector(s.line);
@@ -638,14 +678,15 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 		duty.start.setTime(s.report);
 	    }
 	    sector = YAHOO.rp.eventMaker.factory('Sector',this.baseDate);
-	    sector.start.setDayOfMonth(this.matchedFields[1]);
-	    sector.end.setDayOfMonth(this.matchedFields[1]);
+	    sector.start.setDayOfMonth(tripDate);
+	    sector.end.setDayOfMonth(tripDate);
 	    sector.start.setTime(s.start);
 	    sector.end.setTime(s.end);
 	    sector.origin = s.origin;
 	    sector.destination = s.dest;
 	    sector.flightNo = s.flightNo;
 
+/*
 	    if (this.isNewDuty(sector.start.valueOf())) {
 		duty.postProcess();
 		duty = YAHOO.rp.eventMaker.factory('FlyingDuty');
@@ -656,10 +697,15 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 		}
 		trip.duties.events.add(duty);
 	    }
-
+*/
 	    duty.sectors.events.add(sector);
 	}
-
+	if (summaryDay.endOfDuty()) {
+	    this.finishFlyingDuty();
+	}
+	if (summaryDays.endOfTrip(tripDate)) {
+	    this.finishTrip();
+	}
     };
 
     this.doTripCrewLineAction = function() {

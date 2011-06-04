@@ -18,6 +18,59 @@ YAHOO.rp.BaFcSummaryBuilder = function() {
             tripSummaryLine : /\d{4}/
         },
 //        DayData = {date: 0, dayOfWeek: 'xx', trip: 'xxxx', dest: 'xxx', carryInTripFlag: false, gndDuties: ''},
+        SummaryData = function() {
+          this.date = 0;
+          this.dayOfWeek = 'xx';
+          this.tripNo = '';
+          this.dest = 'xxx';
+          this.carryInFlag = false;
+          this.gndDuties = [];
+
+/*
+	33793308                    3379            3283        3317            3393        3319                3280
+ lgw     LGW JER LGW                  -  LGW         EDI JER LGW JER LGW         LGW         JER LGW  -          EDI JER LGW
+ (01) 02  03  04  05  06  07  08  09  10  11  12  13  14  15  16  17  18  19  20  21  22  23  24  25  26  27  28  29  30  01  02
+
+start trip if day has a trip no'
+start a CI trip if day = 01 & no trip no' & duty !=''
+end a trip if next day has trip no or duty != 'XXX'
+
+start duty if duty line = 'XXX'
+start duty if duty line = '-' & duty != 'REST'
+end duty if duty line = 'XXX'
+
+Day 01 - end of carry in trip
+    start a carry in trip, start duty, end duty
+    02 - end trip
+    03 - start of trip & start & end of duty
+    04 - end duty
+*/
+
+          this.isStartOfTrip = function() {
+            var result = false;
+            if (+this.tripNo > 999) {
+                result = true;
+            }
+            return true;
+          };
+
+          this.isEndOfDuty = function() {
+            var result = false;
+            if (this.dest.length === 3) {
+                result = true;
+            }
+            return true;
+          };
+
+          this.isNotFlyingDuty = function() {
+            var result = false;
+            if ((this.tripNo === '') && (this.dest === '')) {
+                result = true;
+            }
+            return true;
+          };
+
+        },
         newDay,
         carryInTripFlag = false,
 
@@ -75,12 +128,11 @@ YAHOO.rp.BaFcSummaryBuilder = function() {
                 theTrip = tripLine.substring(i,i+4).trim();
                 theDest = dutyEndLine.substring(i,i+4).trim();
 
-                newDay = {};
+                newDay = new SummaryData();
                 newDay.date = theDate;
                 newDay.dayOfWeek = theDay;
                 newDay.dest = theDest;
-                newDay.trip = theTrip;
-                newDay.gndDuties = [];
+                newDay.tripNo = theTrip;
 
                 // get all gnd duties for associated day
                 for (j = 0; j < summaryLines.length; j += 1) {
@@ -112,6 +164,43 @@ YAHOO.rp.BaFcSummaryBuilder = function() {
 	};
 
      //-------------------------------------------------------------------------
+
+    this.dayTypeEnum = {
+        unrecognised: 0,
+        carryInTrip: 1,
+        endOfDuty: 2,
+        endOfTrip: 3,
+        restDayAfterDuty: 4
+
+    };
+
+/*
+    1234
+     XXX - start of trip
+
+      -  - rest day
+    lgw  - carry in trip (end of trip if next day blank or start of trip)
+*/
+    this.getDayType = {
+
+    }
+
+    this.isEndOfTrip = function(dayNo) {
+        var nextDayNo = dayNo + 1,
+            nextDay = summaryDays[nextDay],
+            result = true;
+
+        if (nextDayNo > summaryDays.length) {
+            result = false;
+        }
+        else {
+            if (!nextDay.isStartOfTrip() &&
+                nextDay.dest !='') {
+                result = false;
+            }
+        }
+        return result;
+    };
 
     this.hasACarryInTrip = function() {
         return carryInTripFlag;

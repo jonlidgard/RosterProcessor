@@ -150,6 +150,8 @@ YAHOO.rp.BaFcStateMaker.BuildingSummaryState = function () {
     }
     this.analyseLine = function() {
 	this.parser.buildSummary();
+	this.changeState('lookingForTripState');
+
     };
     this.exit = function() {
 	this.parser.buildSummaryExit();
@@ -166,13 +168,8 @@ YAHOO.rp.BaFcStateMaker.InACarryInTripState = function () {
                     { test: 'testForFlyingDutyLine',
                     action: 'doFlyingDutyLineAction',
 		    nstate: 'inAFlyingDutyState'},
-                    { test: 'testForMultiRestDayLine',
-                    action: 'doMultiRestDayLineAction'},
                     { test: 'testForRestDayLine',
                     action: 'doRestDayLineAction'},
-		    { test: 'testForMultiDayLine',
-                    action: 'doMultiDayLineAction',
-		    nstate: 'lookingForTripState'},
                     { test: 'testForGndDutyLine',
                     action: 'doGndDutyLineAction',
 		    nstate: 'lookingForTripState'}];
@@ -197,9 +194,12 @@ YAHOO.rp.BaFcStateMaker.LookingForTripState = function () {
     this.testList =[{ test: 'testForTripCrewLine',
                     action: 'doTripCrewLineAction',
 		    nstate: 'lookingForCrewLineState'},
-                    { test: 'testForTripLine',
-                    action: 'doTripLineAction',
-		    nstate: 'inATripState'}];
+                    { test: 'testForFlyingDutyLine',
+                    action: 'doFlyingDutyLineAction'},
+                    { test: 'testForRestDayLine',
+                    action: 'doRestDayLineAction'},
+                    { test: 'testForGndDutyLine',
+                    action: 'doGndDutyLineAction'}];
 };
 
 YAHOO.rp.BaFcStateMaker.InATripState = function () {
@@ -211,13 +211,8 @@ YAHOO.rp.BaFcStateMaker.InATripState = function () {
                     { test: 'testForFlyingDutyLine',
                     action: 'doFlyingDutyLineAction'},
 //		    nstate: 'inAFlyingDutyState'},
-                    { test: 'testForMultiRestDayLine',
-                    action: 'doMultiRestDayLineAction'},
                     { test: 'testForRestDayLine',
                     action: 'doRestDayLineAction'},
-                    { test: 'testForMultiDayLine',
-                    action: 'doMultiDayLineAction',
-		    nstate: 'lookingForTripState'},
                     { test: 'testForGndDutyLine',
                     action: 'doGndDutyLineAction',
 		    nstate: 'lookingForTripState'}];
@@ -235,8 +230,7 @@ YAHOO.rp.BaFcStateMaker.InATripState = function () {
     };
 
 };
-YAHOO.rp.BaFcStateMaker.InAFlyingDutyState = function () {
-};
+
 YAHOO.rp.BaFcStateMaker.GetCrewNamesState = function () {
     this.name = "In a Trip State";
 
