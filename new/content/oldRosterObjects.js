@@ -10,7 +10,7 @@ Version 0.1.25, April 20th, 2008.
 debugger;
 
 
-//---------------------------- ROSTER OBJECTS -------------------------------                                          
+//---------------------------- ROSTER OBJECTS -------------------------------
 
 var rosterObjects = {
     WHOLEDAY : 86400000,
@@ -19,7 +19,7 @@ var rosterObjects = {
     PREFLIGHTDUTYTIME : 3600000, // 1 hour
     LHRCCPREFLIGHTDUTYTIME : 4800000, // 01:20
     MINREST : 39600000, // 11 hours
-    
+
     roster : function () {
        this.parsePage = undefined;
        this.getFileName = undefined;
@@ -61,7 +61,7 @@ var rosterObjects = {
        {
               if( this.wholeDay )
               {
-                     return( this.startTime.toISO8601String(3, true));                     
+                     return( this.startTime.toISO8601String(3, true));
               }
               else
               {
@@ -72,7 +72,7 @@ var rosterObjects = {
        {
               if( this.wholeDay )
               {
-                     return( this.endTime.toISO8601String(3, true));                     
+                     return( this.endTime.toISO8601String(3, true));
               }
               else
               {
@@ -81,7 +81,7 @@ var rosterObjects = {
        }
        this.getSummary = function ()
        {
-              // remove multiple spaces       
+              // remove multiple spaces
               return(this.summary.replace(/ +/," "));
        }
        this.getDescription = function ()
@@ -93,7 +93,7 @@ var rosterObjects = {
 
 
 
-    
+
        this.document = null; // rp_getContentDocument();
        this.text = {all:"",header:"",body:"",footer:""};
        this.staffNo = "";
@@ -113,7 +113,7 @@ var rosterObjects = {
        this.getRawRosterText = function() {
               return rp_getContentDocument().body.textContent; };
        this.removeHeaderInfo = function() {
-              this.text.all = this.text.all.replace(/Roster Processor.*$/img,"");    
+              this.text.all = this.text.all.replace(/Roster Processor.*$/img,"");
               // This trims whitespace from the beginning & end of the roster, not on individual lines.
               this.text.all = this.text.all.replace(/^\s*|\s*$/g,"");
        }
@@ -125,7 +125,7 @@ var rosterObjects = {
               }
        }
        this.getRosterInfo = null;
-        
+
     }
 }
 
@@ -167,7 +167,7 @@ function baseEvent()
        {
               if( this.wholeDay )
               {
-                     return( this.startTime.toISO8601String(3, true));                     
+                     return( this.startTime.toISO8601String(3, true));
               }
               else
               {
@@ -178,7 +178,7 @@ function baseEvent()
        {
               if( this.wholeDay )
               {
-                     return( this.endTime.toISO8601String(3, true));                     
+                     return( this.endTime.toISO8601String(3, true));
               }
               else
               {
@@ -187,7 +187,7 @@ function baseEvent()
        }
        this.getSummary = function ()
        {
-              // remove multiple spaces       
+              // remove multiple spaces
               return(this.summary.replace(/ +/," "));
        }
        this.getDescription = function ()
@@ -213,7 +213,7 @@ function groundDuty(summary, description, creationDate)
               var optionOffDays = rosterprocessor_getBooleanPreference("rosterprocessor.fcShowOffDays", true);
               var optionWrapDays = rosterprocessor_getBooleanPreference("rosterprocessor.fcShowWrapDays", true);
               var optionLeaveDays = rosterprocessor_getBooleanPreference("rosterprocessor.fcShowLeaveDays", true);
-              var dontShowIt =                     
+              var dontShowIt =
                    (!optionOffDays && this.dutyCode in set('OFF','IN')) ||
                    (!optionWrapDays && this.dutyCode == 'WR') ||
                    (!optionLeaveDays && this.dutyCode in set('LM','LP','LA','LB','3A','3B','LL'));
@@ -292,7 +292,7 @@ function flyingDuty(summary, description, creationDate)
               if ( rosterprocessor_getBooleanPreference("rosterprocessor.fcCrewOnSummary", true))
               {
                      summaryLine = summaryLine + " " + abbrevName(this.crewList);
-              }                     
+              }
               return summaryLine;
        }
 
@@ -347,7 +347,7 @@ function flightSector( creationDate )
               }
               separator = (this.postFltCodes.substring(0,1) == 'X') ? 'x' : '-';
               separator = (this.preFltCode == 'DH') ? '*' : separator;
-              
+
               var simFlag = this.isSim() || this.preFltCode == 'LIMO';
               var o = simFlag ? '' : abbrevBase(this.origin.IATA);
               var d = simFlag ? '' : abbrevBase(this.dest.IATA);
@@ -356,7 +356,7 @@ function flightSector( creationDate )
               summaryLine = summaryLine + separator;
               summaryLine = summaryLine + d;
               summaryLine = summaryLine + this.endTime.toISO8601String(7);
-              
+
               if ( separator == '-') {
                      summaryLine = trimString(this.preFltCode) + ' ' + summaryLine + ' ' + this.postFltCodes;
               }
@@ -365,7 +365,7 @@ function flightSector( creationDate )
               //       if ( trimString(this.preFltCode) != 'LIMO' ) { // dont add crew names to LIMO sectors
               //              summaryLine = summaryLine + " " + abbrevName(this.crewList);
               //       }
-              //}                     
+              //}
 
               summaryLine = trimString(summaryLine);
               LOG(10,"Pst FLt Codes " + this.postFltCodes);
@@ -387,7 +387,7 @@ function flightCrew()
 
 /*
 var xcalParser = {
-       
+
        createXcalTree: function() {
               this.xcal = document.implementation.createDocument(ICALNS,'xcal',null);
               xcal.createElement("iCalendar");
@@ -395,5 +395,3 @@ var xcalParser = {
        }
 };
 */
-
-

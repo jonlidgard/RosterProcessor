@@ -42,7 +42,7 @@ YAHOO.rpTest.yuitest.EventTestCase = new YAHOO.tool.TestCase({
         // Test rosterText functionality
     testNewEvent: function() {
         var Assert = YAHOO.util.Assert,
-            e = this.eventCollection.events,
+            e = this.eventCollection,
             myEvent;
 
         Assert.isFunction(e.add);

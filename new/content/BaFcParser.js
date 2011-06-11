@@ -71,10 +71,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 
     this.states = { lookingForMetaDataState: new YAHOO.rp.BaFcStateMaker.factory('LookingForMetaDataState',this),
 		    buildingSummaryState: new YAHOO.rp.BaFcStateMaker.factory('BuildingSummaryState',this),
-//		    inACarryInTripState: new YAHOO.rp.BaFcStateMaker.factory('InACarryInTripState',this),
-		    lookingForTripState: new YAHOO.rp.BaFcStateMaker.factory('LookingForTripState',this),
-		    inATripState: new YAHOO.rp.BaFcStateMaker.factory('InATripState',this),
-//		    inAFlyingDutyState: new YAHOO.rp.BaFcStateMaker.factory('InAFlyingDutyState',this),
+		    lookingForDutyState: new YAHOO.rp.BaFcStateMaker.factory('LookingForDutyState',this),
 		    getCrewNamesState: new YAHOO.rp.BaFcStateMaker.factory('GetCrewNamesState',this)};
 
     this.eventCollection = new YAHOO.rp.EventCollection();
@@ -172,7 +169,6 @@ YAHOO.rp.BaFcParser = function(theRoster) {
     };
     this.addEvent = function (fields) {
 
-//	var e = this.eventCollection.events.newEvent(),
 	var e = YAHOO.rp.eventMaker.factory('GroundDuty',this.baseDate),
 	    d,
 	    u = YAHOO.rp.utils;
@@ -233,12 +229,13 @@ YAHOO.rp.BaFcParser = function(theRoster) {
      *
      */
     this.testForRosterDateLine = function() {
+	var result = false;
         if ((this.matchedFields = this.matches.rosterDateLine.exec(this.line)) !== null) {
             console.log("Found a roster date line");
             this.lineType = lte.rosterDateLine;
-            return true;
+            result = true;
         }
-        return false;
+        return result;
     };
     this.doRosterDateLineAction = function() {
         var f = this.matchedFields;
@@ -265,15 +262,16 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         this.roster.createdDate.setFullYear(2000 + (f[8] - 0), f[6]-1, f[7]);
         this.roster.createdDate.setHours(f[9], f[10], 0, 0);
         console.log("Roster created: " + this.roster.createdDate);
-	return false; // Don't skip next test
+	return true; // Don't skip next test
     };
     this.testForRosterTypeLine = function() {
+	var result;
         if ((this.matchedFields = this.matches.rosterType.exec(this.line)) !== null) {
             console.log("Found a roster type line");
             this.lineType = lte.rosterType;
-            return true;
+            result = true;
         }
-        return false;
+        return result;
     };
     this.doRosterTypeLineAction = function() {
         var f = this.matchedFields;
@@ -286,12 +284,13 @@ YAHOO.rp.BaFcParser = function(theRoster) {
         console.log("Crewcode:" + this.roster.nameCode);
     };
     this.testForCrewInfoLine = function() {
+	var result;
         if ((this.matchedFields = this.matches.crewInfoLine.exec(this.line)) !== null) {
             console.log("Found a crew info line");
             this.lineType = lte.crewInfoLine;
-            return true;
+            result = true;
         }
-        return false;
+        return result;
     };
     this.doCrewInfoLineAction = function() {
         //  'LIDDJ818995 CA LGW sen 1308 737
@@ -324,12 +323,13 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 
     };
     this.testForBLKLine = function() {
-        if ((this.matchedFields = this.matches.blkLine.exec(this.line)) !== null) {
+        var result;
+	if ((this.matchedFields = this.matches.blkLine.exec(this.line)) !== null) {
             console.log("Found a BLK line");
             this.lineType = lte.blkLine;
-            return true;
+            result = true;
         }
-        return false;
+        return result;
     };
     this.doBLKLineAction = function() {
 
@@ -365,7 +365,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	this.summaryBuilder = new YAHOO.rp.BaFcSummaryBuilder();
     };
     this.buildSummary = function() {
-	this.summaryBuilder.processLine(this.line);
+	return this.summaryBuilder.processLine(this.line);
 
 /*	if (this.summaryBuilder.processLine(this.line) === true) {
 	    // Finished building summary
@@ -373,7 +373,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 		this.state = this.state.changeState('inACarryInTripState');
 	    }
 	    else {
-		this.state = this.state.changeState('lookingForTripState');
+		this.state = this.state.changeState('lookingForDutyState');
 	    }
 	}
 */
@@ -400,76 +400,77 @@ YAHOO.rp.BaFcParser = function(theRoster) {
     };
 
     this.testForCrewNamesLine = function() {
-        if ((this.matchedFields = this.matches.crewNamesLine.exec(this.line)) !== null) {
+        var result;
+	if ((this.matchedFields = this.matches.crewNamesLine.exec(this.line)) !== null) {
             console.log("Found a CrewNames line");
             this.lineType = lte.crewLine;
-            return true;
+            result = true;
         }
-        return false;
+        return result;
     };
-    this.doCrewLineAction = function() {
+    this.doCrewNamesLineAction = function() {
+	this.state.ignoreUnrecognisedLines = true;
         console.log("Doing crewLineAction");
     };
 
     this.testForRestDayLine = function() {
-	var result = false;
-	if (this.testForGndDutyLine &&
-	    (this.lineType === lte.restDay) ||
-	    (this.lineType === lte.multiRestDay)) {
+	var result = false,
+//	    isGndDuty = false;
+	    isGndDuty = this.testForGndDutyLine();
+	if ( isGndDuty &&
+	    ((this.lineType === lte.restDay) ||
+	    (this.lineType === lte.multiRestDay))) {
 	    result = true;
 	}
 	return result;
     };
 
     this.testForGndDutyLine = function() {
-	var result = false, switchSelector = 0;
-	/* switchSelector
-	  bit 1 - sgl Day
-	  bit 2 - multi Day
-	  bit 3 - REST
-	*/
 
-        if ((this.matchedFields = this.matches.gndDutyLine.exec(this.line)) !== null) {
-	    result = true;
-	    switchSelector = switchSelector | 1;
+	var result = true, switchSelector = 0, gndDutyCode = '';
+
+	if ((this.matchedFields = this.matches.gndDutyLine.exec(this.line)) !== null) {
+	    switchSelector = switchSelector + 1;
+	    gndDutyCode = this.matchedFields[3].trim();
 	}
 	else { // is it a multi day
 	    if ((this.matchedFields = this.matches.multiDayLine.exec(this.line)) !== null) {
-		result = true;
-		switchSelector = switchSelector | 2;
+		switchSelector = switchSelector + 2;
+		gndDutyCode = this.matchedFields[3].trim();
 	    }
 	}
-	if (result === true) {
-	    if (this.matchedFields[3].trim() === 'REST') {
-	        switchSelector = switchSelector | 4;
-	    }
 
-	    switch (switchSelector) {
-	        case 1:
-	            console.log("Found a Gnd Duty line");
-	       	this.lineType = lte.gndDay;
-			result = true;
-		    break;
-		case 2:
-		    console.log("Found a Multi Day line");
-		    this.lineType = lte.multiDay;
-		    break;
-		case 5:
-		    console.log("Found a REST day line");
-		    this.lineType = lte.restDay;
-		    break;
-		case 6:
-		    console.log("Found a multi REST day line");
-		    this.lineType = lte.multiRestDay;
-		    break;
-	    }
+	if (gndDutyCode === 'REST') {
+	    switchSelector = switchSelector + 4;
+	}
+	switch (+switchSelector) {
+	    case 1:
+//		console.log("Found a Gnd Duty line");
+		this.lineType = lte.gndDuty;
+		break;
+
+	    case 2:
+//		console.log("Found a Multi Day line");
+		this.lineType = lte.multiDay;
+		break;
+	    case 5:
+//		console.log("Found a REST day line");
+		this.lineType = lte.restDay;
+		break;
+	    case 6:
+//		console.log("Found a multi REST day line");
+		this.lineType = lte.multiRestDay;
+		break;
+	    default:
+		result = false;
+		break;
 	}
         return result;
     };
 
     this.doRestDayLineAction = function() {
 	var trip = this.currentTrip,
-	    duty = trip.duties.events.current(),
+	    duty = this.currentFlyingDuty,
 	    tripDate = this.matchedFields[1],
 	    summaryDays = this.summaryBuilder.getDays(),
 	    summaryDay = summaryDays[tripDate],
@@ -480,9 +481,9 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    if (+tripDate === 1) {
 		this.startNewTrip(); // carry in trip
 	    }
-	}
-	else {
-	    throw "Found REST day outside of a trip";
+	    else {
+		throw "Found a REST day outside of a trip";
+	    }
 	}
 	// Wrap up old duty
 	if (typeof duty !== 'undefined') {
@@ -500,23 +501,28 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    e = this.addEvent({summary: 3, startDay: 1, endDay: 2});
 	}
 
-	if (summaryDays.endOfTrip(tripDate)) {
+	if (this.summaryBuilder.isEndOfTrip(tripDate)) {
 	    this.finishTrip();
 	}
 	else {
-	    this.trip.duties.add(e);
+	    this.currentTrip.duties.events.add(duty);
 	}
     };
 
     this.doGndDutyLineAction = function() {
         var e;
-        if (this.lineType === lte.gndDay) {
+        if (this.lineType === lte.gndDuty) {
 	    console.log("Doing gnd dutyLineAction");
 	    e = this.addEvent({summary: 3, startDay: 1, endDay: 1, dayOfWeek: 2});
 	}
 	else {
-	    console.log("Doing multi-day lineAction");
-	    e = this.addEvent({summary: 3, startDay: 1, endDay: 2});
+	    if (this.lineType === lte.multiDay) {
+		console.log("Doing multi-day lineAction");
+		e = this.addEvent({summary: 3, startDay: 1, endDay: 2});
+	    }
+	    else {
+		throw "Unrecognised duty " + this.lineType;
+	    }
 	}
 	this.eventCollection.events.add(e);
 	this.mergeEvents(this.eventCollection.events);
@@ -599,10 +605,10 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    trip = em.factory('Trip');
 
 	// Make sure trip no's match
-	if (trip.tripNo !== summaryDay.tripNo) {
+	if ((tripNo !== summaryDay.tripNo) && !summaryDay.carryInTripFlag) {
 	    throw "Trip no's don't match for: tripDate";
 	}
-
+	trip.tripNo = tripNo;
 	this.eventCollection.events.add(trip);
 	console.log('trip:' + trip.tripNo);
 	delete this.prevClearTime;
@@ -627,13 +633,15 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    typeof this.currentTrip.postProcess === 'function') {
 	    this.currentTrip.postProcess();
 	    delete this.currentTrip; // set to undefined
+	    console.log("Finishing trip");
 	}
     };
     this.finishFlyingDuty = function() {
 	if (typeof this.currentTrip === 'object' &&
-	    typeof this.currentFlyingDuty.postProcess === 'function') {
+	    typeof this.currentFlyingDuty === 'object') {
 	    this.currentFlyingDuty.postProcess();
 	    delete this.currentFlyingDuty; // set to undefined
+	    console.log("Finishing duty");
 	}
     };
 
@@ -659,7 +667,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    duty = this.currentFlyingDuty,
 	    sector,
 	    s = {},
-	    tripDate = this.matchedFields[1],
+	    tripDate = +this.matchedFields[1],
 	    summaryDays = this.summaryBuilder.getDays(),
 	    summaryDay = summaryDays[tripDate];
 
@@ -668,7 +676,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 
 	// Start a new duty ( and trip ) if neccessary
 	if (typeof duty !== 'object') {
-	    this.startNewFlyingDuty();
+	    duty = this.startNewFlyingDuty();
 	}
 	// Add sectors
         s.line = this.matchedFields[4];
@@ -700,10 +708,10 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 */
 	    duty.sectors.events.add(sector);
 	}
-	if (summaryDay.endOfDuty()) {
+	if (summaryDay.isEndOfDuty()) {
 	    this.finishFlyingDuty();
 	}
-	if (summaryDays.endOfTrip(tripDate)) {
+	if (this.summaryBuilder.isEndOfTrip(tripDate)) {
 	    this.finishTrip();
 	}
     };
@@ -719,7 +727,8 @@ YAHOO.rp.BaFcParser = function(theRoster) {
     this.parse = function() {
         var parsing = false;
         console.clear();
-        this.state = this.states.lookingForMetaDataState;
+        delete this.baseDate;
+	this.state = this.states.lookingForMetaDataState;
         this.state.enter();
 
         while (this.roster.rosterText.hasNext()) {
@@ -731,5 +740,6 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    }
 	}
 	this.state.exit();
+	return this.eventCollection.events.all();
     };
 };

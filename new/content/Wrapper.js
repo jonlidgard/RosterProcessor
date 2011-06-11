@@ -38,7 +38,7 @@ RP.namespace = function (ns_string) {
 */
 
 YAHOO.rp = {
-    
+
     // Constants
     constants : {
         VERSION : '0.3',
@@ -65,7 +65,7 @@ YAHOO.rp = {
         MONTHSOFYEAR : ["JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"]
     },
 
-    // vars    
+    // vars
     myRoster : null,
 
     /**
@@ -89,7 +89,7 @@ YAHOO.rp = {
         this.toString = function () {
             return this.name + ': "' + this.message + '"';
         };
-        
+
     },
 
 
@@ -98,7 +98,7 @@ YAHOO.rp = {
      *
      * @returns {object} theRoster- BaFcRoster, BaCcRoster, undefined
      */
-    
+
     isValidRoster : function () {
         var i = this.rosterTypes.length, theRoster;
         while (i > 0) {
@@ -131,7 +131,7 @@ YAHOO.rp = {
                 return;
             }
         }
-    
+
     },
 
 
@@ -139,8 +139,13 @@ YAHOO.rp = {
         this.init();
         var lines = document.getElementById("roster").innerHTML,
             roster = new YAHOO.rp.Roster(lines),
-            parser = new YAHOO.rp.BaFcParser(roster);
-        parser.parse();
+            parser = new YAHOO.rp.BaFcParser(roster),
+            e = parser.parse(),
+            prefs = {useUTC: true,
+                    icalVersion: 2,
+                    detailLevel: 'showDuty'},
+            output = YAHOO.rp.outputIcal(e, prefs);
+        return output;
     }
 
 
@@ -158,7 +163,7 @@ YAHOO.rp = {
         return;
       }
     }
-    
+
     var rt = (myRoster instanceof BaFcRoster) ? 1 : 0;
       rt = (myRoster instanceof BaCcRoster) ? 2 : rt;
 
@@ -168,4 +173,4 @@ YAHOO.rp = {
         var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
         fp.defaultString = myRoster.getFileName() + icalExt;
       }
-*/    
+*/

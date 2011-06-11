@@ -29,27 +29,31 @@
 
 YAHOO.rp.BaFcStateMaker = function () {
     this.name = 'Default State';
-    this.parser = undefined;
+//    this.parser = undefined;
     this.testList = [];
     this.ignoreUnrecognisedLines = true;
 };
 
 YAHOO.rp.BaFcStateMaker.prototype.enter = function () {
     console.log("Entering State: " + this.name);
-    return this;
+//    return this;
 };
 
 YAHOO.rp.BaFcStateMaker.prototype.exit = function () {
     console.log("Exiting State: " + this.name);
-    return this;
+//    return this;
 };
 
 YAHOO.rp.BaFcStateMaker.prototype.changeState = function (s) {
     var newState = this.parser.states[s];
     if (typeof newState === 'object') {
-        this.exit();
+        if (typeof this.exit === 'function') {
+	    this.exit();
+	}
         this.prevState = this;
-        newState.enter();
+        if (typeof newState.enter === 'function') {
+            newState.enter();
+	}
         this.parser.state = newState;
         return newState;
     }
@@ -61,9 +65,9 @@ YAHOO.rp.BaFcStateMaker.prototype.changeState = function (s) {
 
 YAHOO.rp.BaFcStateMaker.prototype.analyseLine = function () {
     var i = 0,
-        nextState = undefined,
+        nextState,
         x,test,action,
-	skipRestOfTests,
+	dontSkipRestOfTests,
 	unrecognisedLine = true;
     if (typeof this.parser !== 'object') {
         throw "StateMaker.AnalyseLine: parser object not defined";
@@ -71,24 +75,24 @@ YAHOO.rp.BaFcStateMaker.prototype.analyseLine = function () {
     while (i < this.testList.length) {
         x = this.testList[i];
 	i += 1;
-        test = this.parser[x['test']];
+        test = this.parser[x.test];
         if (typeof test !== 'function') {
-            console.log('Unrecognised test function:' + x['test']);
+            console.log('Unrecognised test function:' + x.test);
             continue;
         }
-        action = this.parser[x['action']];
+        action = this.parser[x.action];
         if (typeof action !== 'function') {
-            console.log('Unrecognised action function:' + x['action']);
+            console.log('Unrecognised action function:' + x.action);
             continue;
         }
-        nextState = x['nstate'];
+        nextState = x.nstate;
         if ( test.apply(this.parser) === true ) {
 	    unrecognisedLine = false;
-            skipRestOfTests = action.apply(this.parser);
+            dontSkipRestOfTests = action.apply(this.parser);
             if (typeof nextState !== 'undefined') {
                 this.changeState(nextState);
             }
-            if (skipRestOfTests === true) {
+            if (typeof dontSkipRestOfTests === 'undefined' || dontSkipRestOfTests === false) {
 		break;
             }
         }
@@ -132,68 +136,36 @@ YAHOO.rp.BaFcStateMaker.LookingForMetaDataState = function () {
                     { test: 'testForBLKLine',
                     action: 'doBLKLineAction',
                     nstate: 'buildingSummaryState'}];
-/*
-    that.foundBLKLine = function() {
-        parser.ignoreUnrecognisedLines = true; // Ignore the cruft between BLK & DAY DUTY FS
-    };
-    that.foundDayDutyFSLine = function() {
-	parser.ignoreUnrecognisedLines = false; // Don't ignore lines frome here-on.
-    };
-*/
+
 };
 
 YAHOO.rp.BaFcStateMaker.BuildingSummaryState = function () {
     this.name = 'Building summary';
 
     this.enter = function() {
+        console.log("Entering State: " + this.name);
 	this.parser.buildSummaryEnter();
-    }
+    };
     this.analyseLine = function() {
-	this.parser.buildSummary();
-	this.changeState('lookingForTripState');
-
+	if (this.parser.buildSummary() === true) {
+	    this.changeState('lookingForDutyState');
+	}
     };
     this.exit = function() {
+        console.log("Exiting State: " + this.name);
 	this.parser.buildSummaryExit();
-    }
+    };
 
 };
-
-YAHOO.rp.BaFcStateMaker.InACarryInTripState = function () {
-    this.name = "Carry-In Trip State";
+YAHOO.rp.BaFcStateMaker.LookingForDutyState = function () {
+    this.name = "Looking for Duty State";
 
     this.testList =[{ test: 'testForTripCrewLine',
                     action: 'doTripCrewLineAction',
-		    nstate: 'lookingForCrewLineState'},
-                    { test: 'testForFlyingDutyLine',
-                    action: 'doFlyingDutyLineAction',
-		    nstate: 'inAFlyingDutyState'},
-                    { test: 'testForRestDayLine',
-                    action: 'doRestDayLineAction'},
-                    { test: 'testForGndDutyLine',
-                    action: 'doGndDutyLineAction',
-		    nstate: 'lookingForTripState'}];
-
-
-    this.enter = function () {
-	YAHOO.rp.BaFcStateMaker.prototype.enter.call(this);
-	this.parser.getCarryInTrip();
-	return this;
-    };
-
-    this.exit = function () {
-	YAHOO.rp.BaFcStateMaker.prototype.exit.call(this);
-	this.parser.finishTrip(this.parser.currentTrip);
-	return this;
-    };
-};
-
-YAHOO.rp.BaFcStateMaker.LookingForTripState = function () {
-    this.name = "Looking for Trip State";
-
-    this.testList =[{ test: 'testForTripCrewLine',
-                    action: 'doTripCrewLineAction',
-		    nstate: 'lookingForCrewLineState'},
+		    nstate: 'getCrewNamesState'},
+		    { test: 'testForCrewNamesLine',
+                    action: 'doCrewNamesLineAction',
+		    nstate: 'getCrewNamesState'},
                     { test: 'testForFlyingDutyLine',
                     action: 'doFlyingDutyLineAction'},
                     { test: 'testForRestDayLine',
@@ -201,39 +173,9 @@ YAHOO.rp.BaFcStateMaker.LookingForTripState = function () {
                     { test: 'testForGndDutyLine',
                     action: 'doGndDutyLineAction'}];
 };
-
-YAHOO.rp.BaFcStateMaker.InATripState = function () {
-    this.name = "In a Trip State";
-
-    this.testList =[{ test: 'testForTripCrewLine',
-                    action: 'dTripCrewLineAction',
-		    nstate: 'lookingForCrewLineState'},
-                    { test: 'testForFlyingDutyLine',
-                    action: 'doFlyingDutyLineAction'},
-//		    nstate: 'inAFlyingDutyState'},
-                    { test: 'testForRestDayLine',
-                    action: 'doRestDayLineAction'},
-                    { test: 'testForGndDutyLine',
-                    action: 'doGndDutyLineAction',
-		    nstate: 'lookingForTripState'}];
-
-    this.enter = function () {
-	YAHOO.rp.BaFcStateMaker.prototype.enter.call(this);
-	this.parser.startNewTrip();
-	return this;
-    };
-
-    this.exit = function () {
-	YAHOO.rp.BaFcStateMaker.prototype.exit.call(this);
-	this.parser.finishTrip(this.parser.currentTrip);
-	return this;
-    };
-
-};
-
 YAHOO.rp.BaFcStateMaker.GetCrewNamesState = function () {
-    this.name = "In a Trip State";
+    this.name = "Get Crew Names State";
 
-    this.testList =[{ test: 'testForCrewNames',
+    this.testList =[{ test: 'testForCrewNamesLine',
                     action: 'doCrewNamesLineAction'}];
 };

@@ -22,66 +22,60 @@ YAHOO.rp.outputIcal = function (events, preferences) {
         TZINFO = preferences.useUTC ? ICAL.TIMEZONE_INFO : "",
         event,
         i = 0,
-        u = YAHOO.rp.utils;
+        u = YAHOO.rp.utils,
 
-    this.outputHeader = function() {
+        outputHeader = function() {
         // MS Outlook doesn't like V2.0 of ical spec so use v1.0 for windows machines
         var calHeader;
-        switch (u.BrowserDetect.OS)
+        switch (preferences.icalVersion)
         {
-            case 'Windows':
+            case 1:
                 calHeader = ICAL.V1_HEADER + TZINFO;
                 break;
-            case 'Mac':
-                calHeader = ICAL.V2_HEADER + TZINFO;
-                break;
-            case 'Linux':
-                calHeader = ICAL.V2_HEADER + TZINFO;
-                break;
-            default:
+            case 2:
                 calHeader = ICAL.V2_HEADER + TZINFO;
                 break;
         }
         outputText = outputText.concat(calHeader);
-    };
+    },
 
-    this.outputFooter = function() {
+    outputFooter = function() {
         outputText = outputText.concat(ICAL.CAL_FOOTER);
-    };
+    },
 
-    this.outputSector = function (s) {
+    outputSector = function (s) {
         outputText += ICAL.EVENT_HEADER +
-            'CREATED:' + getCreated() + '\n' +
-            'LAST_MODIFIED:' + getLastModified() + '\n' +
-            'DTSTAMP:' + getDtStamp() + '\n' +
-            'UID:' + getUUID() + '\n';
-
+            'CREATED:' + s.getCreated() + '\n' +
+            'LAST_MODIFIED:' + s.getLastModified() + '\n' +
+            'DTSTAMP:' + s.getDtStamp() + '\n' +
+            'UID:' + s.getUUID() + '\n';
+/*
         if ( firstSector ) {
             crewLine = " " + abbrevName(crewList);
             //  rptText = "RPT" + theEvent.startTime.toISO8601String(7,false) + "Z ";
             rptText = '';
-            outputText += 'DTSTART' + TZID + theEvent.getStartTime() + '\n';
+            outputText += 'DTSTART' + TZID + s.start.ISO8601DateTime() + '\n';
         }
         else {
-            rptText = '';
+*/            rptText = '';
             crewLine = '';
-        }
-        firstSector = false;
-        outputText += 'DTSTART' + TZID + getStartTime() + '\n' +
-            'DTEND' + TZID + getEndTime() + '\n' +
-            'SUMMARY:' + rptText + getSummary() + crewLine + '\n' +
-            'DESCRIPTION:' + getDescription() + '\n' +
-            'CATEGORIES:' + categories + '\n' + ICAL.EVENT_FOOTER;
-    };
+ //       }
+ //       firstSector = false;
+        outputText += 'DTSTART' + TZID + s.start.ISO8601DateTime() + '\n' +
+            'DTEND' + TZID + s.end.ISO8601DateTime() + '\n' +
+            'SUMMARY:' + rptText + s.getSummary() + crewLine + '\n' +
+            'DESCRIPTION:' + s.getDescription() + '\n' +
+            'CATEGORIES:' + s.categories + '\n' + ICAL.EVENT_FOOTER;
+    },
 
-    this.outputDuty = function() {
+    outputDuty = function(e) {
         outputText += ICAL.EVENT_HEADER;
-        outputText += 'CREATED:' + e.getCreated() + "\n";
-        outputText += 'LAST-MODIFIED:' + e.getLastModified() + "\n";
-        outputText += 'DTSTAMP:' + e.getDtStamp() + "\n";
+        outputText += 'CREATED:' + e.created.ISO8601DateTime() + "\n";
+        outputText += 'LAST-MODIFIED:' + e.lastModified.ISO8601DateTime() + "\n";
+        outputText += 'DTSTAMP:' + e.dtStamp.ISO8601DateTime() + "\n";
         outputText += 'UID:' + e.getUUID() + "\n";
-        outputText += 'DTSTART' + TZID + e.getStartTime() + "\n";
-        outputText += 'DTEND' + TZID + e.getEndTime() + "\n";
+        outputText += 'DTSTART' + TZID + e.start.ISO8601DateTime() + "\n";
+        outputText += 'DTEND' + TZID + e.end.ISO8601DateTime() + "\n";
         outputText += 'SUMMARY:' + e.getSummary() + "\n";
         outputText += 'DESCRIPTION:' + e.getDescription() + "\n";
         if (e.isWholeDay())
@@ -93,41 +87,42 @@ YAHOO.rp.outputIcal = function (events, preferences) {
             outputText += 'CATEGORIES:' + e.categories + "\n";
         }
         outputText += ICAL.EVENT_FOOTER;
-    };
+    },
 
-    this.outputEvent = function(e) {
-        var mySector,crewLine,firstSector = true;
+    outputEvent = function(e) {
+        var mySector,crewLine,firstSector = true,d,s;
 
         if (e.name === 'trip') {
             switch (preferences.detailLevel) {
                 case 'showSectors':
                     while (e.duties.events.hasNext()) {
                         d = e.duties.events.next();
-                        while (d.sectors.hasNexy()) {
+                        while (d.sectors.events.hasNext()) {
                             s = d.sectors.events.next();
-                            this.outputSectors(s);
+                            outputSector(s);
                         }
                     }
                     break;
 
-                case 'showDuty':
-                    while (e.duties.events.hasNext()) {
-                        d = e.duties.events.next();
-                        this.outputDuties(d);
-                    }
-                    break;
                 case 'showTrip':
                     this.outputTrip(e);
                     break;
                 case 'showAtWork':
                     this.outputAtWork(e);
                     break;
+                default:
+                    while (e.duties.events.hasNext()) {
+                        d = e.duties.events.next();
+                        outputDuty(d);
+                    }
+                    break;
+
             }
         }
         else {
             this.outputDuty(e);
         }
-    }
+    };
     // Add the header
     outputHeader();
     // Add the events

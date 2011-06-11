@@ -74,12 +74,12 @@ YAHOO.rp.EventDate = function() {
 	return newEventDate;
     };
     this.ISO8601DateTime = function() {
-	return u.ISO8601String(d)
+	return u.ISO8601String(d);
     };
     this.ISO8601Date = function() {
-
+	return u.ISO8601String(d);
     };
-}
+};
 
 YAHOO.rp.eventMaker = function() {
     this.start = new YAHOO.rp.EventDate();
@@ -88,6 +88,10 @@ YAHOO.rp.eventMaker = function() {
     this.destination = '';
     this.summary = '';
     this.description = '';
+    this.dtStamp = new YAHOO.rp.EventDate();;
+    this.created = new YAHOO.rp.EventDate();
+    this.lastModified = new YAHOO.rp.EventDate();
+    this.categories = '';
 
 
 };
@@ -119,10 +123,23 @@ YAHOO.rp.eventMaker.prototype.getLength = function() {
     return this.end.valueOf() - this.start.valueOf();
 };
 
-YAHOO.rp.eventMaker.prototype.getId = function() {
-    return '';
+YAHOO.rp.eventMaker.prototype.getUUID = function() {
+    return 'UUID';
 };
 
+YAHOO.rp.eventMaker.prototype.getCreated = function() {
+    return this.created;
+};
+YAHOO.rp.eventMaker.prototype.getLastModified = function() {
+    return this.lastModified;
+};
+YAHOO.rp.eventMaker.prototype.getDtStamp = function() {
+    return this.dtStamp;
+};
+
+YAHOO.rp.eventMaker.prototype.isWholeDay = function() {
+    return false;
+};
 
 YAHOO.rp.eventMaker.prototype.postProcess = function() {
     console.log('Post Processing');
@@ -183,12 +200,18 @@ YAHOO.rp.EventCollection = function() {
 
     var c = YAHOO.rp.constants;
 
-    this.events = (function() {
+//    this.events = (function() {
+    return (function() {
 
 	var eventsList = [],
 	index = 0;
 
 	return {
+	    ev: eventsList,
+
+	    all: function() {
+		return eventsList;
+	    },
 	    add: function(e,key) {
 		if (typeof key === 'undefined') {
 		    eventsList[eventsList.length] = e;

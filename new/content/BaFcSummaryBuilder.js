@@ -7,8 +7,10 @@
 
 "use strict";
 
-YAHOO.rp.BaFcSummaryBuilder = function() {
+YAHOO.rp.BaFcSummaryBuilder = function(theParser) {
     var nextLineIsDayOfWeekLine = false,
+        parser = theParser,
+        matchedFields,
         lte = YAHOO.rp.BaFcLineTypeEnum,
         summaryLines = [],
         summaryDays = [],
@@ -25,6 +27,7 @@ YAHOO.rp.BaFcSummaryBuilder = function() {
           this.dest = 'xxx';
           this.carryInFlag = false;
           this.gndDuties = [];
+
 
 /*
 	33793308                    3379            3283        3317            3393        3319                3280
@@ -51,7 +54,7 @@ Day 01 - end of carry in trip
             if (+this.tripNo > 999) {
                 result = true;
             }
-            return true;
+            return result;
           };
 
           this.isEndOfDuty = function() {
@@ -59,7 +62,7 @@ Day 01 - end of carry in trip
             if (this.dest.length === 3) {
                 result = true;
             }
-            return true;
+            return result;
           };
 
           this.isNotFlyingDuty = function() {
@@ -67,14 +70,14 @@ Day 01 - end of carry in trip
             if ((this.tripNo === '') && (this.dest === '')) {
                 result = true;
             }
-            return true;
+            return result;
           };
 
         },
         newDay,
         carryInTripFlag = false,
 
-        testForDatesLine = function(line, matchedFields) {
+        testForDatesLine = function(line) {
             if ((matchedFields = matches.monthDateLine.exec(line)) !== null) {
                 console.log("Found a dates line");
                 return lte.datesLine;
@@ -88,6 +91,8 @@ Day 01 - end of carry in trip
                 lastDayOfMonth,i=0,j,k,sl,
                 processedFirstTripFlag = false;
 
+            summaryDays = [];
+            summaryDays.push(''); // push a dummy entry to fix zero based index
             console.log("Processing Summary");
             daysLine = summaryLines.pop();
             dateLine = summaryLines.pop();
@@ -117,6 +122,9 @@ Day 01 - end of carry in trip
             lastDayOfMonth = 0;
             for( i = offset ; i < dateLine.length; i = i + 4) {
                 theDate = +dateLine.substring(i+2,i+4);
+                if (typeof theDate != 'number') {
+                    throw 'Dateline date not a number: ' + theDate;
+                }
                 if ( theDate < lastDayOfMonth ) {
                     theDate = theDate + lastDayOfMonth;
                 }
@@ -165,29 +173,9 @@ Day 01 - end of carry in trip
 
      //-------------------------------------------------------------------------
 
-    this.dayTypeEnum = {
-        unrecognised: 0,
-        carryInTrip: 1,
-        endOfDuty: 2,
-        endOfTrip: 3,
-        restDayAfterDuty: 4
-
-    };
-
-/*
-    1234
-     XXX - start of trip
-
-      -  - rest day
-    lgw  - carry in trip (end of trip if next day blank or start of trip)
-*/
-    this.getDayType = {
-
-    }
-
     this.isEndOfTrip = function(dayNo) {
-        var nextDayNo = dayNo + 1,
-            nextDay = summaryDays[nextDay],
+        var nextDayNo = +dayNo + 1,
+            nextDay = summaryDays[nextDayNo],
             result = true;
 
         if (nextDayNo > summaryDays.length) {
@@ -195,7 +183,7 @@ Day 01 - end of carry in trip
         }
         else {
             if (!nextDay.isStartOfTrip() &&
-                nextDay.dest !='') {
+                nextDay.dest !=='') {
                 result = false;
             }
         }
