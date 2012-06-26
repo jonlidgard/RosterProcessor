@@ -135,7 +135,7 @@ YAHOO.rp = {
     },
 
 
-    parseRoster : function () {
+    parseBaFcRoster : function () {
         this.init();
         var lines = document.getElementById("roster").innerHTML,
             roster = new YAHOO.rp.Roster(lines),
@@ -143,11 +143,29 @@ YAHOO.rp = {
             e = parser.parse(),
             prefs = {useUTC: true,
                     icalVersion: 2,
-                    detailLevel: 'showDuty'},
+                    detailLevel: 'showSector'},
             output = YAHOO.rp.outputIcal(e, prefs);
+    	console.clear();
+            console.log("========================== ICAL =========================");
+            console.log(output);
+        return output;
+    },
+
+    parseBaCcRoster : function () {
+        this.init();
+        var lines = document.getElementById("roster").innerHTML,
+            roster = new YAHOO.rp.Roster(lines),
+            parser = new YAHOO.rp.BaCcParser(roster),
+            e = parser.parse(),
+            prefs = {useUTC: true,
+                    icalVersion: 2,
+                    detailLevel: 'showSector'},
+            output = YAHOO.rp.outputIcal(e, prefs);
+    	console.clear();
+            console.log("========================== ICAL =========================");
+            console.log(output);
         return output;
     }
-
 
 
 

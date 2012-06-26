@@ -101,7 +101,7 @@ YAHOO.rpTest.yuitest.ParserTestCase = new YAHOO.tool.TestCase({
         Assert.areSame(new Date("MAR 01, 2011 00:45:00 UTC").valueOf(), e.end.valueOf(), 'endTime not updated');
 
     },
-
+/*
     testCheckDate: function () {
         var Assert = YAHOO.util.Assert,
             parser = this.parser;
@@ -110,7 +110,7 @@ YAHOO.rpTest.yuitest.ParserTestCase = new YAHOO.tool.TestCase({
             Assert.isTrue(parser.checkDate(' we ', new Date('APR 20, 2011 00:00:00 UTC')));
             Assert.isTrue(parser.checkDate(' fr ', new Date('JAN 01, 2010 00:00:00 UTC')));
     },
-
+*/
 
     testNextSector: function () {
         var Assert = YAHOO.util.Assert,

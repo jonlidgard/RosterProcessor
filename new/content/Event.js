@@ -47,6 +47,7 @@ YAHOO.rp.EventDate = function() {
 
     this.setTime = function(tm) {
 	u.setHHMM({date: d, time: tm});
+	this.peekDate = d;
     };
     this.setDate = function(bd) {
 	if (typeof bd === 'number') {
@@ -55,19 +56,63 @@ YAHOO.rp.EventDate = function() {
 	else if (typeof bd === 'object') {
 	    d = new Date(bd.valueOf());
 	}
+	this.peekDate = d;
     };
     this.setDayOfMonth = function(dy) {
 	d.setUTCDate(dy);
+ 	this.peekDate = d;
     };
+   
+    this.setShortMonth = function(mmm) {
+	var m = u.indexOfMonth(mmm);
+	d.setUTCMonth(m);
+    };
+   
     this.incDate = function() {
 	d = u.incUTCDay(d);
+	this.peekDate = d;
     };
+
+    this.decDate = function() {
+	d = u.decUTCDay(d);
+	this.peekDate = d;
+    };
+
+    this.incYear = function() {
+	d = u.incUTCYear(d);
+	this.peekDate = d;
+    };
+
+    this.decYear = function() {
+	d = u.decUTCYear(d);
+	this.peekDate = d;
+    };
+
+    this.incMonth = function() {
+	d = u.incUTCMonth(d);
+	this.peekDate = d;
+    };
+
+    this.decMonth = function() {
+	d = u.decUTCMonth(d);
+	this.peekDate = d;
+    };
+    
+    this.isGreaterThan = function(otherDate) {
+	return (d.valueOf() > otherDate.valueOf());
+    }
+
+    this.isLessThan = function(otherDate) {
+	return (d.valueOf() < otherDate.valueOf());
+    }
+
     this.valueOf = function() {
 	return d.valueOf();
     };
     this.date = function() {
 	return d;
     };
+    
     this.clone = function() {
 	var newEventDate = new YAHOO.rp.EventDate();
 	newEventDate.setDate(d);
@@ -77,7 +122,7 @@ YAHOO.rp.EventDate = function() {
 	return u.ISO8601String(d);
     };
     this.ISO8601Date = function() {
-	return u.ISO8601String(d);
+	return u.ISO8601String(d,true);
     };
 };
 
@@ -88,11 +133,13 @@ YAHOO.rp.eventMaker = function() {
     this.destination = '';
     this.summary = '';
     this.description = '';
-    this.dtStamp = new YAHOO.rp.EventDate();;
+    this.rosterLine = '';
+    this.dtStamp = new YAHOO.rp.EventDate();
+    this.dtStamp.setDate(new Date());
     this.created = new YAHOO.rp.EventDate();
     this.lastModified = new YAHOO.rp.EventDate();
     this.categories = '';
-
+    this.uuid = YAHOO.rp.utils.generateGUID();
 
 };
 
@@ -121,20 +168,6 @@ YAHOO.rp.eventMaker.prototype.print = function() {
 
 YAHOO.rp.eventMaker.prototype.getLength = function() {
     return this.end.valueOf() - this.start.valueOf();
-};
-
-YAHOO.rp.eventMaker.prototype.getUUID = function() {
-    return 'UUID';
-};
-
-YAHOO.rp.eventMaker.prototype.getCreated = function() {
-    return this.created;
-};
-YAHOO.rp.eventMaker.prototype.getLastModified = function() {
-    return this.lastModified;
-};
-YAHOO.rp.eventMaker.prototype.getDtStamp = function() {
-    return this.dtStamp;
 };
 
 YAHOO.rp.eventMaker.prototype.isWholeDay = function() {

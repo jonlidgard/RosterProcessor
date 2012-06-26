@@ -1,0 +1,22 @@
+TODO
+
+17/10/11
+
+Time & Dates of trips
+
+Summary line info
+
+Following is used on a ground duty
+    function modLine(line)
+    {
+       line = line.replace(/^\s+|\s+$/g,"");
+       line = line.replace(/\s+/g," ");
+       line = line.replace(/\s+BEGIN 0001 END 2400/," DAY");
+       line = line.replace(/\s+BEGIN (\d{4}) END (\d{4})/," $1Z $2Z");
+       return( line );
+    }
+
+
+25/06/12 21:20
+
+Working on addEvent in BaCcParser

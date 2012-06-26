@@ -18,13 +18,13 @@ YAHOO.rp.outputIcal = function (events, preferences) {
                 TZIDcode: ';VALUE=DATE;TZID=/www.aircrewrosters.com/20070129_1/Europe/London:'},
         rptText = "",
         outputText = "",
-        TZID = preferences.useUTC ? ICAL.TZIDcode : ":",
+        TZID = preferences.useUTC ? ":" : ICAL.TZIDcode,
         TZINFO = preferences.useUTC ? ICAL.TIMEZONE_INFO : "",
         event,
         i = 0,
         u = YAHOO.rp.utils,
 
-        outputHeader = function() {
+        outputIcalHeader = function() {
         // MS Outlook doesn't like V2.0 of ical spec so use v1.0 for windows machines
         var calHeader;
         switch (preferences.icalVersion)
@@ -39,48 +39,26 @@ YAHOO.rp.outputIcal = function (events, preferences) {
         outputText = outputText.concat(calHeader);
     },
 
-    outputFooter = function() {
+    outputIcalFooter = function() {
         outputText = outputText.concat(ICAL.CAL_FOOTER);
     },
 
-    outputSector = function (s) {
-        outputText += ICAL.EVENT_HEADER +
-            'CREATED:' + s.getCreated() + '\n' +
-            'LAST_MODIFIED:' + s.getLastModified() + '\n' +
-            'DTSTAMP:' + s.getDtStamp() + '\n' +
-            'UID:' + s.getUUID() + '\n';
-/*
-        if ( firstSector ) {
-            crewLine = " " + abbrevName(crewList);
-            //  rptText = "RPT" + theEvent.startTime.toISO8601String(7,false) + "Z ";
-            rptText = '';
-            outputText += 'DTSTART' + TZID + s.start.ISO8601DateTime() + '\n';
-        }
-        else {
-*/            rptText = '';
-            crewLine = '';
- //       }
- //       firstSector = false;
-        outputText += 'DTSTART' + TZID + s.start.ISO8601DateTime() + '\n' +
-            'DTEND' + TZID + s.end.ISO8601DateTime() + '\n' +
-            'SUMMARY:' + rptText + s.getSummary() + crewLine + '\n' +
-            'DESCRIPTION:' + s.getDescription() + '\n' +
-            'CATEGORIES:' + s.categories + '\n' + ICAL.EVENT_FOOTER;
-    },
-
-    outputDuty = function(e) {
+    addIcalEvent = function(e) {
         outputText += ICAL.EVENT_HEADER;
         outputText += 'CREATED:' + e.created.ISO8601DateTime() + "\n";
         outputText += 'LAST-MODIFIED:' + e.lastModified.ISO8601DateTime() + "\n";
         outputText += 'DTSTAMP:' + e.dtStamp.ISO8601DateTime() + "\n";
-        outputText += 'UID:' + e.getUUID() + "\n";
-        outputText += 'DTSTART' + TZID + e.start.ISO8601DateTime() + "\n";
-        outputText += 'DTEND' + TZID + e.end.ISO8601DateTime() + "\n";
+        outputText += 'UID:' + e.uuid + "\n";
         outputText += 'SUMMARY:' + e.getSummary() + "\n";
-        outputText += 'DESCRIPTION:' + e.getDescription() + "\n";
-        if (e.isWholeDay())
-        {
+//        outputText += 'DESCRIPTION:' + e.getDescription() + "\n";
+        outputText += 'DESCRIPTION:' + e.rosterLine + "\n";
+        if (e.isWholeDay()) {
+            outputText += 'DTSTART' + TZID + e.start.ISO8601Date() + "\n";
+            outputText += 'DTEND' + TZID + e.end.ISO8601Date() + "\n";
             outputText += "TRANSP:TRANSPARENT\n";
+        } else {
+            outputText += 'DTSTART' + TZID + e.start.ISO8601DateTime() + "\n";
+            outputText += 'DTEND' + TZID + e.end.ISO8601DateTime() + "\n";
         }
         if( e.categories != "")
         {
@@ -89,16 +67,24 @@ YAHOO.rp.outputIcal = function (events, preferences) {
         outputText += ICAL.EVENT_FOOTER;
     },
 
+    outputSector = function (s) {
+        addIcalEvent(s);
+    },
+
+    outputDuty = function(e) {
+        addIcalEvent(e);
+    },
+
     outputEvent = function(e) {
         var mySector,crewLine,firstSector = true,d,s;
 
         if (e.name === 'trip') {
             switch (preferences.detailLevel) {
-                case 'showSectors':
-                    while (e.duties.events.hasNext()) {
-                        d = e.duties.events.next();
-                        while (d.sectors.events.hasNext()) {
-                            s = d.sectors.events.next();
+                case 'showSector':
+                    while (e.duties.hasNext()) {
+                        d = e.duties.next();
+                        while (d.sectors.hasNext()) {
+                            s = d.sectors.next();
                             outputSector(s);
                         }
                     }
@@ -111,8 +97,8 @@ YAHOO.rp.outputIcal = function (events, preferences) {
                     this.outputAtWork(e);
                     break;
                 default:
-                    while (e.duties.events.hasNext()) {
-                        d = e.duties.events.next();
+                    while (e.duties.hasNext()) {
+                        d = e.duties.next();
                         outputDuty(d);
                     }
                     break;
@@ -120,11 +106,11 @@ YAHOO.rp.outputIcal = function (events, preferences) {
             }
         }
         else {
-            this.outputDuty(e);
+            outputDuty(e);
         }
     };
     // Add the header
-    outputHeader();
+//    outputIcalHeader();
     // Add the events
 
     for ( ;i < events.length; i += 1 )
@@ -132,7 +118,7 @@ YAHOO.rp.outputIcal = function (events, preferences) {
         outputEvent(events[i]);
     }
 
-    outputFooter();
+    outputIcalFooter();
     return outputText;
 
 

@@ -1,0 +1,268 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=us-ascii"/>
+	<META HTTP-EQUIV="Expires" CONTENT="Tue, 01 Jan 1980 1:00:00 GMT">
+	<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+	<title>RosterProcessor Test Page</title>
+
+<!--	<link rel="stylesheet" type="text/css" href="yui 2/assets/yui.css" /> -->
+	<link rel="stylesheet" type="text/css" href="yui 2/assets/dpSyntaxHighlighter.css" />
+	<link rel="stylesheet" type="text/css" href="yui 2/build/logger/assets/skins/sam/logger.css" />
+	<link rel="stylesheet" type="text/css" href="yui 2/build/yuitest/assets/skins/sam/yuitest.css" />
+	<link rel="stylesheet" type="text/css" href="yui 2/build/yuitest/assets/testlogger.css" />
+	<link rel="stylesheet" type="text/css" href="yui 2/build/button/assets/skins/sam/button.css" />
+
+	<style type="text/css">
+	#title {
+	position:absolute;
+	left:29px;
+	top:10px;
+	width:374px;
+	height:37px;
+	z-index:1;
+	font-family: "Lucida Sans Unicode", "Lucida Grande", sans-serif;
+	font-size: 24px;
+	color: #000;
+	background-color: #CCF;
+	border-top-color: #000;
+	border-right-color: #000;
+	border-bottom-color: #000;
+	border-left-color: #000;
+	border-top-style: none;
+	border-right-style: none;
+	border-bottom-style: none;
+	border-left-style: none;
+	padding: 0px;
+	}
+	#roster {
+	position:absolute;
+	left:30px;
+	top:50px;
+	width:900px;
+	height:500px;
+	z-index:1;
+	font-family: "Courier New", Courier, monospace;
+	font-size: 10px;
+	color: #006;
+	background-color: #FFC;
+	}
+	#toolbar {
+	position:absolute;
+	left: 700px;
+	top: 10px;
+	}
+	#yuiLogger {
+	position:absolute;
+	left: 10px;
+	top: 580px;
+	}
+	#testLogger {
+	position:absolute;
+	left: 10px;
+	top: 1980px;
+	}
+
+	</style>
+
+	<script type="text/javascript" src="yui 2/build/yuiloader/yuiloader-min.js"></script>
+	<script type="text/javascript" src="yui 2/build/event/event-min.js"></script>
+	<script type="text/javascript" src="yui 2/build/dom/dom-min.js"></script>
+<!--	<script type="text/javascript" src="yui 2/build/yuiloader/yuiloader-dom-event.js"></script> -->
+	<script type="text/javascript" src="yui 2/build/yahoo-dom-event/yahoo-dom-event.js"></script>
+	<script type="text/javascript" src="yui 2/build/logger/logger-min.js"></script>
+	<script type="text/javascript" src="yui 2/build/yuitest/yuitest-min.js"></script>
+	<script type="text/javascript" src="yui 2/build/event-simulate/event-simulate-min.js"></script>
+	<script type="text/javascript" src="yui 2/build/element/element-min.js"></script>
+	<script type="text/javascript" src="yui 2/build/button/button-min.js"></script>
+
+</head>
+
+<body>
+	<div id="title">
+		RosterProcessor Test Page
+	</div>
+
+	<div>
+		<textarea name="rosterCode" id="roster" cols="45" rows="5">           TU 22 MAY    MBT 
+WE 23 MAY    MBT
+TH 24 MAY    REPORT AT 1335 LOCAL TIME LON
+             TRIP LENGTH  6 DAYS  
+             1405   BA227     LHR   ATL   2310 77Y  1105    
+SA 26 MAY    0120   BA226     ATL   LHR   0925 77Z   950    
+SU 27 MAY    0915   BA185     LHR   EWR   1700 77X   945    
+MO 28 MAY    2225   BA184     EWR   LHR   0520 77X   840    
+             CLEAR TIME (TU 29 MAY) 0705 LOCAL TIME LON
+             -------------------  TOTAL DUTY HOURS   3920
+                    MACKILLOP    REBECCA         B4B     41   A9    
+                    WELLS        MICHAEL         B4B     42   A12   
+                    FAVA         PAOLA           B4B     42   Z1    
+                    PRIOR        STEPHEN         B7      43   Z9    
+                    CAMACHO SANT CARMEN          B7      43   B15   
+                    DA SILVA     PAULO           B7      43   C9    
+                    VOLDING      LESLEY          B7      53   Z3    
+                    REITH        JENNIFER        B7      53   B2    
+                    MOUNTAIN     CLAIRE          B7      53   A8    
+                    DIBDEN       MARK            B7      53   Z4    
+                    STEWART      LINDSAY         B7      53   Z5    
+WE 30 MAY    MBT
+TH 31 MAY    MBT
+FR 01 JUN    REPORT AT 1855 LOCAL TIME LON
+             TRIP LENGTH  5 DAYS  
+             1925   BA011     LHR   SIN   0815 74D  1450    
+MO 04 JUN    1455   BA012     SIN   LHR   0400 74H  1450    
+             CLEAR TIME (TU 05 JUN) 0545 LOCAL TIME LON
+             -------------------  TOTAL DUTY HOURS   2940
+                    MACKILLOP    REBECCA         77B     41   A9    
+                    DYSON        KIM             77B     42   B9    
+                    HUGHES       ALISON          77B     42   H4    
+                    GARCIA RIBEL RUBEN           77B     43   C2    
+                    LEVY         LINDA           77B     43   A5    
+                    GONIDAKIS    FRAGISKOS       77B     43   H11   
+                    HUSSAIN      ISHFAQ          77B     43   H11   
+                    WEST         STEPHEN         77B     53   A9    
+                    THROWER      HEATHER         77B     53   C4    
+                    PASTORE      PAOLA           77B     53   C6    
+                    CAPUANO      VINCENZO        77B     53   Z6    
+                    DI PAOLO     ROBERTO         77B     53   C4    
+WE 06 JUN    MBT
+TH 07 JUN    MBT
+FR 08 JUN    MBT
+SA 09 JUN    MBT                                                                
+SU 10 JUN    REPORT AT 0930 LOCAL TIME LON 
+             TRIP LENGTH  3 DAYS  
+             1000   BA139     LHR   BOM   1905 77Z  1105    
+MO 11 JUN    2105   BA138     BOM   LHR   0630 77Y  1125    
+             CLEAR TIME (TU 12 JUN) 0815 LOCAL TIME LON
+             -------------------  TOTAL DUTY HOURS   2230
+                    MACKILLOP    REBECCA         B4B     41   A9    
+                    SCHOFIELD    WENDI           B4B     42   Z3    
+                    ZOTTL        LYNNE           B4B     42   Z10   
+                    TAYLOR       JOANNE          B7      43   A5    
+                    WAPLE        SUSAN           B7      43   B6    
+                    GOODWIN      KATIE           B7      43   H7    
+                    STRUCKETT    PAUL            B7      53   C7    
+WE 13 JUN    MBT
+TH 14 JUN    MBT
+FR 15 JUN    REPORT AT 1135 LOCAL TIME LON
+             TRIP LENGTH  3 DAYS  
+             1205   BA107     LHR   DXB   1850 74H   845    
+SA 16 JUN    2155   BA106     DXB   LHR   0520 74D   915    
+             CLEAR TIME (SU 17 JUN) 0705 LOCAL TIME LON
+             -------------------  TOTAL DUTY HOURS   1800
+                    MACKILLOP    REBECCA         77B     41   A9    
+                    MILLER       DAVID           77B     42   H12   
+                    RASMUSSEN    LARS            77B     42   A1    
+                    MASKELYNE    JAMES           77B     42   B2    
+                    GEE          ELAINE          77B     43   B9    
+                    FORBES       GWEN            77B     43   A3    
+                    MAUGUEN      SOPHIE          77B     43   B8    
+                    ALI          TAHIR           77B     43   H1    
+                    BOWES        DONNA-MARIE     77B     53   B11   
+                    HINDMARSH    SOPHIE          77B     53   B6    
+                    YIANNORIDES  GEORGIO         77B     53   A9    
+                     1 CREW MEMBER(S) TBN            2 7477B6    53
+MO 18 JUN    MBT
+TU 19 JUN    MBT                                                                
+WE 20 JUN    REPORT AT 1700 LOCAL TIME LON 
+             TRIP LENGTH  5 DAYS  
+             1730   BA025     LHR   HKG   0500 74H  1330    
+SA 23 JUN    1515   BA026     HKG   LHR   0350 74D  1420    
+             CLEAR TIME (SU 24 JUN) 0535 LOCAL TIME LON
+             -------------------  TOTAL DUTY HOURS   2750
+                    MACKILLOP    REBECCA         77B     41   A9    
+                    POPPLETON    ANDROULLA       77B     42   H2    
+                    VAN LON      JENNIFER        77B     42   B12   
+                    LOMAS        WENDY           77B     43   B3    
+                    PRITCHARD    JANE            77B     43   Z4    
+                    CASCAIS MIRA ANIBAL          77B     43   H2    
+                    D'ARCY       AUDREY          77B     43   Z14   
+                    PENNYCOOK    SARAH           77B     53   B12   
+                    NIAZ         AZHAR           77B     53   Z8    
+                    STEWART      KAREN           77B     53   C7    
+                    MIRALEIS     KAREN           77B     53   H2    
+                    JACOBS       FRAZER          77B     53   Z4    
+MO 25 JUN    MBT
+TU 26 JUN    MBT
+WE 27 JUN    MBT
+TH 28 JUN    MBT
+FR 29 JUN    REPORT AT 2000 LOCAL TIME LON
+             TRIP LENGTH  2 DAYS  
+             2030   BA237     LHR   DME   0030 76Z          
+SA 30 JUN    0150   BA236     DME   LHR   0555 76Z  1140    
+             CLEAR TIME 0740 LOCAL TIME LON
+             -------------------  TOTAL DUTY HOURS   1140
+                    MACKILLOP    REBECCA         77B     41   A9    
+                    VAN LON      JENNIFER        77B     42   B12   
+                    GOLDEN       MARK            77B     43   B9    
+                    LIVINGSTONE  BARRIE          77B     53   C7    
+                    WILLIAMS     SCOTT           77B     53   B15   
+                    WITHE        JOANNE          77B     53   C11   
+                    KNOWLSON     GILLIAN         77B     53   A11   
+              
+             MESSAGES                          01A         
+             BOM  UNIFORM REQUIRED POSITIONING IN OR OUT BOM 
+             BOM                                             
+             DXB  UNIFORM REQUIRED POSITIONING IN OR OUT DXB 
+             DXB                                             
+       
+COMPLETE ROSTER PUBLISHED 300612    
+
+Your planned block hours to the end of     are 0856:59.
+</textarea>
+		<div id="toolbar">
+			<input type="button" onclick="YAHOO.rp.parseBaCcRoster();" name="parseButton" id="parseButton1" value="Parse" />
+		</div>
+	</div>
+<div id="yuiLogger"></div> 	 
+<script type="text/javascript"> 
+	var myCompact = new YAHOO.widget.LogReader("yuiLogger", {verboseOutput:false}); 
+	myCompact.setTitle("Compact Output"); 
+</script>
+
+
+
+<div id="testLogger"></div>
+<script type="text/javascript">
+YAHOO.namespace("rp");
+
+</script>
+<script src="unitTests/testRoster.js"></script>
+<script src="unitTests/testBaCcParser.js"></script>
+<script src="unitTests/testUtils.js"></script>
+<script src="unitTests/testEvent.js"></script>
+<script src="unitTests/testOutputIcal.js"></script>
+<script src="new/content/Wrapper.js"></script>
+<script src="new/content/Utils.js"></script>
+<script src="new/content/Event.js"></script>
+<script src="new/content/rosterObject.js"></script>
+<script src="new/content/BaCcState.js"></script>
+<script src="new/content/BaCcParser.js"></script>
+<script src="new/content/outputIcal.js"></script>
+
+<script type="text/javascript">
+
+
+	//console.clear();
+    YAHOO.rpTest.yuitest.BaFcParserSuite = new YAHOO.tool.TestSuite("baCcParser Suite");
+    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.UtilsTestCase);
+    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.EventTestCase);
+//   YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.RosterTestCase);
+    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.BaCcParserTestCase);
+//    YAHOO.rpTest.yuitest.BaFcParserSuite.add(YAHOO.rpTest.yuitest.OutputIcalTestCase);
+
+
+    YAHOO.util.Event.onDOMReady(function (){
+        //create the logger
+       var logger = new YAHOO.tool.TestLogger("testLogger");
+       YAHOO.tool.TestRunner.add(YAHOO.rpTest.yuitest.BaFcParserSuite);
+
+        //run the tests
+        YAHOO.tool.TestRunner.run();
+    });
+
+</script>
+</body>
+</html>

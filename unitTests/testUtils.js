@@ -73,7 +73,9 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
             testString2 = "trailing_spaces     ",
             testString3 = "      leading_&_trailing_spaces     ";
 
-        Assert.isFunction(String.trim);
+        Assert.isFunction(YAHOO.rp.utils.init, 'utils init function not defined');
+        YAHOO.rp.utils.init();
+ //       Assert.isFunction(String.trim, 'trim function not defined');
         result = testString1.trim();
         Assert.areSame("leading_spaces",result,"didn't trim leading whitespace");
 
@@ -151,8 +153,22 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
         Assert.areSame(0,result);
 
         result = this.utils.daysSince1970(new Date("JAN 01 1971"));
-        Assert.areSame(364,result);
+        Assert.areSame(365,result);
 
+    },
+
+    testIncDecUTCYear: function() {
+        var Assert = YAHOO.util.Assert,
+            c = YAHOO.rp.constants,
+            result;
+
+        Assert.isFunction(this.utils.incUTCYear, 'incUTCYear not defined');
+        result = this.utils.incUTCYear(new Date("JAN 01 2011 00:00:00 UTC"));
+        Assert.areSame(result.valueOf(), new Date("JAN 01 2012 00:00:00 UTC").valueOf(), 'did not increment year correctly');
+
+        Assert.isFunction(this.utils.decUTCYear, 'decUTCYear not defined');
+        result = this.utils.decUTCYear(new Date("JAN 01 2012 00:00:00 UTC"));
+        Assert.areSame(new Date("JAN 01 2011 00:00:00 UTC").valueOf(),result.valueOf(), 'did not decrement year correctly');
     },
 
     testIncDecUTCMonth: function() {
@@ -161,12 +177,12 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
             result;
 
         Assert.isFunction(this.utils.incUTCMonth, 'incUTCMonth not defined');
-        result = this.utils.incUTCMonth(new Date("JAN 01, 2011 00:00:00 UTC"));
-        Assert.areSame(new Date("FEB 01 2011 00:00:00 UTC"), result, 'did not increment month correctly');
+        result = this.utils.incUTCMonth(new Date("JAN 01 2011 00:00:00 UTC"));
+        Assert.areSame(result.valueOf(), new Date("FEB 01 2011 00:00:00 UTC").valueOf(), 'did not increment month correctly');
 
         Assert.isFunction(this.utils.decUTCMonth, 'decUTCMonth not defined');
         result = this.utils.decUTCMonth(new Date("FEB 01 2011 00:00:00 UTC"));
-        Assert.areSame(new Date("JAN 01, 2011 00:00:00 UTC"),result, 'did not decrement month correctly');
+        Assert.areSame(new Date("JAN 01, 2011 00:00:00 UTC").valueOf(),result.valueOf(), 'did not decrement month correctly');
     },
 
     testIncDecUTCDay: function() {
@@ -182,6 +198,15 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
         result = this.utils.decUTCDay(new Date(c.WHOLEDAY));
         Assert.areSame(0,result.valueOf(), 'did not decrement day correctly');
 
+    },
+
+    testCheckDate: function () {
+        var Assert = YAHOO.util.Assert,
+            u = YAHOO.rp.utils;
+
+            Assert.isFunction(u.checkDate);
+            Assert.isTrue(u.checkDate(' we ', new Date('APR 20, 2011 00:00:00 UTC')));
+            Assert.isTrue(u.checkDate(' fr ', new Date('JAN 01, 2010 00:00:00 UTC')));
     },
 
     testDaysSince1970BadInput: function() {
@@ -233,10 +258,5 @@ YAHOO.rpTest.yuitest.UtilsTestCase = new YAHOO.tool.TestCase({
         result = an(testString5);
         Assert.areSame("FS Name.",result);
     }
-
-
-
-
-
 
 });

@@ -27,7 +27,7 @@ YAHOO.rpTest.yuitest.EventTestCase = new YAHOO.tool.TestCase({
          * Cleans up everything that was created by setUp().
          */
     tearDown: function() {
-        delete this.events;
+        delete this.eventCollection;
     },
 
     //---------------------------------------------------------------------
@@ -39,6 +39,37 @@ YAHOO.rpTest.yuitest.EventTestCase = new YAHOO.tool.TestCase({
         Assert.isObject(this.eventCollection);
     },
 
+    testEventDate: function() {
+        var Assert = YAHOO.util.Assert,
+        ed = YAHOO.rp.EventDate;
+        
+        var d = new ed(),
+            e = new ed();
+        
+        Assert.isFunction(ed);
+        Assert.isObject(d);
+        
+        d.setDate(new Date("NOV 01 2011 00:00:00 UTC").valueOf());
+        Assert.areSame(new Date("NOV 01 2011 00:00:00 UTC").valueOf(), d.valueOf(), 'assign date from number failed' );
+        d.incYear();
+        Assert.areSame(new Date("NOV 01 2012 00:00:00 UTC").valueOf(), d.valueOf(), 'inc year failed' );
+        d.decYear();
+        Assert.areSame(new Date("NOV 01 2011 00:00:00 UTC").valueOf(), d.valueOf(), 'dec year failed' );
+        
+        var anotherDate = new Date("JAN 01 2011 00:00:00 UTC");
+        d.setDate(anotherDate);
+        Assert.areSame(new Date("JAN 01 2011 00:00:00 UTC").valueOf(), d.valueOf(), 'assign date from date failed' );
+        d.decMonth();
+        Assert.areSame(new Date("DEC 01 2010 00:00:00 UTC").valueOf(), d.valueOf(), 'dec month failed' );
+        d.incMonth();
+        Assert.areSame(new Date("JAN 01 2011 00:00:00 UTC").valueOf(), d.valueOf(), 'inc month failed' );
+
+        e.setDate(new Date("DEC 31 2010 00:00:00 UTC"));
+        Assert.isTrue(e.isLessThan(d), 'isLessThan not working');
+        Assert.isTrue(d.isGreaterThan(e), 'isGreaterThan not working');
+        
+    },
+    
         // Test rosterText functionality
     testNewEvent: function() {
         var Assert = YAHOO.util.Assert,

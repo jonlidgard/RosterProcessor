@@ -35,6 +35,9 @@ YAHOO.rp.Roster = function (rosterLines) {
 
 
         return {
+	    allLines: function() {
+		return rosterLines;
+	    },
             hasNext: function() {
                 getNext();
                 return index < lines.length;

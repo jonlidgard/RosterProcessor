@@ -167,11 +167,20 @@ YAHOO.rp.utils = {
         },
 
         daysInMonth : function (sMonth, iYear) {
-            var days = 32 - new Date(sMonth + " 32 " + iYear).getDate();
+            var u = YAHOO.rp.utils;
+            var days = 32 - new Date(iYear,u.indexOfMonth(sMonth) ,32).getDate();
             if (isNaN(days))  {
                 throw new TypeError("daysInMonth, Invalid input: " + sMonth + ", " + iYear);
             }
             return days;
+        },
+
+        checkDate : function (shortDay, rosterDate) {
+            var dayOfWeek,
+                c = YAHOO.rp.constants;
+
+            dayOfWeek = shortDay.trim().toUpperCase();
+            return (dayOfWeek === c.DAYSOFWEEK[rosterDate.getDay()]);
         },
 
 
@@ -264,6 +273,16 @@ YAHOO.rp.utils = {
             return result;
         },
 
+        incUTCYear : function (d) {
+            d.setUTCFullYear(d.getUTCFullYear() + 1);
+            return d;
+        },
+
+        decUTCYear : function (d) {
+            d.setUTCFullYear(d.getUTCFullYear() - 1);
+            return d;
+        },
+
         incUTCMonth : function (d) {
             d.setUTCMonth(d.getUTCMonth() + 1);
             return d;
@@ -301,14 +320,14 @@ YAHOO.rp.utils = {
 
 
 
-        ISO8601String : function (theDate, noTime) {
+        ISO8601String : function (theDate, dateOnly) {
             /* if noTime = true
                YYYY-MM-DD (eg 1997-07-16Z)
                else
                YYYY-MM-DDThhmmZ (eg 1997-07-16T1920Z)
             */
 
-            var addTime = (typeof noTime === 'undefined') ? true : noTime,
+            var dontAddTime = (typeof dateOnly === 'undefined') ? false : dateOnly,
                 date = theDate,
                 str;
 
@@ -316,7 +335,7 @@ YAHOO.rp.utils = {
             str = date.getUTCFullYear();
             str += this.zeropad(date.getUTCMonth() + 1);
             str += this.zeropad(date.getUTCDate());
-            if (addTime === true) {
+            if (dontAddTime === false) {
                 str += "T" + this.zeropad(date.getUTCHours()) +
                 this.zeropad(date.getUTCMinutes()) + 'Z';
             }
@@ -365,6 +384,7 @@ YAHOO.rp.utils = {
                         return data[i].identity;
                     }
                 }
+                return  nil;
 	},
 	searchVersion: function (dataString) {
 		var index = dataString.indexOf(this.versionSearchString),

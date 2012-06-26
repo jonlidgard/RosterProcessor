@@ -167,24 +167,17 @@ YAHOO.rp.BaFcParser = function(theRoster) {
             e.push(thisEvent);
         }
     };
-
-    this.setGenericEventParams = function (e) {
-	e.created.setDate(this.roster.createdDate);
-	e.lastModified.setDate(this.roster.createdDate);
-    };
-
     this.addEvent = function (fields) {
 
 	var e = YAHOO.rp.eventMaker.factory('GroundDuty',this.baseDate),
 	    d,
 	    u = YAHOO.rp.utils;
 
-	this.setGenericEventParams(e);
 	e.summary = this.matchedFields[fields.summary];
 	e.description = this.line;
         e.start.setDayOfMonth(this.matchedFields[fields.startDay]);
         e.end.setDayOfMonth(this.matchedFields[fields.endDay]);
-	e.rosterLine = this.line;
+
 //??? Need to check this code block
 	if (typeof fields.dayOfWeekField !== 'undefined' &&
 	    !this.checkDate(this.matchedFields[fields.dayOfWeek], e.start.date() )) {
@@ -217,8 +210,8 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    prevDuty,
 	    c = YAHOO.rp.constants;
 
-	if( roster.events.length > 1) {
-            prevDuty = roster.peek();
+	if( roster.events.size() > 1) {
+            prevDuty = roster.events.peek();
             clearTime = prevDuty.getEndDate();
             reportTime = thisDuty.getStartDate();
 
@@ -393,9 +386,8 @@ YAHOO.rp.BaFcParser = function(theRoster) {
     this.getCarryInTrip = function() {
 	var trip = YAHOO.rp.eventMaker.factory('Trip');
 
-	this.setGenericEventParams(trip);
 	trip.tripNo = 'CI';
-	this.eventCollection.add(trip);
+	this.eventCollection.events.add(trip);
 	this.currentTrip = trip;
     };
     this.testForTripCrewLine = function() {
@@ -513,7 +505,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    this.finishTrip();
 	}
 	else {
-	    this.currentTrip.duties.add(duty);
+	    this.currentTrip.duties.events.add(duty);
 	}
     };
 
@@ -532,8 +524,8 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 		throw "Unrecognised duty " + this.lineType;
 	    }
 	}
-	this.eventCollection.add(e);
-	this.mergeEvents(this.eventCollection);
+	this.eventCollection.events.add(e);
+	this.mergeEvents(this.eventCollection.events);
     };
 
     this.testForFlyingDutyLine = function() {
@@ -594,7 +586,7 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    }
 	    postCodesIndex = startIndex + reportLength + c.STARTOFPOSTFLIGHTCODES;
 	    sector.postCodes = sectorsLine.slice(postCodesIndex, nextStartIndex).trim();
-	    sector.lineSlice = sectorsLine.slice(startIndex-c.PREFLIGHTCODESLENGTH,nextStartIndex).trim();
+
 	    sector.line = sectorsLine.slice(nextStartIndex);
 	    if (sector.line.trim() === '') {
 		delete sector.line;
@@ -612,13 +604,12 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    summaryDay = summaryDays[tripDate],
 	    trip = em.factory('Trip');
 
-	this.setGenericEventParams(trip);
 	// Make sure trip no's match
 	if ((tripNo !== summaryDay.tripNo) && !summaryDay.carryInTripFlag) {
 	    throw "Trip no's don't match for: tripDate";
 	}
 	trip.tripNo = tripNo;
-	this.eventCollection.add(trip);
+	this.eventCollection.events.add(trip);
 	console.log('trip:' + trip.tripNo);
 	delete this.prevClearTime;
 	this.currentTrip = trip;
@@ -628,13 +619,11 @@ YAHOO.rp.BaFcParser = function(theRoster) {
     this.startNewFlyingDuty = function() {
 	var em = YAHOO.rp.eventMaker,
 	    duty = em.factory('FlyingDuty');
-
-	this.setGenericEventParams(duty);
 	this.finishFlyingDuty();
 	if (typeof this.currentTrip !== 'object') {
 	    this.startNewTrip();
 	}
-	this.currentTrip.duties.add(duty);
+	this.currentTrip.duties.events.add(duty);
 	this.currentFlyingDuty = duty;
 	return duty;
     };
@@ -662,8 +651,8 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    c = YAHOO.rp.constants,
 	    startNewDuty = false;
 
-	thisDuty = trip.duties.current();
-	lastSector = thisDuty.sectors.current();
+	thisDuty = trip.duties.events.current();
+	lastSector = thisDuty.sectors.events.current();
 
 	if (typeof lastSector !== 'undefined') {
 	    if (sectorStartTime - lastSector.end.valueOf() >= c.MINREST) {
@@ -697,7 +686,6 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 		duty.start.setTime(s.report);
 	    }
 	    sector = YAHOO.rp.eventMaker.factory('Sector',this.baseDate);
-	    this.setGenericEventParams(sector);
 	    sector.start.setDayOfMonth(tripDate);
 	    sector.end.setDayOfMonth(tripDate);
 	    sector.start.setTime(s.start);
@@ -705,24 +693,20 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    sector.origin = s.origin;
 	    sector.destination = s.dest;
 	    sector.flightNo = s.flightNo;
-	    sector.rosterLine = s.lineSlice;
-	    console.log("Start: " +sector.start.date());
-	    console.log("End: " +sector.end.date());
+
 /*
 	    if (this.isNewDuty(sector.start.valueOf())) {
 		duty.postProcess();
 		duty = YAHOO.rp.eventMaker.factory('FlyingDuty');
-		this.setGenericEventParams(duty);
 		if (sector.origin === this.roster.base) {
 		    trip.postProcess();
 		    trip = this.startNewTrip();
-		    duty = trip.duties.current();
+		    duty = trip.duties.events.current();
 		}
-		trip.duties.add(duty);
+		trip.duties.events.add(duty);
 	    }
 */
-	    duty.sectors.add(sector);
-	    duty.rosterLine = this.line;
+	    duty.sectors.events.add(sector);
 	}
 	if (summaryDay.isEndOfDuty()) {
 	    this.finishFlyingDuty();
@@ -756,6 +740,6 @@ YAHOO.rp.BaFcParser = function(theRoster) {
 	    }
 	}
 	this.state.exit();
-	return this.eventCollection.all();
+	return this.eventCollection.events.all();
     };
 };
